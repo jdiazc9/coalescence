@@ -1,0 +1,14 @@
+assumptions = community_simulator.usertools.a_default.copy()
+assumptions['n_wells'] = 100
+assumptions['S'] = 100 # number of species sampled at initialization
+assumptions['SA'] = 400 # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 0 # number of generalists
+assumptions['l'] = 0.8 # leakage fraction
+assumptions['MA'] = 100 # [30, 30, 30] # number of resources per resource class
+assumptions['response'] = 'type I'
+assumptions['sampling'] = 'Gamma' # 'Binary'
+assumptions['supply'] = 'off'
+assumptions['R0_food'] = 1000
+assumptions['m'] = 0 # turn off mortality (?)
+assumptions['c0'] = 0.01 # background consumption rate in binary model
+assumptions['c1'] = 1 # specific consumption rate in binary model

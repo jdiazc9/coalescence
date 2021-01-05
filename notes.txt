@@ -1,0 +1,23 @@
+Problem with lines 90-91 of the Community method of the community-simulator package. The method first attempts to convert all lists within the params list to np.arrays because it doesn't expect a list of matrices (pd.DataFrames) like we are providing now. A list of pd.DataFrames can't be coerced to a np.array. We can skip this operation by adding a condition such as
+
+if item != 'D'
+
+so that the coercion is only attempted for those items in params that are not D.
+
+Does skipping coercion for D affect anything downstream? It could potentially affect the dynamics, but we are already using custom dynamics that allow for the processing of multiple (listed) D matrices.
+
+---
+
+Problem with line 32 of the essentialtools module of the community-simulator package. 'Invalid shape' error returned when asserting item 'D' of params list. Method attempts to get the np.shape() of metabolic matrix but np.shape() fails when applied to a list instead. Will require some tweaking to bypass this issue.
+
+What the method is trying to do here is get rid of the rows/columns that correspond to extint resources. We probably need to bypass the assessment of D in the first instance, and then add a new chunk to assess each element of the list D separately.
+
+---
+
+Skipping coercion of pd.DataFrame into np.array does affect downstream processing. Solving the system dynamics requires operating with parameters and matrices that are in the form of np.arrays, so we need to coerce every element of the list D into a np.array before proceeding (skipping isn't enough).
+
+Also, consider that in the custom dynamics that we define we should expect inputs (R, params) to be in np.array form. All the operations should be performed expecting this data type.
+
+---
+
+Execution time: with multiMatrix=True, a plate with 3 wells takes about ... to get stabilized (with standard parameters, time_per_cycle=1, n_transfers=20, dilution_factor=1/100). That's about 

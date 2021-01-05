@@ -40,96 +40,6 @@ start_time = time.time()
 
 ### USER-DEFINED FUNCTIONS
 
-# generate a list of metabolic matrices
-def MakeMatrices_multi(assumptions,mode='random'):
-    if mode == 'random':
-        return community_simulator.usertools.MakeMatrices(assumptions)[0], [community_simulator.usertools.MakeMatrices(assumptions)[1] for i in range(sum(assumptions['SA'])+assumptions['Sgen'])]
-    elif mode == 'secrete_consumables':
-        c, M = MakeMatrices_multi(assumptions,mode='random') # base case
-        
-        n = c == assumptions['c0']
-        for i in range(len(M)): # loop through species
-            ni = np.where(n.iloc[i,:])[0]
-            M[i].iloc[ni,:] = 0 # M[i].iloc[ni,ni] = 0 also removes (sets to 0) the columns (in addition to the rows) corresponding to resources that the species i cannot consume, which should have no effect in practice
-            M[i] = M[i]/M[i].sum()
-        
-        return c, M
-
-# make resource dynamics if each species has its own metabolic matrix
-def MakeResourceDynamics_multi(assumptions):
-    """
-    This function is adapted so that it returns a function (dRdt) which,
-    in turn, ALWAYS expects params['D'] to be a LIST of metabolic matrices D_i
-    of length equal to the total number of species (Stot).
-    The i-th element of the list should the metabolic matrix of species i.
-    
-    Original description from the Community Simulator package:
-    Construct resource dynamics. 'assumptions' must be a dictionary containing at least
-    three entries:
-    
-    response = {'type I', 'type II', 'type III'} specifies nonlinearity of growth law
-    
-    regulation = {'independent','energy','mass'} allows microbes to adjust uptake
-        rates to favor the most abundant accessible resources (measured either by
-        energy or mass)
-    
-    supply = {'off','external','self-renewing'} sets choice of
-        intrinsic resource dynamics
-        
-    Returns a function of N, R, and the model parameters, which itself returns the
-        vector of resource rates of change dR/dt
-    """
-    sigma = {'type I': lambda R,params: params['c']*R,
-             'type II': lambda R,params: params['c']*R/(1+params['c']*R/params['sigma_max']),
-             'type III': lambda R,params: (params['c']*R)**params['n']/(1+(params['c']*R)**params['n']/params['sigma_max'])
-        }
-    
-    u = {'independent': lambda x,params: 1.,
-         'energy': lambda x,params: (((params['w']*x)**params['nreg']).T
-                                      /np.sum((params['w']*x)**params['nreg'],axis=1)).T,
-         'mass': lambda x,params: ((x**params['nreg']).T/np.sum(x**params['nreg'],axis=1)).T
-        }
-    
-    h = {'off': lambda R,params: 0.,
-         'external': lambda R,params: (params['R0']-R)/params['tau'],
-         'self-renewing': lambda R,params: params['r']*R*(params['R0']-R),
-         'predator': lambda R,params: params['r']*R*(params['R0']-R)-params['u']*R
-    }
-    
-    J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
-                             *params['w']*sigma[assumptions['response']](R,params))
-    
-    """
-    ### original in community-simulator package (single D matrix)
-    J_out = lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T)
-    ###
-    """
-    
-    """
-    ### my first attempt at multiple matrices - very unefficient and slow bc it requires a lot of .dot() operations between large matrices
-    def J_out(R,params):
-        # get J_in so J_in(R,params) does not have to be re-evaluated for every element of the list
-        Jin = J_in(R,params)
-        # J_out is now a list of J_out_i matrices
-        # J_out_i is the result of the operation (l*J_in)*D_i'
-        # where D_i is the metabolic matrix for species i and ' indicates transposition
-        #J_out = pd.Series(params['D']).apply(lambda x: (params['l']*J_in(R,params)).dot(x.T)).tolist()
-        J_out = pd.Series(params['D']).apply(lambda x: (params['l']*Jin).dot(x.T)).tolist()
-        # the final J_out comes from combining all the J_out_i row by row
-        J_out = [J_out[i][i,:] for i in range(J_out[0].shape[0])]
-        J_out = np.array(J_out)
-        return J_out
-    ###
-    """
-    
-    ### my second attempt: using list comprehension and trimming J_in before .dot() to speed up
-    J_out = lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
-    
-    return lambda N,R,params: (h[assumptions['supply']](R,params)
-                               -(J_in(R,params)/params['w']).T.dot(N)
-                               +(J_out(R,params)/params['w']).T.dot(N))
-    ###
-
 # stabilize communities through serial passaging
 def stabilizeCommunities(plate):
     
@@ -289,28 +199,21 @@ assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1 # specific consumption rate in binary model
-assumptions['sparsity'] = 0.05 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
-assumptions['metabolism'] = 'common' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
-assumptions['rs'] = 0 # resource secretion: 0 means random secretions, 1 means secretions are correlated to the species ability to consume the secreted resource (only used if 'metabolism' is 'specific')
+assumptions['sparsity'] = 0.05 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['fs'] = 0.05 #0.45 # energy flux towards resources of the same type as the consumed one
+assumptions['fw'] = 0.65 #0.45 # energy flux towards waste resources
+assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
+assumptions['rs'] = 1 # resource secretion: 0 means random secretions, 1 means secretions are correlated to the species
 
 # parameters
 params = community_simulator.usertools.MakeParams(assumptions)
 
-# if ''metabolism' is 'specific', make the list of D matrices...
-if assumptions['metabolism'] == 'specific':
-    params['c'], params['D'] = MakeMatrices_multi(assumptions,mode='random') # modes: 'random' generates random matrices according to assumptions, 'secrete_consumables' makes it so each species only secretes resources that be consumed by itself
-
-# ...and make the dynamics depending on whether there is one or multiple D matrices
+# dynamics
 def dNdt(N,R,params):
     return community_simulator.usertools.MakeConsumerDynamics(assumptions)(N,R,params)
-
-if assumptions['metabolism'] == 'specific':
-    def dRdt(N,R,params):
-        return MakeResourceDynamics_multi(assumptions)(N,R,params)
-else:     
-    def dRdt(N,R,params):
-        return community_simulator.usertools.MakeResourceDynamics(assumptions)(N,R,params)
+def dRdt(N,R,params):
+    return community_simulator.usertools.MakeResourceDynamics(assumptions)(N,R,params)
 
 dynamics = [dNdt,dRdt]
 
@@ -319,9 +222,9 @@ fig,ax=plt.subplots()
 sns.heatmap(params['c'],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
 ax.set_title('consumer matrix c')
 fig
-if isinstance(params['D'],list):
+if assumptions['metabolism'] == 'specific':
     Dplot = params['D'][4]
-else:
+elif assumptions['metabolism'] == 'common':
     Dplot = params['D']
 fig,ax=plt.subplots()
 sns.heatmap(Dplot,cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
@@ -601,34 +504,6 @@ print("%s s" % (time.time() - start_time))
 """
 
 print("%s s" % (time.time() - start_time))
-
-# test the behavior of the rs control parameter
-assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 10
-assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 20 # number of generalists
-assumptions['l'] = 0.8 # leakage fraction
-assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
-assumptions['response'] = 'type I'
-assumptions['regulation'] = 'energy' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
-assumptions['sampling'] = 'Binary' # 'Binary' or 'Gamma' (sampling of the matrix c)
-assumptions['supply'] = 'off'
-assumptions['R0_food'] = 1000
-assumptions['m'] = 0 # turn off mortality (?)
-assumptions['c0'] = 0.0 # background consumption rate in binary model
-assumptions['c1'] = 1 # specific consumption rate in binary model
-assumptions['sparsity'] = 0.05 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
-assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
-assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
-assumptions['rs'] = 0 # resource secretion: 0 means random secretions, 1 means secretions are correlated to the species ability to consume the secreted resource (only used if 'metabolism' is 'specific')
-
-c, D = community_simulator.usertools.myMakeMatrices(assumptions)
-Dplot = D[0]
-sns.heatmap(Dplot,cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
-ax.set_title('metabolic matrix D')
-fig
-
 
 
 

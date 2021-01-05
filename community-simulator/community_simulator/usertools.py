@@ -107,6 +107,10 @@ def MakeInitialState(assumptions):
 
 def MakeMatrices(assumptions):
     """
+    Adapted from the original community simulator package, now supports generation of
+    multiple metabolic matrices D (one per spepcies) and correlation between species
+    uptake rates and secretion fluxes.
+    
     Construct consumer matrix and metabolic matrix.
     
     assumptions = dictionary of metaparameters
@@ -123,6 +127,8 @@ def MakeMatrices(assumptions):
         'fw' = fraction of secretion flux into waste resource type
         'sparsity' = effective sparsity of metabolic matrix (from 0 to 1)
         'wate_type' = index of resource type to designate as "waste"
+        'metabolism' = {'common','specific'} specifies whether species should share a common metabolic matrix or each have their own
+        'rs' = degree of correlation between uptake rates and resource secretions
     
     Returns:
     c = consumer matrix
@@ -244,31 +250,100 @@ def MakeMatrices(assumptions):
         print('Invalid distribution choice. Valid choices are kind=Gaussian, kind=Binary, kind=Gamma, kind=Uniform.')
         return 'Error'
 
-    #SAMPLE METABOLIC MATRIX FROM DIRICHLET DISTRIBUTION
-    DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
-    for type_name in type_names:
-        MA = len(DT.loc[type_name])
-        if type_name is not waste_name:
-            #Set background secretion levels
-            p = pd.Series(np.ones(M)*(1-assumptions['fs']-assumptions['fw'])/(M-MA-M_waste),index = DT.keys())
-            #Set self-secretion level
-            p.loc[type_name] = assumptions['fs']/MA
-            #Set waste secretion level
-            p.loc[waste_name] = assumptions['fw']/M_waste
-            #Sample from dirichlet
-            DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
-        else:
-            if M > MA:
+    if assumptions['metabolism'] == 'common': # if the metabolic matrix is common for all species, continue normally as in the original community-simulator package
+       
+        #SAMPLE METABOLIC MATRIX FROM DIRICHLET DISTRIBUTION
+        DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
+        for type_name in type_names:
+            MA = len(DT.loc[type_name])
+            if type_name is not waste_name:
                 #Set background secretion levels
-                p = pd.Series(np.ones(M)*(1-assumptions['fw']-assumptions['fs'])/(M-MA),index = DT.keys())
+                p = pd.Series(np.ones(M)*(1-assumptions['fs']-assumptions['fw'])/(M-MA-M_waste),index = DT.keys())
                 #Set self-secretion level
-                p.loc[type_name] = (assumptions['fw']+assumptions['fs'])/MA
+                p.loc[type_name] = assumptions['fs']/MA
+                #Set waste secretion level
+                p.loc[waste_name] = assumptions['fw']/M_waste
+                #Sample from dirichlet
+                DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
             else:
-                p = pd.Series(np.ones(M)/M,index = DT.keys())
-            #Sample from dirichlet
-            DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
+                if M > MA:
+                    #Set background secretion levels
+                    p = pd.Series(np.ones(M)*(1-assumptions['fw']-assumptions['fs'])/(M-MA),index = DT.keys())
+                    #Set self-secretion level
+                    p.loc[type_name] = (assumptions['fw']+assumptions['fs'])/MA
+                else:
+                    p = pd.Series(np.ones(M)/M,index = DT.keys())
+                #Sample from dirichlet
+                DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
+            
+        D = DT.T
+    
+    elif assumptions['metabolism'] == 'specific': # if we want a different metabolic matrix for each species, generate a list
         
-    return c, DT.T
+        def generalized_dirichlet(alpha,size=None): # custom Dirichlet sampling function that accepts alpha=0 (always samples 0 in those instances); use this function in case some uptake rate is 0 (e.g. in binary sampling of matrix c) because we are going to weigh secretions for each species using uptake rates
+            alpha = np.asarray(alpha)
+            if size == None:
+                size = 1
+                
+            alpha_nonzero = np.where(alpha != 0)[0]
+            out = np.zeros((size,len(alpha)))
+            
+            if len(alpha_nonzero)>0:
+                out[:,alpha_nonzero] = dirichlet(alpha[alpha_nonzero],size=size)
+            
+            return out
+    
+        # create empty list of matrices D
+        D = ['NA' for i in range(S)]
+        
+        # loop through species and generate matrices
+        for s in range(S):
+            
+            # initialize matrix for species s
+            DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
+            
+            # weights
+            cs = c.iloc[s,:] # uptake rates of species s (will be used to weigh secretions based on assumptions['rs'])
+            weight = (cs - 1)*assumptions['rs'] + 1 # each species secretion levels will depend on the affinity (uptake rate) of that species for the secreted resource (controlled by parameter 'rs' in the assumptions)
+            weight.loc[waste_name] = 1 # weighing does not apply to waste resource (waste secretions remain random)
+            # normalize weights so that final fluxes (determined by fs and fw) are not altered
+            wsum = weight.copy()
+            for type_name in type_names:
+                MA = len(DT.loc[type_name])
+                if weight.loc[type_name].sum()>0:
+                    wsum.loc[type_name] = weight.loc[type_name].sum()/MA
+                else:
+                    wsum.loc[type_name] = 1 # if there is no flux to an entire resource type, this would give a 0 and then a NaN when dividing. Instead, we set it to 1 so it gives 0 when dividing (this will modify energy fluxes defined by fs and fw but there is no way around it)
+            weight = weight.div(wsum)
+            
+            # make matrix
+            for type_name in type_names:
+                MA = len(DT.loc[type_name])
+                if type_name is not waste_name:
+                    #Set background secretion levels
+                    p = pd.Series(np.ones(M)*(1-assumptions['fs']-assumptions['fw'])/(M-MA-M_waste),index = DT.keys())
+                    #Set self-secretion level
+                    p.loc[type_name] = assumptions['fs']/MA
+                    #Set waste secretion level
+                    p.loc[waste_name] = assumptions['fw']/M_waste
+                    # new: add weights
+                    p = p*weight
+                    #Sample from dirichlet
+                    DT.loc[type_name] = generalized_dirichlet(p/assumptions['sparsity'],size=MA) # use generalized Dirichlet in case some weighs are zero (in the limit case where an uptake rate is zero, e.g. if matrix c is binary)
+                else: # the waste resource is treated as before, i.e. there is no weighing: all species can produce arbitrary amounts of waste resources regardless of their ability to consume them
+                    if M > MA:
+                        #Set background secretion levels
+                        p = pd.Series(np.ones(M)*(1-assumptions['fw']-assumptions['fs'])/(M-MA),index = DT.keys())
+                        #Set self-secretion level
+                        p.loc[type_name] = (assumptions['fw']+assumptions['fs'])/MA
+                    else:
+                        p = pd.Series(np.ones(M)/M,index = DT.keys())
+                    #Sample from dirichlet
+                    DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
+                    
+            D[s] = DT.T
+        
+    return c, D
 
 def MakeParams(assumptions):
     """
@@ -324,6 +399,13 @@ def MakeParams(assumptions):
 
 def MakeResourceDynamics(assumptions):
     """
+    This function is adapted so that it returns a function (dRdt) which,
+    in turn, can expect params['D'] to be a list of metabolic matrices D_i
+    of length equal to the total number of species (Stot).
+    The i-th element of the list should the metabolic matrix of species i.
+    
+    Original description from the Community Simulator package:
+        
     Construct resource dynamics. 'assumptions' must be a dictionary containing at least
     three entries:
     
@@ -354,15 +436,49 @@ def MakeResourceDynamics(assumptions):
          'external': lambda R,params: (params['R0']-R)/params['tau'],
          'self-renewing': lambda R,params: params['r']*R*(params['R0']-R),
          'predator': lambda R,params: params['r']*R*(params['R0']-R)-params['u']*R
-    }
+        }
     
     J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
                              *params['w']*sigma[assumptions['response']](R,params))
+    
+    """
+    ### original in community-simulator package (single D matrix)
     J_out = lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T)
+    ###
+    """
+    
+    """
+    ### my first attempt at multiple matrices - very unefficient and slow bc it requires a lot of .dot() operations between large matrices
+    def J_out(R,params):
+        # get J_in so J_in(R,params) does not have to be re-evaluated for every element of the list
+        Jin = J_in(R,params)
+        # J_out is now a list of J_out_i matrices
+        # J_out_i is the result of the operation (l*J_in)*D_i'
+        # where D_i is the metabolic matrix for species i and ' indicates transposition
+        #J_out = pd.Series(params['D']).apply(lambda x: (params['l']*J_in(R,params)).dot(x.T)).tolist()
+        J_out = pd.Series(params['D']).apply(lambda x: (params['l']*Jin).dot(x.T)).tolist()
+        # the final J_out comes from combining all the J_out_i row by row
+        J_out = [J_out[i][i,:] for i in range(J_out[0].shape[0])]
+        J_out = np.array(J_out)
+        return J_out
+    ###
+    """
+    
+    """
+    ### my second attempt: using list comprehension and trimming J_in before .dot() to speed up
+    J_out = lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
+    ###
+    """
+    
+    ### incorporating both scenarios (D is a matrix or D is a list) in the same function
+    J_out = {'common': lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T),
+             'specific': lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
+            }
     
     return lambda N,R,params: (h[assumptions['supply']](R,params)
                                -(J_in(R,params)/params['w']).T.dot(N)
-                               +(J_out(R,params)/params['w']).T.dot(N))
+                               +(J_out[assumptions['metabolism']](R,params)/params['w']).T.dot(N))
+    ###
     
 def MakeConsumerDynamics(assumptions):
     """
@@ -478,247 +594,3 @@ def BinaryRandomMatrix(a,b,p):
     m[r<p] = 1.0
     
     return m
-
-def myMakeMatrices(assumptions):
-    """
-    Construct consumer matrix and metabolic matrix.
-    
-    assumptions = dictionary of metaparameters
-        'sampling' = {'Gaussian','Binary','Gamma'} specifies choice of sampling algorithm
-        'SA' = number of species in each family
-        'MA' = number of resources of each type
-        'Sgen' = number of generalist species
-        'muc' = mean sum of consumption rates
-        'sigc' = standard deviation for Gaussian sampling of consumer matrix
-        'q' = family preference strength (from 0 to 1)
-        'c0' = row sum of background consumption rates for Binary sampling
-        'c1' = specific consumption rate for Binary sampling
-        'fs' = fraction of secretion flux into same resource type
-        'fw' = fraction of secretion flux into waste resource type
-        'sparsity' = effective sparsity of metabolic matrix (from 0 to 1)
-        'wate_type' = index of resource type to designate as "waste"
-    
-    Returns:
-    c = consumer matrix
-    D = metabolic matrix
-    """
-    #PREPARE VARIABLES
-    #Force number of species to be an array:
-    if isinstance(assumptions['MA'],numbers.Number):
-        assumptions['MA'] = [assumptions['MA']]
-    if isinstance(assumptions['SA'],numbers.Number):
-        assumptions['SA'] = [assumptions['SA']]
-    #Force numbers of species to be integers:
-    assumptions['MA'] = np.asarray(assumptions['MA'],dtype=int)
-    assumptions['SA'] = np.asarray(assumptions['SA'],dtype=int)
-    assumptions['Sgen'] = int(assumptions['Sgen'])
-    #Default waste type is last type in list:
-    if 'waste_type' not in assumptions.keys():
-        assumptions['waste_type']=len(assumptions['MA'])-1
-
-    #Extract total numbers of resources, consumers, resource types, and consumer families:
-    M = np.sum(assumptions['MA'])
-    T = len(assumptions['MA'])
-    S = np.sum(assumptions['SA'])+assumptions['Sgen']
-    F = len(assumptions['SA'])
-    M_waste = assumptions['MA'][assumptions['waste_type']]
-    #Construct lists of names of resources, consumers, resource types, and consumer families:
-    resource_names = ['R'+str(k) for k in range(M)]
-    type_names = ['T'+str(k) for k in range(T)]
-    family_names = ['F'+str(k) for k in range(F)]
-    consumer_names = ['S'+str(k) for k in range(S)]
-    waste_name = type_names[assumptions['waste_type']]
-    resource_index = [[type_names[m] for m in range(T) for k in range(assumptions['MA'][m])],
-                      resource_names]
-    consumer_index = [[family_names[m] for m in range(F) for k in range(assumptions['SA'][m])]
-                      +['GEN' for k in range(assumptions['Sgen'])],consumer_names]
-    
-    #PERFORM GAUSSIAN SAMPLING
-    if assumptions['sampling'] == 'Gaussian':
-        #Initialize dataframe:
-        c = pd.DataFrame(np.zeros((S,M)),columns=resource_index,index=consumer_index)
-        #Add Gaussian-sampled values, biasing consumption of each family towards its preferred resource:
-        for k in range(F):
-            for j in range(T):
-                if k==j:
-                    c_mean = (assumptions['muc']/M)*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                    c_var = (assumptions['sigc']**2/M)*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                else:
-                    c_mean = (assumptions['muc']/M)*(1-assumptions['q'])
-                    c_var = (assumptions['sigc']**2/M)*(1-assumptions['q'])
-                c.loc['F'+str(k)]['T'+str(j)] = c_mean + np.random.randn(assumptions['SA'][k],assumptions['MA'][j])*np.sqrt(c_var)
-        if 'GEN' in c.index:
-            c_mean = assumptions['muc']/M
-            c_var = assumptions['sigc']**2/M
-            c.loc['GEN'] = c_mean + np.random.randn(assumptions['Sgen'],M)*np.sqrt(c_var)
-                    
-    #PERFORM BINARY SAMPLING
-    elif assumptions['sampling'] == 'Binary':
-        assert assumptions['muc'] < M*assumptions['c1'], 'muc not attainable with given M and c1.'
-        #Construct uniform matrix at total background consumption rate c0:
-        c = pd.DataFrame(np.ones((S,M))*assumptions['c0']/M,columns=resource_index,index=consumer_index)
-        #Sample binary random matrix blocks for each pair of family/resource type:
-        for k in range(F):
-            for j in range(T):
-                if k==j:
-                    p = (assumptions['muc']/(M*assumptions['c1']))*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                else:
-                    p = (assumptions['muc']/(M*assumptions['c1']))*(1-assumptions['q'])
-                    
-                c.loc['F'+str(k)]['T'+str(j)] = (c.loc['F'+str(k)]['T'+str(j)].values 
-                                                + assumptions['c1']*BinaryRandomMatrix(assumptions['SA'][k],assumptions['MA'][j],p))
-        #Sample uniform binary random matrix for generalists:
-        if 'GEN' in c.index:
-            p = assumptions['muc']/(M*assumptions['c1'])
-            c.loc['GEN'] = c.loc['GEN'].values + assumptions['c1']*BinaryRandomMatrix(assumptions['Sgen'],M,p)
-
-    # PERFORM GAMMA SAMPLING
-    elif assumptions['sampling'] == 'Gamma':
-        #Initialize dataframe
-        c = pd.DataFrame(np.zeros((S,M)),columns=resource_index,index=consumer_index)
-        #Add Gamma-sampled values, biasing consumption of each family towards its preferred resource
-        for k in range(F):
-            for j in range(T):
-                if k==j:
-                    c_mean = (assumptions['muc']/M)*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                    c_var = (assumptions['sigc']**2/M)*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                    thetac = c_var/c_mean
-                    kc = c_mean**2/c_var
-                    c.loc['F'+str(k)]['T'+str(j)] = np.random.gamma(kc,scale=thetac,size=(assumptions['SA'][k],assumptions['MA'][j]))
-                else:
-                    c_mean = (assumptions['muc']/M)*(1-assumptions['q'])
-                    c_var = (assumptions['sigc']**2/M)*(1-assumptions['q'])
-                    thetac = c_var/c_mean
-                    kc = c_mean**2/c_var
-                    c.loc['F'+str(k)]['T'+str(j)] = np.random.gamma(kc,scale=thetac,size=(assumptions['SA'][k],assumptions['MA'][j]))
-        if 'GEN' in c.index:
-            c_mean = assumptions['muc']/M
-            c_var = assumptions['sigc']**2/M
-            thetac = c_var/c_mean
-            kc = c_mean**2/c_var
-            c.loc['GEN'] = np.random.gamma(kc,scale=thetac,size=(assumptions['Sgen'],M))
-            
-    #PERFORM UNIFORM SAMPLING
-    elif assumptions['sampling'] == 'Uniform':
-        #Initialize dataframe:
-        c = pd.DataFrame(np.zeros((S,M)),columns=resource_index,index=consumer_index)
-        #Add uniformly sampled values, biasing consumption of each family towards its preferred resource:
-        for k in range(F):
-            for j in range(T):
-                if k==j:
-                    c_mean = (assumptions['muc']/M)*(1+assumptions['q']*(M-assumptions['MA'][j])/assumptions['MA'][j])
-                else:
-                    c_mean = (assumptions['muc']/M)*(1-assumptions['q'])
-                c.loc['F'+str(k)]['T'+str(j)] = c_mean + (np.random.rand(assumptions['SA'][k],assumptions['MA'][j])-0.5)*assumptions['b']
-        if 'GEN' in c.index:
-            c_mean = assumptions['muc']/M
-            c.loc['GEN'] = c_mean + (np.random.rand(assumptions['Sgen'],M)-0.5)*assumptions['b']
-    
-    else:
-        print('Invalid distribution choice. Valid choices are kind=Gaussian, kind=Binary, kind=Gamma, kind=Uniform.')
-        return 'Error'
-
-
-
-
-
-
-
-
-    
-
-
-    if assumptions['metabolism'] == 'common': # if the metabolic matrix is common for all species, continue normally as in the original community-simulator package
-       
-        #SAMPLE METABOLIC MATRIX FROM DIRICHLET DISTRIBUTION
-        DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
-        for type_name in type_names:
-            MA = len(DT.loc[type_name])
-            if type_name is not waste_name:
-                #Set background secretion levels
-                p = pd.Series(np.ones(M)*(1-assumptions['fs']-assumptions['fw'])/(M-MA-M_waste),index = DT.keys())
-                #Set self-secretion level
-                p.loc[type_name] = assumptions['fs']/MA
-                #Set waste secretion level
-                p.loc[waste_name] = assumptions['fw']/M_waste
-                #Sample from dirichlet
-                DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
-            else:
-                if M > MA:
-                    #Set background secretion levels
-                    p = pd.Series(np.ones(M)*(1-assumptions['fw']-assumptions['fs'])/(M-MA),index = DT.keys())
-                    #Set self-secretion level
-                    p.loc[type_name] = (assumptions['fw']+assumptions['fs'])/MA
-                else:
-                    p = pd.Series(np.ones(M)/M,index = DT.keys())
-                #Sample from dirichlet
-                DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
-            
-        D = DT.T
-    
-    elif assumptions['metabolism'] == 'specific': # if we want a different metabolic matrix for each species, generate a list
-        
-        def generalized_dirichlet(alpha,size=None): # custom Dirichlet sampling function that accepts alpha=0 (always samples 0 in those instances); use this function in case some uptake rate is 0 (e.g. in binary sampling of matrix c) because we are going to weigh secretions for each species using uptake rates
-            alpha = np.asarray(alpha)
-            if size == None:
-                size = 1
-                
-            alpha_nonzero = np.where(alpha != 0)[0]
-            out = np.zeros((size,len(alpha)))
-            
-            if len(alpha_nonzero)>0:
-                out[:,alpha_nonzero] = dirichlet(alpha[alpha_nonzero],size=size)
-            
-            return out
-    
-        # create empty list of matrices D
-        D = ['NA' for i in range(S)]
-        
-        # loop through species and generate matrices
-        for s in range(S):
-            
-            # initialize matrix for species s
-            DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
-            
-            # weights
-            cs = c.iloc[s,:] # uptake rates of species s (will be used to weigh secretions based on assumptions['rs'])
-            weight = (cs - 1)*assumptions['rs'] + 1 # each species secretion levels will depend on the affinity (uptake rate) of that species for the secreted resource (controlled by parameter 'rs' in the assumptions)
-            weight.loc[waste_name] = 1 # weighing does not apply to waste resource (waste secretions remain random)
-            # normalize weights so that final fluxes (determined by fs and fw) are not altered
-            wsum = weight.copy()
-            for type_name in type_names:
-                MA = len(DT.loc[type_name])
-                if weight.loc[type_name].sum()>0:
-                    wsum.loc[type_name] = weight.loc[type_name].sum()/MA
-                else:
-                    wsum.loc[type_name] = 1 # if there is no flux to an entire resource type, this would give a 0 and then a NaN when dividing. Instead, we set it to 1 so it gives 0 when dividing (this will modify energy fluxes defined by fs and fw but there is no way around it)
-            weight = weight.div(wsum)
-            
-            # make matrix
-            for type_name in type_names:
-                MA = len(DT.loc[type_name])
-                if type_name is not waste_name:
-                    #Set background secretion levels
-                    p = pd.Series(np.ones(M)*(1-assumptions['fs']-assumptions['fw'])/(M-MA-M_waste),index = DT.keys())
-                    #Set self-secretion level
-                    p.loc[type_name] = assumptions['fs']/MA
-                    #Set waste secretion level
-                    p.loc[waste_name] = assumptions['fw']/M_waste
-                    # new: add weights
-                    p = p*weight
-                    #Sample from dirichlet
-                    DT.loc[type_name] = generalized_dirichlet(p/assumptions['sparsity'],size=MA) # use generalized Dirichlet in case some weighs are zero (in the limit case where an uptake rate is zero, e.g. if matrix c is binary)
-                else: # the waste resource is treated as before, i.e. there is no weighing: all species can produce arbitrary amounts of waste resources regardless of their ability to consume them
-                    if M > MA:
-                        #Set background secretion levels
-                        p = pd.Series(np.ones(M)*(1-assumptions['fw']-assumptions['fs'])/(M-MA),index = DT.keys())
-                        #Set self-secretion level
-                        p.loc[type_name] = (assumptions['fw']+assumptions['fs'])/MA
-                    else:
-                        p = pd.Series(np.ones(M)/M,index = DT.keys())
-                    #Sample from dirichlet
-                    DT.loc[type_name] = dirichlet(p/assumptions['sparsity'],size=MA)
-                    
-            D[s] = DT.T
-        
-    return c, D

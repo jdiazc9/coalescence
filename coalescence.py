@@ -184,27 +184,62 @@ def jensen_shannon(p,q):
 ### SEED AND STABILIZE COMMUNITIES
 
 # assumptions
+
+"""
+# defaults for this simulations (these work)
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 10
+assumptions['n_wells'] = 40 # number of communities
 assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 20 # number of generalists
+assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 50 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
+
 assumptions['response'] = 'type I'
-assumptions['regulation'] = 'energy' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
-assumptions['sampling'] = 'Binary' # 'Binary' or 'Gamma' (sampling of the matrix c)
+assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
+assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
 assumptions['supply'] = 'off'
 assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
+
+assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
-assumptions['c1'] = 1 # specific consumption rate in binary model
-assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
-assumptions['sparsity'] = 0.05 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
-assumptions['fs'] = 0.05 #0.45 # energy flux towards resources of the same type as the consumed one
-assumptions['fw'] = 0.65 #0.45 # energy flux towards waste resources
+assumptions['c1'] = 1.0 # specific consumption rate in binary model
+assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
+
+assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
+assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
-assumptions['rs'] = 1 # resource secretion: 0 means random secretions, 1 means secretions are correlated to the species
+assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
+"""
+
+# try these assumptions
+assumptions = community_simulator.usertools.a_default.copy()
+assumptions['n_wells'] = 500 # number of communities
+assumptions['S'] = 100 # number of species sampled at initialization
+assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 50 # number of generalists
+assumptions['l'] = 0.8 # leakage fraction
+assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
+
+assumptions['response'] = 'type I'
+assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
+assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
+assumptions['supply'] = 'off'
+assumptions['R0_food'] = 1000
+assumptions['m'] = 0 # turn off mortality (?)
+
+assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
+assumptions['c0'] = 0.0 # background consumption rate in binary model
+assumptions['c1'] = 1.0 # specific consumption rate in binary model
+assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
+
+assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
+assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
+assumptions['metabolism'] = 'common' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
+assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
 
 # parameters
 params = community_simulator.usertools.MakeParams(assumptions)
@@ -221,6 +256,10 @@ dynamics = [dNdt,dRdt]
 fig,ax=plt.subplots()
 sns.heatmap(params['c'],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
 ax.set_title('consumer matrix c')
+fig
+fig,ax=plt.subplots()
+sns.heatmap(params['c'].iloc[0:20,:],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
+ax.set_title('consumer matrix c (detail)')
 fig
 if assumptions['metabolism'] == 'specific':
     Dplot = params['D'][4]
@@ -357,8 +396,9 @@ monoculture_invasive_plate.Propagate(1,compress_resources=False,compress_species
 
 ### PAIRWISE COMPETITION
 
-# make plate (added dilution factor)
-N0_pairwise = (monoculture_resident_plate.N + monoculture_invasive_plate.N)/2*(1/100)
+# make plate (rescale so most abundant species at t=0 has abundance 1 (times the scaling factor of the plate))
+N0_pairwise = (monoculture_resident_plate.N + monoculture_invasive_plate.N)
+N0_pairwise = N0_pairwise/N0_pairwise.max()
 init_state_pairwise = (N0_pairwise,
                        init_state[1])
 pairwise_plate = community_simulator.Community(init_state_pairwise,
@@ -453,6 +493,13 @@ for i in range(assumptions['n_wells']):
 def q_vs_fraction():
     x = f_pairwise
     y = Q
+    
+    ### remove nan elements (this happens if pairwise competition ends up in extinction of both, need to investigate how this happens)
+    ### SOLVED: this happens when none of the two competing species are able to grow over the dilution factor during the propagation time.
+    ### It is an unusual case but it is possible and it does not imply code malfunction.
+    n = [ni for ni in range(len(x)) if ~np.isnan(x[ni]) and ~np.isnan(y[ni])]
+    x = [x[i] for i in n]
+    y = [y[i] for i in n]
     
     fig, ax = plt.subplots()
     ax.scatter(x,y,c="black")

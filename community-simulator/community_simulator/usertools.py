@@ -302,6 +302,23 @@ def MakeMatrices(assumptions):
             # initialize matrix for species s
             DT = pd.DataFrame(np.zeros((M,M)),index=c.keys(),columns=c.keys())
             
+            ### my first attempt at correlating values of D with uptake rates:
+            ### this works relatively as intended by weighing the alphas in the Dirichlet sampling so that 
+            ### resources corresponding to higher uptake rates are bised towards higher secretion levels.
+            ### but even with rs=1, a certain degree of randomness is maintained (after biasing the alphas,
+            ### there is still a random sampling step).
+            ### is this behavior desirable? probably yes: secretions are still random, but weights guarantee
+            ### that resources that cannot be consumed by a species (c=0 or very close) are very unlikely to be
+            ### secreted by that species.
+            ### additionally, resources that can be more efficiently consumed by a species tend to be secreted
+            ### in higher abundances by that species than those which can be consumed less efficiently.
+            ### this does NOT mean that uptake rates and secretion fluxes will be perfectly correlated even with
+            ### rs=1; note that dirichlet(alpha) still often produces small values even for large alpha[i].
+            ### the control parameter rs should NOT be interpreted as a correlation, but rather as, well...
+            ### a control parameter. some degree of randomness wil still be mantained in the metabolic fluxes,
+            ### this randomness will be maximal for rs=0 and most constrained for rs=1; where "most constrained"
+            ### means that species will not secrete anything they cannot consume themselves.
+            
             # weights
             cs = c.iloc[s,:] # uptake rates of species s (will be used to weigh secretions based on assumptions['rs'])
             weight = (cs - 1)*assumptions['rs'] + 1 # each species secretion levels will depend on the affinity (uptake rate) of that species for the secreted resource (controlled by parameter 'rs' in the assumptions)

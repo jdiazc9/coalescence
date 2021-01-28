@@ -89,6 +89,7 @@ def rankPlot(N):
     ax.set_ylabel('Relative abundance')
     ax.set_xlabel("Rank")
     ax.set_ylim(1e-4,1e0)
+    ax.set_aspect(5)
         
     return([fig,ax])
 
@@ -207,7 +208,7 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
@@ -216,9 +217,9 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # try these assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 500 # number of communities
+assumptions['n_wells'] = 20 # number of communities
 assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
+assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 50 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
@@ -230,12 +231,12 @@ assumptions['supply'] = 'off'
 assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
 
-assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
+assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
@@ -502,7 +503,7 @@ def q_vs_fraction():
     y = [y[i] for i in n]
     
     fig, ax = plt.subplots()
-    ax.scatter(x,y,c="black")
+    ax.scatter(x,y,edgecolors="black",facecolors="none")
     
     z = np.polyfit(x, y, 1)
     p = np.poly1d(z)
@@ -511,8 +512,11 @@ def q_vs_fraction():
     
     ax.set_ylabel("Q\nCoalesced - Invasive")
     ax.set_xlabel("Frequency of invasive dominant species\nin pairwise competition")
-    ax.set_xlim(0,1)
-    ax.set_ylim(0,1)
+    ax.set_xlim(-0.05,1.05)
+    ax.set_ylim(-0.05,1.05)
+    ax.set_aspect("equal")
+    ax.set_xticks([0,0.5,1])
+    ax.set_yticks([0,0.5,1])
     
     fig
 
@@ -522,13 +526,24 @@ def cohort_vs_alone():
     y = f_coalescence
     
     fig, ax = plt.subplots()
-    ax.scatter(x,y,c="black")
-    ax.plot([0,1],[0,1],'--k')
+    
+    # filled regions
+    w = 0.2 # width of the gray area (diagonal), must be between 0 and 1
+    ax.fill([-0.1,0.1,0.1,-0.1],[-0.1,0.1,1.1,1.1],facecolor="green",alpha=0.15)
+    ax.fill([-0.1,0.1,1.1,1.1],[-0.1,0.1,0.1,-0.1],facecolor="red",alpha=0.15)
+    ax.fill([0,1.1*(1-w),1.1,1.1],[0,1.1,1.1,1.1*(1-w)],facecolor=[0.85,0.85,0.85])
+    
+    
+    ax.scatter(x,y,edgecolors="black",facecolors="none",zorder=5)
+    ax.plot([-0.1,1.1],[-0.1,1.1],'--k')
     
     ax.set_ylabel("Frequency of dominant species\ninvading with cohort")
     ax.set_xlabel("Frequency of dominant species\ninvading alone")
-    ax.set_xlim(0,1)
-    ax.set_ylim(0,1)
+    ax.set_xlim(-0.05,1.05)
+    ax.set_ylim(-0.05,1.05)
+    ax.set_aspect("equal")
+    ax.set_xticks([0,0.5,1])
+    ax.set_yticks([0,0.5,1])
     
     fig
 

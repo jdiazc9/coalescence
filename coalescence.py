@@ -189,38 +189,10 @@ def jensen_shannon(p,q):
 """
 # defaults for this simulations (these work)
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 40 # number of communities
-assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 50 # number of generalists
-assumptions['l'] = 0.8 # leakage fraction
-assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
-
-assumptions['response'] = 'type I'
-assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
-assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
-assumptions['supply'] = 'off'
-assumptions['R0_food'] = 1000
-assumptions['m'] = 0 # turn off mortality (?)
-
-assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
-assumptions['c0'] = 0.0 # background consumption rate in binary model
-assumptions['c1'] = 1.0 # specific consumption rate in binary model
-assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
-
-assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
-assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
-assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
-assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
-assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
-"""
-
-# try these assumptions
-assumptions = community_simulator.usertools.a_default.copy()
 assumptions['n_wells'] = 20 # number of communities
 assumptions['S'] = 100 # number of species sampled at initialization
 assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 50 # number of generalists
+assumptions['Sgen'] = 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -236,11 +208,41 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
 assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
+"""
+
+# try these assumptions
+assumptions = community_simulator.usertools.a_default.copy()
+assumptions['n_wells'] = 200 # number of communities
+assumptions['S'] = 50 # number of species sampled at initialization
+assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 30 # number of generalists
+assumptions['l'] = 0.8 # leakage fraction
+assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
+
+assumptions['response'] = 'type I'
+assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
+assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
+assumptions['supply'] = 'off'
+assumptions['R0_food'] = 1000
+assumptions['m'] = 0 # turn off mortality (?)
+
+assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
+assumptions['c0'] = 0.0 # background consumption rate in binary model
+assumptions['c1'] = 1.0 # specific consumption rate in binary model
+assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
+
+assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
+assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
+assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
+assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
+
+print(assumptions)
 
 # parameters
 params = community_simulator.usertools.MakeParams(assumptions)
@@ -430,6 +432,30 @@ N_singleinv, R_singleinv = stabilizeCommunities(singleinv_plate)
 
 
 
+### COHORT INVADING WITHOUT DOMINANT SPECIES
+
+# make cohort plate
+invasive_cohorts_plate = invasive_plate.copy()
+invasive_cohorts_plate.N = invasive_cohorts_plate.N.droplevel(0)
+for i in range(assumptions['n_wells']):
+    invasive_cohorts_plate.N.loc[dominants_invasive[i]][i] = 0
+invasive_cohorts_plate.N.index = invasive_plate.N.index
+    
+# make plate (added dilution factor)
+N0_cohortinv = (resident_plate.N + invasive_cohorts_plate.N)/2*(1/100)
+init_state_cohortinv = (N0_cohortinv,
+                        init_state[1])
+cohortinv_plate = community_simulator.Community(init_state_cohortinv,
+                                                dynamics,
+                                                params,
+                                                parallel=False,
+                                                scale=1e6)
+
+# stabilize
+N_cohortinv, R_cohortinv = stabilizeCommunities(cohortinv_plate)
+
+
+
 ### GET STATISTICS
 
 # similarity index (based on jensen_shannon, consider alternatives)
@@ -486,6 +512,36 @@ for i in range(assumptions['n_wells']):
     f_singleinv[i] = F.loc[dominants_invasive[i]][i]
     f_singleinv_null[i] = F_null.loc[dominants_invasive[i]][i]
     
+# get community bottom-up cohesiveness (buc): method 1
+# just the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
+buc_resident = ['NA' for i in range(assumptions['n_wells'])]
+buc_invasive = ['NA' for i in range(assumptions['n_wells'])]
+N_resident = N_resident.droplevel(0)
+N_invasive = N_invasive.droplevel(0)
+N_resident_monoculture = monoculture_resident_plate.N.droplevel(0)
+N_invasive_monoculture = monoculture_invasive_plate.N.droplevel(0)
+for i in range(assumptions['n_wells']):
+    buc_resident[i] = N_resident.loc[dominants_resident[i]][i]/N_resident_monoculture.loc[dominants_resident[i]][i]
+    buc_invasive[i] = N_invasive.loc[dominants_invasive[i]][i]/N_invasive_monoculture.loc[dominants_invasive[i]][i]
+buc_resident = [math.log10(x) for x in buc_resident]
+buc_invasive = [math.log10(x) for x in buc_invasive]
+buc_diff = [buc_invasive[i] - buc_resident[i] for i in range(assumptions['n_wells'])]
+
+# get cohort invasiveness (ci)
+ci = ['NA' for i in range(assumptions['n_wells'])]
+N_cohortinv = N_cohortinv.droplevel(0)
+for i in range(assumptions['n_wells']):
+    
+    # identify species in invasive cohort
+    cohort = N_invasive.index[N_invasive.iloc[:,0] > 0]
+    cohort = [x for x in cohort if not(x==dominants_invasive[i])]
+    
+    # how many of those are in the final community? (resident + cohort invading alone)
+    cohort_afterinv = N_cohortinv.iloc[:,i]
+    cohort_afterinv = cohort_afterinv[cohort]
+    
+    # cohort invasivity is the fraction of the species in the cohort that were able to invade
+    ci[i] = sum(cohort_afterinv > 0)/len(cohort)
 
 
 ### PLOTS
@@ -520,7 +576,7 @@ def q_vs_fraction():
     
     fig
 
-# Q vs fraction in pairwise competition
+# fraction when invading alone vs with cohort
 def cohort_vs_alone():
     x = f_singleinv
     y = f_coalescence
@@ -533,7 +589,7 @@ def cohort_vs_alone():
     ax.fill([-0.1,0.1,1.1,1.1],[-0.1,0.1,0.1,-0.1],facecolor="red",alpha=0.15)
     ax.fill([0,1.1*(1-w),1.1,1.1],[0,1.1,1.1,1.1*(1-w)],facecolor=[0.85,0.85,0.85])
     
-    
+    # scatterplot
     ax.scatter(x,y,edgecolors="black",facecolors="none",zorder=5)
     ax.plot([-0.1,1.1],[-0.1,1.1],'--k')
     
@@ -546,10 +602,32 @@ def cohort_vs_alone():
     ax.set_yticks([0,0.5,1])
     
     fig
+    
+# difference in bottom-up cohesiveness vs. cohort invasiveness
+### FIXME: use different colors for dots in the green area of cohort_vs_alone() plot
+def buc_vs_ci():
+    x = ci
+    y = buc_diff
+    
+    # identify dots in green area
+    xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    
+    fig, ax = plt.subplots()
+    
+    ax.scatter(x,y,edgecolors="black",facecolors="none",zorder=1)
+    ax.scatter(xg,yg,edgecolors="green",facecolors=[0,0.5,0,0.5],zorder=1)
+    
+    ax.set_xlabel("Cohort invasiveness")
+    ax.set_ylabel("Bottom-up cohesiveness\nInvasive - Resident")
+    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
+    
+    fig
 
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
+buc_vs_ci()
 
 
 

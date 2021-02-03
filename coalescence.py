@@ -37,8 +37,8 @@ else:
     par = True
 
 # set random and numpy's seed manually for reproducibility
-np.random.seed(0)
-random.seed(0)
+#np.random.seed(0)
+#random.seed(0)
 
 import time
 start_time = time.time()
@@ -224,7 +224,7 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # try these assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 200 # number of communities
+assumptions['n_wells'] = 500 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
 assumptions['SA'] = [200, 200, 200] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 60 # 30 # number of generalists
@@ -540,7 +540,7 @@ N_cohortinv = N_cohortinv.droplevel(0)
 for i in range(assumptions['n_wells']):
     
     # identify species in invasive cohort
-    cohort = N_invasive.index[N_invasive.iloc[:,0] > 0]
+    cohort = N_invasive.index[N_invasive.iloc[:,i] > 0]
     cohort = [x for x in cohort if not(x==dominants_invasive[i])]
     
     # how many of those are in the final community? (resident + cohort invading alone)

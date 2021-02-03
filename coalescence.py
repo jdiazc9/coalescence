@@ -28,6 +28,13 @@ colors = sns.color_palette()
 import random
 import math
 import copy
+import os
+
+# check if running on Windows
+if os.name == 'nt':
+    par = False
+else:
+    par = True
 
 # set random and numpy's seed manually for reproducibility
 np.random.seed(0)
@@ -89,6 +96,7 @@ def rankPlot(N):
     ax.set_ylabel('Relative abundance')
     ax.set_xlabel("Rank")
     ax.set_ylim(1e-4,1e0)
+    ax.set_aspect(5)
         
     return([fig,ax])
 
@@ -188,10 +196,10 @@ def jensen_shannon(p,q):
 """
 # defaults for this simulations (these work)
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 40 # number of communities
+assumptions['n_wells'] = 20 # number of communities
 assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 50 # number of generalists
+assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -202,12 +210,12 @@ assumptions['supply'] = 'off'
 assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
 
-assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
+assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
@@ -216,10 +224,10 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # try these assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 500 # number of communities
-assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [300, 300, 300] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 50 # number of generalists
+assumptions['n_wells'] = 200 # number of communities
+assumptions['S'] = 50 # number of species sampled at initialization
+assumptions['SA'] = [200, 200, 200] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 60 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -230,16 +238,18 @@ assumptions['supply'] = 'off'
 assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
 
-assumptions['q'] = 0.6 #0.9 # preference strength (0 for generalist and 1 for specialist)
+assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.75 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
 assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
+
+print(assumptions)
 
 # parameters
 params = community_simulator.usertools.MakeParams(assumptions)
@@ -302,7 +312,7 @@ init_state_resident = (N0_resident,
 resident_plate = community_simulator.Community(init_state_resident,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # initialize invasive plate
@@ -313,7 +323,7 @@ init_state_invasive = (N0_invasive,
 invasive_plate = community_simulator.Community(init_state_invasive,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # plot initial state
@@ -343,7 +353,7 @@ init_state_coalescence = (N0_coalescence,
 coalescence_plate = community_simulator.Community(init_state_coalescence,
                                                   dynamics,
                                                   params,
-                                                  parallel=False,
+                                                  parallel=par,
                                                   scale=1e6)
 N_coalescence, R_coalescence = stabilizeCommunities(coalescence_plate)
 
@@ -377,7 +387,7 @@ init_state_monoculture_resident = (N0_monoculture_resident,
 monoculture_resident_plate = community_simulator.Community(init_state_monoculture_resident,
                                                            dynamics,
                                                            params,
-                                                           parallel=False,
+                                                           parallel=par,
                                                            scale=1e6)
 
 init_state_monoculture_invasive = (N0_monoculture_invasive,
@@ -385,7 +395,7 @@ init_state_monoculture_invasive = (N0_monoculture_invasive,
 monoculture_invasive_plate = community_simulator.Community(init_state_monoculture_invasive,
                                                            dynamics,
                                                            params,
-                                                           parallel=False,
+                                                           parallel=par,
                                                            scale=1e6)
 
 # stabilize monocultures
@@ -404,7 +414,7 @@ init_state_pairwise = (N0_pairwise,
 pairwise_plate = community_simulator.Community(init_state_pairwise,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # stabilize
@@ -421,11 +431,35 @@ init_state_singleinv = (N0_singleinv,
 singleinv_plate = community_simulator.Community(init_state_singleinv,
                                                 dynamics,
                                                 params,
-                                                parallel=False,
+                                                parallel=par,
                                                 scale=1e6)
 
 # stabilize
 N_singleinv, R_singleinv = stabilizeCommunities(singleinv_plate)
+
+
+
+### COHORT INVADING WITHOUT DOMINANT SPECIES
+
+# make cohort plate
+invasive_cohorts_plate = invasive_plate.copy()
+invasive_cohorts_plate.N = invasive_cohorts_plate.N.droplevel(0)
+for i in range(assumptions['n_wells']):
+    invasive_cohorts_plate.N.loc[dominants_invasive[i]][i] = 0
+invasive_cohorts_plate.N.index = invasive_plate.N.index
+    
+# make plate (added dilution factor)
+N0_cohortinv = (resident_plate.N + invasive_cohorts_plate.N)/2*(1/100)
+init_state_cohortinv = (N0_cohortinv,
+                        init_state[1])
+cohortinv_plate = community_simulator.Community(init_state_cohortinv,
+                                                dynamics,
+                                                params,
+                                                parallel=par,
+                                                scale=1e6)
+
+# stabilize
+N_cohortinv, R_cohortinv = stabilizeCommunities(cohortinv_plate)
 
 
 
@@ -485,6 +519,36 @@ for i in range(assumptions['n_wells']):
     f_singleinv[i] = F.loc[dominants_invasive[i]][i]
     f_singleinv_null[i] = F_null.loc[dominants_invasive[i]][i]
     
+# get community bottom-up cohesiveness, method 1: k-ratio
+# just the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
+kratio_resident = ['NA' for i in range(assumptions['n_wells'])]
+kratio_invasive = ['NA' for i in range(assumptions['n_wells'])]
+N_resident = N_resident.droplevel(0)
+N_invasive = N_invasive.droplevel(0)
+N_resident_monoculture = monoculture_resident_plate.N.droplevel(0)
+N_invasive_monoculture = monoculture_invasive_plate.N.droplevel(0)
+for i in range(assumptions['n_wells']):
+    kratio_resident[i] = N_resident.loc[dominants_resident[i]][i]/N_resident_monoculture.loc[dominants_resident[i]][i]
+    kratio_invasive[i] = N_invasive.loc[dominants_invasive[i]][i]/N_invasive_monoculture.loc[dominants_invasive[i]][i]
+kratio_resident = [math.log10(x) for x in kratio_resident]
+kratio_invasive = [math.log10(x) for x in kratio_invasive]
+kratio_diff = [kratio_invasive[i] - kratio_resident[i] for i in range(assumptions['n_wells'])]
+
+# get cohort invasiveness (ci)
+ci = ['NA' for i in range(assumptions['n_wells'])]
+N_cohortinv = N_cohortinv.droplevel(0)
+for i in range(assumptions['n_wells']):
+    
+    # identify species in invasive cohort
+    cohort = N_invasive.index[N_invasive.iloc[:,0] > 0]
+    cohort = [x for x in cohort if not(x==dominants_invasive[i])]
+    
+    # how many of those are in the final community? (resident + cohort invading alone)
+    cohort_afterinv = N_cohortinv.iloc[:,i]
+    cohort_afterinv = cohort_afterinv[cohort]
+    
+    # cohort invasivity is the fraction of the species in the cohort that were able to invade
+    ci[i] = sum(cohort_afterinv > 0)/len(cohort)
 
 
 ### PLOTS
@@ -502,7 +566,7 @@ def q_vs_fraction():
     y = [y[i] for i in n]
     
     fig, ax = plt.subplots()
-    ax.scatter(x,y,c="black")
+    ax.scatter(x,y,edgecolors="black",facecolors="none")
     
     z = np.polyfit(x, y, 1)
     p = np.poly1d(z)
@@ -511,30 +575,70 @@ def q_vs_fraction():
     
     ax.set_ylabel("Q\nCoalesced - Invasive")
     ax.set_xlabel("Frequency of invasive dominant species\nin pairwise competition")
-    ax.set_xlim(0,1)
-    ax.set_ylim(0,1)
+    ax.set_xlim(-0.05,1.05)
+    ax.set_ylim(-0.05,1.05)
+    ax.set_aspect("equal")
+    ax.set_xticks([0,0.5,1])
+    ax.set_yticks([0,0.5,1])
     
     fig
 
-# Q vs fraction in pairwise competition
+# fraction when invading alone vs with cohort
 def cohort_vs_alone():
     x = f_singleinv
     y = f_coalescence
     
     fig, ax = plt.subplots()
-    ax.scatter(x,y,c="black")
-    ax.plot([0,1],[0,1],'--k')
+    
+    # filled regions
+    w = 0.2 # width of the gray area (diagonal), must be between 0 and 1
+    ax.fill([-0.1,0.1,0.1,-0.1],[-0.1,0.1,1.1,1.1],facecolor="green",alpha=0.15)
+    ax.fill([-0.1,0.1,1.1,1.1],[-0.1,0.1,0.1,-0.1],facecolor="red",alpha=0.15)
+    ax.fill([0,1.1*(1-w),1.1,1.1],[0,1.1,1.1,1.1*(1-w)],facecolor=[0.85,0.85,0.85])
+    
+    # scatterplot
+    ax.scatter(x,y,edgecolors="black",facecolors="none",zorder=5)
+    ax.plot([-0.1,1.1],[-0.1,1.1],'--k')
     
     ax.set_ylabel("Frequency of dominant species\ninvading with cohort")
     ax.set_xlabel("Frequency of dominant species\ninvading alone")
-    ax.set_xlim(0,1)
-    ax.set_ylim(0,1)
+    ax.set_xlim(-0.05,1.05)
+    ax.set_ylim(-0.05,1.05)
+    ax.set_aspect("equal")
+    ax.set_xticks([0,0.5,1])
+    ax.set_yticks([0,0.5,1])
+    
+    fig
+    
+# difference in bottom-up cohesiveness vs. cohort invasiveness
+### FIXME: use different colors for dots in the green area of cohort_vs_alone() plot
+def kratio_vs_ci():
+    x = ci
+    y = kratio_diff
+    
+    # identify dots in green area
+    xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    
+    # identify dots outside of green area
+    xo = [x[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    yo = [y[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    
+    fig, ax = plt.subplots()
+    
+    ax.scatter(xo,yo,edgecolors=[0.5, 0.5, 0.5, 1],facecolors=[0.5, 0.5, 0.5, 0.5],zorder=1)
+    ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
+    
+    ax.set_xlabel("Cohort invasiveness")
+    ax.set_ylabel("K-ratio\nInvasive - Resident")
+    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     
     fig
 
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
+kratio_vs_ci()
 
 
 

@@ -28,6 +28,13 @@ colors = sns.color_palette()
 import random
 import math
 import copy
+import os
+
+# check if running on Windows
+if os.name == 'nt':
+    par = False
+else:
+    par = True
 
 # set random and numpy's seed manually for reproducibility
 np.random.seed(0)
@@ -219,8 +226,8 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 assumptions = community_simulator.usertools.a_default.copy()
 assumptions['n_wells'] = 200 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
-assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 30 # number of generalists
+assumptions['SA'] = [200, 200, 200] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 60 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -305,7 +312,7 @@ init_state_resident = (N0_resident,
 resident_plate = community_simulator.Community(init_state_resident,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # initialize invasive plate
@@ -316,7 +323,7 @@ init_state_invasive = (N0_invasive,
 invasive_plate = community_simulator.Community(init_state_invasive,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # plot initial state
@@ -346,7 +353,7 @@ init_state_coalescence = (N0_coalescence,
 coalescence_plate = community_simulator.Community(init_state_coalescence,
                                                   dynamics,
                                                   params,
-                                                  parallel=False,
+                                                  parallel=par,
                                                   scale=1e6)
 N_coalescence, R_coalescence = stabilizeCommunities(coalescence_plate)
 
@@ -380,7 +387,7 @@ init_state_monoculture_resident = (N0_monoculture_resident,
 monoculture_resident_plate = community_simulator.Community(init_state_monoculture_resident,
                                                            dynamics,
                                                            params,
-                                                           parallel=False,
+                                                           parallel=par,
                                                            scale=1e6)
 
 init_state_monoculture_invasive = (N0_monoculture_invasive,
@@ -388,7 +395,7 @@ init_state_monoculture_invasive = (N0_monoculture_invasive,
 monoculture_invasive_plate = community_simulator.Community(init_state_monoculture_invasive,
                                                            dynamics,
                                                            params,
-                                                           parallel=False,
+                                                           parallel=par,
                                                            scale=1e6)
 
 # stabilize monocultures
@@ -407,7 +414,7 @@ init_state_pairwise = (N0_pairwise,
 pairwise_plate = community_simulator.Community(init_state_pairwise,
                                                dynamics,
                                                params,
-                                               parallel=False,
+                                               parallel=par,
                                                scale=1e6)
 
 # stabilize
@@ -424,7 +431,7 @@ init_state_singleinv = (N0_singleinv,
 singleinv_plate = community_simulator.Community(init_state_singleinv,
                                                 dynamics,
                                                 params,
-                                                parallel=False,
+                                                parallel=par,
                                                 scale=1e6)
 
 # stabilize
@@ -448,7 +455,7 @@ init_state_cohortinv = (N0_cohortinv,
 cohortinv_plate = community_simulator.Community(init_state_cohortinv,
                                                 dynamics,
                                                 params,
-                                                parallel=False,
+                                                parallel=par,
                                                 scale=1e6)
 
 # stabilize
@@ -512,20 +519,20 @@ for i in range(assumptions['n_wells']):
     f_singleinv[i] = F.loc[dominants_invasive[i]][i]
     f_singleinv_null[i] = F_null.loc[dominants_invasive[i]][i]
     
-# get community bottom-up cohesiveness (buc): method 1
+# get community bottom-up cohesiveness, method 1: k-ratio
 # just the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
-buc_resident = ['NA' for i in range(assumptions['n_wells'])]
-buc_invasive = ['NA' for i in range(assumptions['n_wells'])]
+kratio_resident = ['NA' for i in range(assumptions['n_wells'])]
+kratio_invasive = ['NA' for i in range(assumptions['n_wells'])]
 N_resident = N_resident.droplevel(0)
 N_invasive = N_invasive.droplevel(0)
 N_resident_monoculture = monoculture_resident_plate.N.droplevel(0)
 N_invasive_monoculture = monoculture_invasive_plate.N.droplevel(0)
 for i in range(assumptions['n_wells']):
-    buc_resident[i] = N_resident.loc[dominants_resident[i]][i]/N_resident_monoculture.loc[dominants_resident[i]][i]
-    buc_invasive[i] = N_invasive.loc[dominants_invasive[i]][i]/N_invasive_monoculture.loc[dominants_invasive[i]][i]
-buc_resident = [math.log10(x) for x in buc_resident]
-buc_invasive = [math.log10(x) for x in buc_invasive]
-buc_diff = [buc_invasive[i] - buc_resident[i] for i in range(assumptions['n_wells'])]
+    kratio_resident[i] = N_resident.loc[dominants_resident[i]][i]/N_resident_monoculture.loc[dominants_resident[i]][i]
+    kratio_invasive[i] = N_invasive.loc[dominants_invasive[i]][i]/N_invasive_monoculture.loc[dominants_invasive[i]][i]
+kratio_resident = [math.log10(x) for x in kratio_resident]
+kratio_invasive = [math.log10(x) for x in kratio_invasive]
+kratio_diff = [kratio_invasive[i] - kratio_resident[i] for i in range(assumptions['n_wells'])]
 
 # get cohort invasiveness (ci)
 ci = ['NA' for i in range(assumptions['n_wells'])]
@@ -605,21 +612,25 @@ def cohort_vs_alone():
     
 # difference in bottom-up cohesiveness vs. cohort invasiveness
 ### FIXME: use different colors for dots in the green area of cohort_vs_alone() plot
-def buc_vs_ci():
+def kratio_vs_ci():
     x = ci
-    y = buc_diff
+    y = kratio_diff
     
     # identify dots in green area
     xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
     yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
     
+    # identify dots outside of green area
+    xo = [x[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    yo = [y[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    
     fig, ax = plt.subplots()
     
-    ax.scatter(x,y,edgecolors="black",facecolors="none",zorder=1)
-    ax.scatter(xg,yg,edgecolors="green",facecolors=[0,0.5,0,0.5],zorder=1)
+    ax.scatter(xo,yo,edgecolors=[0.5, 0.5, 0.5, 1],facecolors=[0.5, 0.5, 0.5, 0.5],zorder=1)
+    ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
     
     ax.set_xlabel("Cohort invasiveness")
-    ax.set_ylabel("Bottom-up cohesiveness\nInvasive - Resident")
+    ax.set_ylabel("K-ratio\nInvasive - Resident")
     ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     
     fig
@@ -627,7 +638,7 @@ def buc_vs_ci():
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
-buc_vs_ci()
+kratio_vs_ci()
 
 
 

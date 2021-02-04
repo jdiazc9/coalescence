@@ -519,8 +519,7 @@ for i in range(assumptions['n_wells']):
     f_singleinv[i] = F.loc[dominants_invasive[i]][i]
     f_singleinv_null[i] = F_null.loc[dominants_invasive[i]][i]
     
-# get community bottom-up cohesiveness, method 1: k-ratio
-# just the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
+# get the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
 kratio_resident = ['NA' for i in range(assumptions['n_wells'])]
 kratio_invasive = ['NA' for i in range(assumptions['n_wells'])]
 N_resident = N_resident.droplevel(0)
@@ -549,12 +548,102 @@ for i in range(assumptions['n_wells']):
     
     # cohort invasivity is the fraction of the species in the cohort that were able to invade
     ci[i] = sum(cohort_afterinv > 0)/len(cohort)
+    
+# get communities bottom-up cohesiveness (buc)
+buc_resident = ['NA' for i in range(assumptions['n_wells'])]
+buc_invasive = ['NA' for i in range(assumptions['n_wells'])]
+
+sigma = {'type I': lambda R,params: params['c']*R,
+         'type II': lambda R,params: params['c']*R/(1+params['c']*R/params['sigma_max']),
+         'type III': lambda R,params: (params['c']*R)**params['n']/(1+(params['c']*R)**params['n']/params['sigma_max'])
+    }
+
+u = {'independent': lambda x,params: 1.,
+     'energy': lambda x,params: (((params['w']*x)**params['nreg']).T
+                                  /np.sum((params['w']*x)**params['nreg'],axis=1)).T,
+     'mass': lambda x,params: ((x**params['nreg']).T/np.sum(x**params['nreg'],axis=1)).T
+    }
+
+h = {'off': lambda R,params: 0.,
+     'external': lambda R,params: (params['R0']-R)/params['tau'],
+     'self-renewing': lambda R,params: params['r']*R*(params['R0']-R),
+     'predator': lambda R,params: params['r']*R*(params['R0']-R)-params['u']*R
+    }
+
+J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
+                         *params['w']*sigma[assumptions['response']](R,params))
+J_out = {'common': lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T),
+         'specific': lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
+        }
+
+# resident plate
+plate = resident_plate.copy()
+dominants = dominants_resident.copy()
+for i in range(assumptions['n_wells']):
+    
+    # remove dominant
+    plate.N.iloc[int(dominants[i].split('S',1)[1]),i] = 0
+    
+    # get secretions of dominant when feeding on the primary resource
+    if assumptions['metabolism'] == 'specific':
+        R0 = plate.params['D'][int(dominants[i].split('S',1)[1])]
+        R0 = R0[:,0]
+    elif assumptions['metabolism'] == 'common':
+        R0 = plate.params['D'][:,0]
+        
+    # get secretions of cohort when feeding on the dominant's secretions
+    resource_flux = (J_out[assumptions['metabolism']](R0,plate.params)/plate.params['w']).T.dot(plate.N.iloc[:,i])
+    resource_flux = resource_flux.tolist()
+    
+    # get uptake rates of dominant species
+    dominant_uptake_rates = plate.params['c'][int(dominants[i].split('S',1)[1]),:]
+    dominant_uptake_rates = dominant_uptake_rates.tolist()
+    
+    # calculate overlap: use Jensen-Shannon
+    ### FIXME: try other ways to quantify this overlap?
+    x = [dominant_uptake_rates[j]/sum(dominant_uptake_rates) for j in range(len(dominant_uptake_rates))]
+    y = [resource_flux[j]/sum(resource_flux) for j in range(len(resource_flux))]
+    buc_resident[i] = 1 - math.sqrt(jensen_shannon(x,y))
+    
+# invasive plate
+plate = invasive_plate.copy()
+dominants = dominants_invasive.copy()
+for i in range(assumptions['n_wells']):
+    
+    # remove dominant
+    plate.N.iloc[int(dominants[i].split('S',1)[1]),i] = 0
+    
+    # get secretions of dominant when feeding on the primary resource
+    if assumptions['metabolism'] == 'specific':
+        R0 = plate.params['D'][int(dominants[i].split('S',1)[1])]
+        R0 = R0[:,0]
+    elif assumptions['metabolism'] == 'common':
+        R0 = plate.params['D'][:,0]
+        
+    # get secretions of cohort when feeding on the dominant's secretions
+    resource_flux = (J_out[assumptions['metabolism']](R0,plate.params)/plate.params['w']).T.dot(plate.N.iloc[:,i])
+    resource_flux = resource_flux.tolist()
+    
+    # get uptake rates of dominant species
+    dominant_uptake_rates = plate.params['c'][int(dominants[i].split('S',1)[1]),:]
+    dominant_uptake_rates = dominant_uptake_rates.tolist()
+    
+    # calculate overlap: use Jensen-Shannon
+    ### FIXME: try other ways to quantify this overlap?
+    x = [dominant_uptake_rates[j]/sum(dominant_uptake_rates) for j in range(len(dominant_uptake_rates))]
+    y = [resource_flux[j]/sum(resource_flux) for j in range(len(resource_flux))]
+    buc_invasive[i] = 1 - math.sqrt(jensen_shannon(x,y))
+   
+# difference in bottom-up cohesiveness
+buc_diff = [buc_invasive[j]-buc_resident[j] for j in range(assumptions['n_wells'])]
+    
 
 
 ### PLOTS
 
 # Q vs fraction in pairwise competition
 def q_vs_fraction():
+    
     x = f_pairwise
     y = Q
     
@@ -585,6 +674,7 @@ def q_vs_fraction():
 
 # fraction when invading alone vs with cohort
 def cohort_vs_alone():
+    
     x = f_singleinv
     y = f_coalescence
     
@@ -610,9 +700,40 @@ def cohort_vs_alone():
     
     fig
     
-# difference in bottom-up cohesiveness vs. cohort invasiveness
-### FIXME: use different colors for dots in the green area of cohort_vs_alone() plot
+# k-ratio histogram
+def kratio_hist():
+    
+    color_resident = [55/255,126/255,184/255]
+    color_invasive = [255/255,127/255,0/255]
+    
+    x = np.linspace(min(kratio_resident+kratio_invasive),
+                    max(kratio_resident+kratio_invasive),
+                    num=50).tolist()
+    
+    fig, ax = plt.subplots()
+    
+    ax.hist(kratio_resident,
+            bins=x,
+            histtype='stepfilled',
+            color=color_resident+[0.5],
+            edgecolor=color_resident+[1])
+    
+    ax.hist(kratio_invasive,
+            bins=x,
+            histtype='stepfilled',
+            color=color_invasive+[0.5],
+            edgecolor=color_invasive+[1])
+    
+    ax.set_xlabel("log$_{10}$ K-ratio")
+    ax.set_ylabel("Fraction")
+    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
+    plt.legend(['Resident','Invasive'])
+    
+    fig
+    
+# difference in k-ratio vs. cohort invasiveness
 def kratio_vs_ci():
+    
     x = ci
     y = kratio_diff
     
@@ -630,15 +751,43 @@ def kratio_vs_ci():
     ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
     
     ax.set_xlabel("Cohort invasiveness")
-    ax.set_ylabel("K-ratio\nInvasive - Resident")
+    ax.set_ylabel("log$_{10}$ K-ratio\nInvasive - Resident")
     ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     
     fig
+    
+# difference in bottom-up cohesiveness vs. cohort invasiveness
+def buc_vs_ci():
+    
+    x = ci
+    y = buc_diff
+    
+    # identify dots in green area
+    xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
+    
+    # identify dots outside of green area
+    xo = [x[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    yo = [y[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
+    
+    fig, ax = plt.subplots()
+    
+    ax.scatter(xo,yo,edgecolors=[0.5, 0.5, 0.5, 1],facecolors=[0.5, 0.5, 0.5, 0.5],zorder=1)
+    ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
+    
+    ax.set_xlabel("Cohort invasiveness")
+    ax.set_ylabel("Bottom-up cohesiveness\nInvasive - Resident")
+    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
+    
+    fig
+    
 
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
+kratio_hist()
 kratio_vs_ci()
+buc_vs_ci()
 
 
 

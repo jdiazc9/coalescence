@@ -243,7 +243,7 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.8 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
@@ -725,7 +725,7 @@ def kratio_hist():
             edgecolor=color_invasive+[1])
     
     ax.set_xlabel("log$_{10}$ K-ratio")
-    ax.set_ylabel("Fraction")
+    ax.set_ylabel("Counts")
     ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     plt.legend(['Resident','Invasive'])
     
@@ -755,6 +755,38 @@ def kratio_vs_ci():
     ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     
     fig
+    
+# histogram of invasive communities' bottom-up cohesiveness
+def buc_hist():
+    
+    color_resident = [55/255,126/255,184/255]
+    color_invasive = [255/255,127/255,0/255]
+    
+    x = np.linspace(min(buc_resident+buc_invasive),
+                    max(buc_resident+buc_invasive),
+                    num=50).tolist()
+    
+    fig, ax = plt.subplots()
+    
+    ax.hist(buc_resident,
+            bins=x,
+            histtype='stepfilled',
+            color=color_resident+[0.5],
+            edgecolor=color_resident+[1])
+    
+    ax.hist(buc_invasive,
+            bins=x,
+            histtype='stepfilled',
+            color=color_invasive+[0.5],
+            edgecolor=color_invasive+[1])
+    
+    ax.set_xlabel("Bottom-up cohesiveness")
+    ax.set_ylabel("Counts")
+    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
+    plt.legend(['Resident','Invasive'])
+    
+    fig
+    
     
 # difference in bottom-up cohesiveness vs. cohort invasiveness
 def buc_vs_ci():
@@ -787,6 +819,7 @@ q_vs_fraction()
 cohort_vs_alone()
 kratio_hist()
 kratio_vs_ci()
+buc_hist()
 buc_vs_ci()
 
 

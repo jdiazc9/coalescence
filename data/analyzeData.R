@@ -2,7 +2,7 @@
 ### Feb 16 2021
 
 ### ----------------------------------------------------------------------
-### This scripts performas all the analyses and produces all the plots
+### This scripts performs all the analyses and produces all the plots
 ### in the paper.
 ###    1. Community composition (pie plots & rank plots of ESV frequency)
 ###    2. Characterization of isolated species from each community
@@ -24,7 +24,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- FALSE
+save_plots <- TRUE
 
 
 ### ----------------------------------------------------------------------
@@ -32,14 +32,14 @@ save_plots <- FALSE
 ### ----------------------------------------------------------------------
 
 # load OTU table, taxonomy table and metadata
-otus <- read.csv('OTU_table.csv')
-taxa <- read.csv('taxonomy_silva.csv')
-metadata <- read.csv('metaData.csv')
+otus <- read.csv('OTU_table.csv',stringsAsFactors=F)
+taxa <- read.csv('taxonomy_silva.csv',stringsAsFactors=F)
+metadata <- read.csv('metaData.csv',stringsAsFactors=F)
 
-###
-merged <- mergeTaxa(otus,taxa)
-otus <- merged[['otus']]
-taxa <- merged[['taxa']]
+### merge similar taxa?
+# merged <- mergeTaxa(otus,taxa)
+# otus <- merged[['otus']]
+# taxa <- merged[['taxa']]
 
 # check that OTU table and taxonomy table follow the same order
 stopifnot(all(otus$X==taxa$X))
@@ -103,7 +103,7 @@ original_communities[['Citrate']] <- setNames(paste('Community',c(1,2,3,7,8,9,10
 for (cs in carbon_sources) {
   for (comm in community_names) {
     
-    if (T) { # original communities (before propagation, coalescence etc.)
+    if (F) { # original communities (before propagation, coalescence etc.)
       wells <- metadata[metadata$Comm1 == original_communities[[cs]][comm] &
                         metadata$Carbon == cs &
                         (grepl('Gln',metadata$Experiment) | grepl('Cit',metadata$Experiment))
@@ -192,7 +192,7 @@ remove_these <- sapply(otus$seq_id,
                        function(seq_id) {
                          all(plot_this$fraction[plot_this$seq_id == seq_id] == 0)
                        })
-remove_these <- names(remove_these)[remove_these]
+remove_these <- otus$seq_id[remove_these]
 plot_this <- plot_this[!(plot_this$seq_id %in% remove_these),]
 
 # ranks
@@ -288,7 +288,7 @@ if (display_plots) {
   print(myplots[['community-compostion_rankplots']])
 }
 if (save_plots) {
-  ggsave(file.path('.','plots','community-compostion_pieplots-all_with-original.pdf'),
+  ggsave(file.path('.','plots','community-compostion_pieplots-all.pdf'),
          plot=myplots[['community-compostion_pieplots-all']],
          device='pdf',
          height=297,
@@ -432,7 +432,7 @@ for (cs in carbon_sources) {
     these_are_outliers <- apply(fraction_dist,
                                 1,
                                 function(x) all(x > isolates_dist_threshold))
-    print(sum(these_are_outliers))
+    #print(sum(these_are_outliers))
     isolates[[cs]][[comm]] <- isolates[[cs]][[comm]][,!these_are_outliers]
   }
 }
@@ -493,9 +493,9 @@ for (i in 1:ncol(isolates_esv)) {
   isolates_esv[,i] <- smart_round(100*isolates_esv[,i])/100
 }
 
-### At this point, it is reasonable to apply a somewhat arbitrary threshold. Looking at
+### At this point, it is reasonable to apply a sequence frequency threshold. Looking at
 ### isolates_esv, we can see situations (isolates 1, 2, 5 and 7) in which 99% of the sequenced
-### reads match a unique ESV. It is reasonable to round this up to 100%, i.e. asume that all
+### reads match a unique ESV. It is reasonable to round this up to 100%, i.e. assume that all
 ### copies of the 16S rRNA gene of the isolated species match the same unique sequence.
 ### Other cases are trickier:
 ###
@@ -560,7 +560,7 @@ for (i in 1:ncol(isolates_esv)) {
 ###            single base mutations of sequence 4.
 ###         c) Whatever other reason (contamination...)
 ###      Whatever the true reason, the safest option is to just consider that isolate 3 maps
-###      directly and inequivocally to sequence 4. This sequence is not shared by any other
+###      directly and unequivocally to sequence 4. This sequence is not shared by any other
 ###      isolate, and this choice ensures that, if a sample that is supposed to contain
 ###      isolate_3 shows no reads mapping to sequences 1, 5, 10 or 13 (but does show reads
 ###      mapping to sequence 4), the deconvolution process will not result in a measurement
@@ -572,7 +572,11 @@ isolates_esv[isolates_esv[,'isolate_3'] < 0.5,'isolate_3'] <- 0
 isolates_esv <- isolates_esv/matrix(rep(colSums(isolates_esv),nrow(isolates_esv)),
                                     nrow=nrow(isolates_esv),
                                     byrow=TRUE)
-isolates_esv <- smart_round(100*isolates_esv)/100
+
+# round to 2 digits while maintaining normalization
+for (i in 1:ncol(isolates_esv)) {
+  isolates_esv[,i] <- smart_round(100*isolates_esv[,i])/100
+}
 
 # split groups by carbon source
 isolates_groups <- list(Glutamine = isolates_groups[grepl('Glutamine',isolates_groups)],
@@ -603,11 +607,11 @@ isolates <- list(seq=isolates_esv,
 ### or all of those reads could come from different species that share the
 ### same sequence in at least some of its copies of the 16S, so this
 ### relative abundance should be taken as the maximum potential relative
-### abundance of the isolate in the community.
+### abundance of the isolate in the community).
 ### Then, we are going to check the highest relative abundance remaining
 ### in the community once the reads from the isolate have been accounted
 ### for. The reads that are highest in abundance once the reads from the
-### isolate are substracted could come from a single species or multiple
+### isolate are subtracted could come from a single species or multiple
 ### species partially sharing their 16S sequences. Worst case scenario, if
 ### they come from a single species and they are more abundant than the
 ### reads coming from the isolate, then the isolate would not be the most

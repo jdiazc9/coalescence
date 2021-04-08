@@ -18,7 +18,7 @@ import community_simulator
 import community_simulator.usertools
 import community_simulator.visualization
 import numpy as np
-# import pandas as pd
+import pandas as pd
 # import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -171,7 +171,7 @@ def kldiv(p,q):
     d = sum([mylog(p[i],q[i]) for i in range(len(p))])
     return d
 
-# Jensen-Shannon distance
+# Jensen-Shannon similarity (1 - distance)
 # p and q are lists
 def jensen_shannon(p,q):
     
@@ -185,7 +185,46 @@ def jensen_shannon(p,q):
         m = [(p[i]+q[i])/2 for i in range(len(p))]
         js_div = 1/2 * kldiv(p,m) + 1/2 * kldiv(q,m)
         js_dist = math.sqrt(js_div)
-        return js_dist
+        return 1 - js_dist
+    
+# Jaccard similarity
+# p and q are lists
+def jaccard(p,q):
+    
+    intersection = sum([1 for i in range(len(p)) if p[i]>0 and q[i]>0])
+    union = sum([1 for i in range(len(p)) if p[i]>0 or q[i]>0])
+    
+    return intersection/union
+
+# endemic species overlap
+def endemic(p,q,pq):
+    
+    overlap_p_pq = sum([1 for i in range(len(p))
+                        if p[i]>0 and q[i]==0 and pq[i]>0])/sum([1 for i in range(len(p))
+                                                                 if p[i]>0 and q[i]==0])
+    overlap_q_pq = sum([1 for i in range(len(q))
+                        if p[i]==0 and q[i]>0 and pq[i]>0])/sum([1 for i in range(len(q))
+                                                                 if p[i]==0 and q[i]>0])
+    
+    return overlap_p_pq/(overlap_p_pq + overlap_q_pq)
+
+# similarity index
+# p: invasive
+# q: resident
+# pq: coalesced
+def mysim(p,q,pq):
+    
+    # normalization
+    p = [p_i/sum(p) for p_i in p]
+    q = [q_i/sum(q) for q_i in q]
+    pq = [pq_i/sum(pq) for pq_i in pq]
+    
+    sim = {'bray_curtis':bray_curtis(p,pq)/(bray_curtis(p,pq) + bray_curtis(q, pq)),
+           'jensen_shannon':jensen_shannon(p,pq)/(jensen_shannon(p,pq) + jensen_shannon(q, pq)),
+           'jaccard':jaccard(p,pq)/(jaccard(p,pq) + jaccard(q,pq)),
+           'endemic':endemic(p,q,pq)}
+                                                  
+    return sim
 
 
 
@@ -224,7 +263,7 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # try these assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 500 # number of communities
+assumptions['n_wells'] = 100 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
 assumptions['SA'] = [200, 200, 200] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 60 # 30 # number of generalists
@@ -465,15 +504,6 @@ N_cohortinv, R_cohortinv = stabilizeCommunities(cohortinv_plate)
 
 ### GET STATISTICS
 
-# similarity index (based on jensen_shannon, consider alternatives)
-# note: jensen-shannon is a divergence, 
-# sqrt(JS) is a distance
-# 1-sqrt(JS) is a similarity measure
-def mysim(p,q):
-    p = [p_i/sum(p) for p_i in p]
-    q = [q_i/sum(q) for q_i in q]
-    return 1 - math.sqrt(jensen_shannon(p,q))
-
 # get Q for each community
 Q = ['NA' for i in range(assumptions['n_wells'])]
 for i in range(assumptions['n_wells']):
@@ -484,7 +514,7 @@ for i in range(assumptions['n_wells']):
     C = N_coalescence.iloc[:,i].tolist()
     
     # i-th element of Q
-    Q [i] = mysim(I,C)/(mysim(I,C) + mysim(R,C))
+    Q[i] = mysim(I,R,C)['jensen_shannon']
     
 # get fraction in pairwise competition
 f_pairwise = ['NA' for i in range(assumptions['n_wells'])]
@@ -636,7 +666,35 @@ for i in range(assumptions['n_wells']):
    
 # difference in bottom-up cohesiveness
 buc_diff = [buc_invasive[j]-buc_resident[j] for j in range(assumptions['n_wells'])]
+
+
+
+### SAVE DATA
+
+# all statistics
+s0 = ['NA' for i in range(assumptions['n_wells'])]
+stats = {'bray_curtis':s0,'jensen_shannon':s0,'jaccard':s0,'endemic':s0}
+
+for s in list(stats.keys()):
+    for i in range(assumptions['n_wells']):
+        
+        # community compositions as lists
+        R = N_resident.iloc[:,i].tolist()
+        I = N_invasive.iloc[:,i].tolist()
+        C = N_coalescence.iloc[:,i].tolist()
     
+        stats[s][i] = mysim(I,R,C)[s]
+
+# final data frame
+data_out = pd.DataFrame(data={'f_pairwise':f_pairwise,
+                              'q_bray_curtis':stats['bray_curtis'],
+                              'q_jensen_shannon':stats['jensen_shannon'],
+                              'q_jaccard':stats['jaccard'],
+                              'q_endemic':stats['endemic'],
+                              'f_singleinv':f_singleinv,
+                              'f_coalescence':f_coalescence})
+data_out.to_csv(os.path.join('.','data','simul_data.txt'),
+                header=True,index=None,sep='\t',na_rep='NA')
 
 
 ### PLOTS

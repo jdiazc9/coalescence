@@ -280,7 +280,8 @@ myplots[['community-compostion_rankplots']] <-
           legend.title=element_blank(),
           legend.position=c(0.7,0.9),
           legend.background=element_rect(fill='transparent'),
-          text=element_text(size=15))
+          text=element_text(size=15),
+          axis.text=element_text(size=15))
 
 # display and save plots
 if (display_plots) {
@@ -478,6 +479,8 @@ stopifnot(all(sort(unlist(isolates_groups)) == sort(colnames(isolates_dist))))
 ### At this point, the 'isolates_groups' variable is a list containing the information of how many
 ### unique species were isolated from the plating of the communities, and which communities shared
 ### the same isolated species.
+### Note that out of 16 communities (8 for glutamine and 8 for citrate), there are only 9 unique
+### isolates due to repetitions.
 ### Now we want to identify the ESVs composition of each of those isolates.
 
 # first, average across all the columns that correspond to a same unique isolate
@@ -608,14 +611,6 @@ isolates <- list(seq=isolates_esv,
 ### same sequence in at least some of its copies of the 16S, so this
 ### relative abundance should be taken as the maximum potential relative
 ### abundance of the isolate in the community).
-### Then, we are going to check the highest relative abundance remaining
-### in the community once the reads from the isolate have been accounted
-### for. The reads that are highest in abundance once the reads from the
-### isolate are subtracted could come from a single species or multiple
-### species partially sharing their 16S sequences. Worst case scenario, if
-### they come from a single species and they are more abundant than the
-### reads coming from the isolate, then the isolate would not be the most
-### abundant species.
 ### All of this is assuming that the same number of reads per individual
 ### are produced when sequencing. This need not be the case, as different
 ### species may carry different copy numbers of their 16S rRNA gene. So
@@ -713,6 +708,15 @@ if (save_plots) {
          units='mm')
 }
 
+### Our criterion will be so that we mantain maximum consistency with the experimental
+### protocol. We need to consider that a) the dominants at the moment when the plating
+### and isolation was done (transfer 12) may have decreased in abundance after 7
+### additional transfers and b) species may carry different copy number of the 16s rRNA
+### gene so ESV abundance may not perfectly match species abundance. Therefore, we will
+### consider a species to be the dominant of a community if it was isolated from it and is
+### still at a significant abundance after the 7 additional transfers (i.e. is visible in
+### the plot). If the isolate is not visible, we will exclude the corresponding community
+### from downstream analysis. From examining the plot:
 ### Glutamine:
 ###    - isolate_1 is compatible with being the dominant of Community 1 and it was
 ###      isolated from that community.
@@ -747,163 +751,415 @@ if (save_plots) {
 ###    - isolate_2 is compatible with being the dominant of Community 3 and it was
 ###      isolated from that community. Communities 1 and 3 share the same dominant.
 ###    - isolate_2 seems to clearly be the dominant of Community 4, even though
-###      isolate_7 was the one obtained from this community. We will consider
-###      isolate_2 to be the dominant of this community. Communities 1, 3 and 4 share
-###      the same dominant.
+###      isolate_8 was the one obtained from this community. isolate_8 is also at a
+###      relatively high fraction. (*)
 ###    - isolate_2 is compatible with being the dominant of Community 5 and it was
-###      isolated from that community. Communities 1, 3, 4 and 5 share the same
+###      isolated from that community. Communities 1, 3 and 5 share the same
 ###      dominant.
 ###    - isolate_2 is compatible with being the dominant of Community 6. isolate_9 was
 ###      isolated from this community but does not appear to be at significant
 ###      abundance. We will consider isolate_2 to be the dominant of this community.
-###      Communities 1, 3, 4, 5 and 6 share the same dominant.
+###      Communities 1, 3, 5 and 6 share the same dominant.
 ###    - isolate_7 is compatible with being the dominant of Community 7 and it was
 ###      isolated from that community. Communities 2 and 7 share the same dominant.
 ###    - isolate_2 is compatible with being the dominant of Community 8. isolate_4
 ###      could also be compatible but it is consistently in a slightly lower abundance
 ###      across all samples. Neither of these two isolates were isolated from this
 ###      community. We will consider isolate_2 to be the dominant. Communities 1, 3,
-###      4, 5, 6 and 8 share the same dominant.
+###      5, 6 and 8 share the same dominant.
 
-# get the true dominants of each community
-dominants <- vector(mode='list',length=length(carbon_sources))
+# dominants
+dominants <- vector(mode='list',length=2)
 names(dominants) <- carbon_sources
-for (cs in carbon_sources) {
-  dominants[[cs]] <- vector(mode='list',length=length(community_names))
-  names(dominants[[cs]]) <- community_names
-}
+dominants[['Glutamine']] <- list(isolate_1 = 'Community1',
+                                 isolate_2 = 'Community2',
+                                 isolate_3 = 'Community3',
+                                 isolate_4 = c('Community4','Community6'),
+                                 isolate_5 = c('Community7','Community8'),
+                                 other = 'Community5')
+dominants[['Citrate']] <- list(isolate_2 = c('Community3','Community5'),
+                               isolate_6 = 'Community1',
+                               isolate_7 = c('Community2','Community7'),
+                               isolate_8 = 'Community4',
+                               other = c('Community6','Community8'))
 
-# loop through carbon sources, communities and samples
+
+### ----------------------------------------------------------------------
+### PAIRWISE COMPETITION VS. COALESCENCE VS. DOMINANT INVADING ALONE
+### ----------------------------------------------------------------------
+
+# intialize plotting table
+plot_this <- data.frame(carbon_source = character(0),
+                        community_1 = character(0),
+                        community_2 = character(0),
+                        isolate_1 = character(0),
+                        isolate_2 = character(0),
+                        plate_pairwise = character(0),
+                        well_pairwise = character(0),
+                        f_pairwise = numeric(0),
+                        plate_coalescence = character(0),
+                        well_coalescence = character(0),
+                        q_bray_curtis = numeric(0),
+                        q_jensen_shannon = numeric(0),
+                        q_jaccard = numeric(0),
+                        q_endemic = numeric(0),
+                        q_bray_curtis_cohort = numeric(0),
+                        q_jensen_shannon_cohort = numeric(0),
+                        q_jaccard_cohort = numeric(0),
+                        q_endemic_cohort = numeric(0),
+                        f_singleinv = numeric(0))
+
+# run through carbon sources and communities
 for (cs in carbon_sources) {
-  for (comm in community_names) {
-    for (sample in colnames(communities[[cs]][[comm]])) {
+  for (i in 1:(length(community_names)-1)) {
+    for (j in (i+1):length(community_names)) {
       
-      # community composition array
-      cc <- as.matrix(communities[[cs]][[comm]][,sample,drop=FALSE])
+      cs <- 'Glutamine'
+      i <- 2
+      j <- 4
       
-      # matrix to map species relative abundance to ESV relative abundance
-      Q <- as.matrix(isolates[['seq']])
+      # communities
+      comm_1 <- community_names[i] # by convention, community 1 will be the invasive and 2 the resident
+      comm_2 <- community_names[j]
       
-      # keep only ESVs with abundance over 0 in either the community or the matrix
-      n <- rowSums(Q)>0 | rowSums(cc)>0
-      Q <- Q[n,,drop=FALSE]
-      cc <- cc[n,,drop=FALSE]
+      # dominants of the communities
+      dom_1 <- names(dominants[[cs]])[grep(comm_1,dominants[[cs]])]
+      dom_2 <- names(dominants[[cs]])[grep(comm_2,dominants[[cs]])]
       
-      # reset variables
-      max_rel_abundance <- setNames(rep(NA,length(isolate_names)),
-                                    isolate_names)
-      is_isolate <- setNames(rep(NA,length(isolate_names)),
-                             isolate_names)
-      
-      # for every isolate...
-      for (iso in isolate_names) {
+      # proceed only if the dominants of both communities are defined and different
+      if (dom_1 != dom_2 & dom_1 != 'other' & dom_2 != 'other') {
         
-        # maximum potential abundance of the isolate in the community
-        max_rel_abundance[iso] <- min(cc/Q[,iso],na.rm=TRUE)
+        # find wells of pairwise competition
+        champ_1 <- gsub('Community','Champion',comm_1)
+        champ_2 <- gsub('Community','Champion',comm_2)
+        wells_pairwise <- metadata[((metadata$Comm1 == champ_1 & metadata$Comm2 == champ_2) | (metadata$Comm1 == champ_2 & metadata$Comm2 == champ_1)) &
+                                   metadata$Carbon == cs
+                                   ,]
         
-        # is this the isolate that was obtained from this community?
-        is_isolate[iso] <- comm %in% isolates[['groups']][[cs]][[iso]]
+        # composition of pairwise competition wells
+        cc_pairwise <- otus[,wells_pairwise$Sample,drop=F]
+        
+        # deconvolution matrix (isolates-to-ESVs map)
+        Q = isolates[['seq']][,c(dom_1,dom_2)]
+        
+        # keep only sequences with abundance > 0
+        n <- rowSums(Q)>0 | rowSums(cc_pairwise)>0
+        Q <- Q[n,]
+        cc_pairwise <- cc_pairwise[n,]
+        
+        # deconvolute and get abundance of dom_1 and dom_2
+        f_pairwise <- Ginv(as.matrix(Q)) %*% as.matrix(cc_pairwise)
+        
+        # set to 0 negative values (check that they are not large, but rather small artifacts due to sequencing error)
+        if (F) {
+          if (any(f_pairwise<0)) {
+            print(c(cs,comm_1,comm_2))
+            print('some negative abundances')
+            print(f_pairwise[f_pairwise<0])
+          }
+        }
+        f_pairwise[f_pairwise<0] <- 0
+        
+        # re-normalize (check that normalization is not too far off 1)
+        if (F) {
+          if (any(abs(colSums(f_pairwise) - 1)>0.05)) {
+            print(c(cs,comm_1,comm_2))
+            print('some normalization issues')
+            print(colSums(f_pairwise)[abs(colSums(f_pairwise) - 1)>0.05])
+          }
+        }
+        f_pairwise <- f_pairwise/matrix(rep(colSums(f_pairwise),nrow(f_pairwise)),
+                                        nrow=nrow(f_pairwise),
+                                        byrow=T)
+        
+        # fraction of dominant 1 (invasive)
+        f_pairwise <- f_pairwise[1,]
+        
+        # find all instances of community coalescence
+        wells_coalescence <- metadata[((metadata$Comm1 == comm_1 & metadata$Comm2 == comm_2) | (metadata$Comm1 == comm_2 & metadata$Comm2 == comm_1)) &
+                                      metadata$StabilizingCarb1 == cs &
+                                      metadata$StabilizingCarb2 == cs &
+                                      metadata$Carbon == cs
+                                      ,]
+        
+        # composition of coalesced community
+        cc_coalesced <- otus[,wells_coalescence$Sample,drop=F]
+        rownames(cc_coalesced) <- otus$seq_id
+        
+        # composition of invasive and resident comunnities (average across replicates)
+        cc_invasive <- as.data.frame(rowMeans(communities[[cs]][[comm_1]]))
+        cc_resident <- as.data.frame(rowMeans(communities[[cs]][[comm_2]]))
+        
+        # compositions of community cohorts (dominants removed)
+        cc_coalesced_cohort <- cc_coalesced
+        
+        n <- rownames(Q)[Q[,dom_1] > 0]
+        cc_invasive_cohort <- cc_invasive
+        cc_invasive_cohort[n,] <- 0
+        cc_coalesced_cohort[n,] <- 0
+        
+        n <- rownames(Q)[Q[,dom_2] > 0]
+        cc_resident_cohort <- cc_resident
+        cc_resident_cohort[n,] <- 0
+        cc_coalesced_cohort[n,] <- 0
+        
+        # re-normalize cohort compositions
+        cc_invasive_cohort <- cc_invasive_cohort/matrix(rep(colSums(cc_invasive_cohort),nrow(cc_invasive_cohort)),
+                                                        nrow=nrow(cc_invasive_cohort),
+                                                        byrow=TRUE)
+        cc_resident_cohort <- cc_resident_cohort/matrix(rep(colSums(cc_resident_cohort),nrow(cc_resident_cohort)),
+                                                        nrow=nrow(cc_resident_cohort),
+                                                        byrow=TRUE)
+        cc_coalesced_cohort <- cc_coalesced_cohort/matrix(rep(colSums(cc_coalesced_cohort),nrow(cc_coalesced_cohort)),
+                                                          nrow=nrow(cc_coalesced_cohort),
+                                                          byrow=TRUE)
+        
+        # relative similarity invasive-to-coalesced (bray_curtis)
+        sim_invasive <- cc_similarity(cc_invasive,cc_coalesced,metric='bray_curtis')
+        sim_resident <- cc_similarity(cc_resident,cc_coalesced,metric='bray_curtis')
+        q_bray_curtis <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (jaccard)
+        sim_invasive <- cc_similarity(cc_invasive,cc_coalesced,metric='jaccard')
+        sim_resident <- cc_similarity(cc_resident,cc_coalesced,metric='jaccard')
+        q_jaccard <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (jensen_shannon)
+        sim_invasive <- cc_similarity(cc_invasive,cc_coalesced,metric='jensen_shannon')
+        sim_resident <- cc_similarity(cc_resident,cc_coalesced,metric='jensen_shannon')
+        q_jensen_shannon <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (endemic species)
+        q_endemic <- rep(NA,ncol(cc_coalesced))
+        for (k in 1:ncol(cc_coalesced)) {
+          q_endemic[k] <- endemic(cc_invasive,cc_resident,cc_coalesced[,k])
+        }
+        
+        # relative similarity invasive-to-coalesced (bray_curtis, cohorts)
+        sim_invasive <- cc_similarity(cc_invasive_cohort,cc_coalesced_cohort,metric='bray_curtis')
+        sim_resident <- cc_similarity(cc_resident_cohort,cc_coalesced_cohort,metric='bray_curtis')
+        q_bray_curtis_cohort <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (jaccard, cohorts)
+        sim_invasive <- cc_similarity(cc_invasive_cohort,cc_coalesced_cohort,metric='jaccard')
+        sim_resident <- cc_similarity(cc_resident_cohort,cc_coalesced_cohort,metric='jaccard')
+        q_jaccard_cohort <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (jensen_shannon, cohorts)
+        sim_invasive <- cc_similarity(cc_invasive_cohort,cc_coalesced_cohort,metric='jensen_shannon')
+        sim_resident <- cc_similarity(cc_resident_cohort,cc_coalesced_cohort,metric='jensen_shannon')
+        q_jensen_shannon_cohort <- sim_invasive/(sim_invasive + sim_resident)
+        
+        # relative similarity invasive-to-coalesced (endemic species, cohorts)
+        q_endemic_cohort <- rep(NA,ncol(cc_coalesced_cohort))
+        for (k in 1:ncol(cc_coalesced_cohort)) {
+          q_endemic_cohort[k] <- endemic(cc_invasive_cohort,cc_resident_cohort,cc_coalesced_cohort[,k])
+        }
+        
+        # frequency of invasive dominant invading resident community alone
+        wells_singleinv <- metadata[((metadata$Comm1 == champ_1 & metadata$Comm2 == comm_2) | (metadata$Comm1 == comm_2 & metadata$Comm2 == champ_1)) &
+                                      metadata$Carbon == cs
+                                      ,]
+        cc_singleinv <- otus[,wells_singleinv$Sample,drop=F]
+        
+        # invasive dominant ESV composition
+        Q = isolates[['seq']]
+        
+        # keep only sequences that we can map to isolates
+        n <- rowSums(Q)>0
+        Q <- Q[n,]
+        cc_singleinv <- cc_singleinv[n,,drop=FALSE]
+        
+        # deconvolute and get abundance of dom_1
+        f_singleinv <- Ginv(as.matrix(Q)) %*% as.matrix(cc_singleinv)
+        f_singleinv <- f_singleinv[1,]
+        
+        # add to plotting table
+        plot_this <- rbind(plot_this,
+                           data.frame(
+                             carbon_source = cs,
+                             community_1 = comm_1,
+                             community_2 = comm_2,
+                             isolate_1 = dom_1,
+                             isolate_2 = dom_2,
+                             plate_pairwise = wells_pairwise$Experiment,
+                             well_pairwise = wells_pairwise$Well,
+                             f_pairwise = f_pairwise,
+                             plate_coalescence = wells_coalescence$Experiment,
+                             well_coalescence = wells_coalescence$Well,
+                             q_bray_curtis = q_bray_curtis,
+                             q_jensen_shannon = q_jensen_shannon,
+                             q_jaccard = q_jaccard,
+                             q_endemic = q_endemic,
+                             q_bray_curtis_cohort = q_bray_curtis_cohort,
+                             q_jensen_shannon_cohort = q_jensen_shannon_cohort,
+                             q_jaccard_cohort = q_jaccard_cohort,
+                             q_endemic_cohort = q_endemic_cohort,
+                             f_singleinv = f_singleinv
+                           ))
         
       }
       
-      # check which isolate is the most abundant and add to data list
-      dominants[[cs]][[comm]] <- c(dominants[[cs]][[comm]],
-                                   names(which.max(max_rel_abundance)))
-      
-    
     }
   }
 }
 
-# check conflicts (different samples giving different dominants)
-for (cs in carbon_sources) {
-  for (comm in community_names) {
-    
-    # remove repetitions
-    dominants[[cs]][[comm]] <- unique(dominants[[cs]][[comm]])
-    
-    # if there is still a conflict...
-    if (length(dominants[[cs]][[comm]]) > 1) {
-      
-      # check if any of the possibile dominants was isolated from the community itself
-      where_from_isolated <- isolates[['groups']][[cs]][dominants[[cs]][[comm]]]
-      isolated_from_comm <- unlist(lapply(where_from_isolated,
-                                          function(x) comm %in% x))
-      
-      # if any of the possible dominants was isolated from the community itself, take that one as the dominant
-      if (any(isolated_from_comm)) dominants[[cs]][[comm]] <- names(isolated_from_comm)[isolated_from_comm]
-      
-    }
-    
-  }
+# check that sample positioning in wells is consistent
+stopifnot(all(plot_this$well_pairwise == plot_this$well_coalescence))
+
+# reshape plotting table (this makes it easier to create multipanel plots)
+plot_this <- gather(plot_this,metric,value,q_bray_curtis:q_endemic_cohort)
+
+# characters as factors
+plot_this$carbon_source <- factor(plot_this$carbon_source,levels=c('Glutamine','Citrate'))
+plot_this$community_1 <- factor(plot_this$community_1,levels=community_names)
+plot_this$community_2 <- factor(plot_this$community_2,levels=community_names)
+plot_this$metric <- factor(plot_this$metric,levels=unique(plot_this$metric))
+
+# make plots
+myplots[['q-vs-pairwise_bray-curtis']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=2) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE) +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of invasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),) +
+  coord_fixed() +
+  ggtitle('Bray-Curtis similarity')
+
+myplots[['q-vs-pairwise_other-metrics']] <-
+  ggplot(data=plot_this[plot_this$metric!='q_bray_curtis' & !grepl('cohort',plot_this$metric),],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=2) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE) +
+  facet_grid(~ metric,
+             labeller=labeller(metric=setNames(c('Jaccard similarity',
+                                                 'Jensen-Shannon similarity\n(1 - distance)',
+                                                 'Endemic species overlap'),
+                                               c('q_jaccard',
+                                                 'q_jensen_shannon',
+                                                 'q_endemic')))) +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of invasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        strip.text=element_text(hjust=-0.01,
+                                vjust=-0.01),
+        strip.background=element_rect(fill='transparent',
+                                      color='transparent')) +
+  coord_fixed()
+
+myplots[['q-vs-pairwise_cohorts']] <-
+  ggplot(data=plot_this[grepl('cohort',plot_this$metric),],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=2) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE) +
+  facet_wrap(~ metric,
+             nrow=2,
+             labeller=labeller(metric=setNames(c('Bray-Curtis similarity',
+                                                 'Jaccard similarity',
+                                                 'Jensen-Shannon similarity\n(1 - distance)',
+                                                 'Endemic species overlap'),
+                                               c('q_bray_curtis_cohort',
+                                                 'q_jaccard_cohort',
+                                                 'q_jensen_shannon_cohort',
+                                                 'q_endemic_cohort')))) +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of invasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        strip.text=element_text(hjust=-0.01,
+                                vjust=-0.01),
+        strip.background=element_rect(fill='transparent',
+                                      color='transparent')) +
+  coord_fixed()
+
+# display and save plots
+if (display_plots) {
+  print(myplots[['q-vs-pairwise_bray-curtis']])
+  print(myplots[['q-vs-pairwise_other-metrics']])
+  print(myplots[['q-vs-pairwise_cohorts']])
+}
+if (save_plots) {
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis']],
+         device='pdf',
+         height=120,
+         width=120,
+         units='mm')
+  ggsave(file.path('.','plots','q-vs-pairwise_other-metrics.pdf'),
+         plot=myplots[['q-vs-pairwise_other-metrics']],
+         device='pdf',
+         height=120,
+         width=240,
+         units='mm')
+  ggsave(file.path('.','plots','q-vs-pairwise_cohorts.pdf'),
+         plot=myplots[['q-vs-pairwise_cohorts']],
+         device='pdf',
+         height=180,
+         width=180,
+         units='mm')
 }
 
-### Up to this point, the systematic analysis yields the same conclusions
-### that we derived from analyzing the plots:
-### In glutamine, the first 4 communities have unqieu dominants that were
-### isolated from each one of them. Community 5 shares the dominant of
-### Community 2, while Community 6 shares the dominant of Community 4.
-### Communities 7 and 8 share another unique dominant.
-### In citrate, there are only two unique dominants. The first one is
-### shared by communities 1, 3, 4, 5, 6 and 8, while the other one is
-### shared by communities 2 and 7.
-###
-### We need to make one additional check. These dominants we have are the
-### isolates that were most abundant in the communities *out of all the
-### isolates we have sequenced individually*. But this does not negate the
-### possibility that another species, one that we have not isolated and
-### sequenced, is present in the community at a higher abundance.
-### To check whether this is the case, we will compare the relative
-### abundance of the most abundant ESV in the community with the maximum
-### relative abundance of the (supposed) dominant.
 
-# initialize variable for the check
-really_dominants <- vector(mode='list',length=length(carbon_sources))
-names(really_dominants) <- carbon_sources
-for (cs in carbon_sources) {
-  really_dominants[[cs]] <- vector(mode='list',length=length(community_names))
-  names(really_dominants[[cs]]) <- community_names
-}
 
-# loop through carbon sources, communities and samples
-for (cs in carbon_sources) {
-  for (comm in community_names) {
-    for (sample in colnames(communities[[cs]][[comm]])) {
-      
-      # community composition array
-      cc <- as.matrix(communities[[cs]][[comm]][,sample,drop=FALSE])
-      
-      # matrix to map species relative abundance to ESV relative abundance
-      Q <- as.matrix(isolates[['seq']])
-      
-      # keep only ESVs with abundance over 0 in either the community or the matrix
-      n <- rowSums(Q)>0 | rowSums(cc)>0
-      Q <- Q[n,,drop=FALSE]
-      cc <- cc[n,,drop=FALSE]
-      
-      # maximum relative abundance of the supposed dominant
-      max_dom <- min(cc/Q[,dominants[[cs]][[comm]]],na.rm=TRUE)
-      
-      # maximum relative abundance of an ESV
-      max_esv <- max(cc)
-      
-      # check whether supposed dominant is more abundant and add info to data list
-      really_dominants[[cs]][[comm]] <- c(really_dominants[[cs]][[comm]],
-                                          max_dom >= max_esv)
-      
-    }
-  }
-}
 
-# check if the supposed dominant was indeed the highest ESV in at least one sample
-for (cs in carbon_sources) {
-  really_dominants[[cs]] <- lapply(really_dominants[[cs]],
-                                   any)
-}
 
-### Community 5 from glutamine and Community 7 from citrate have ESVs that are
-### more abundant than the isolate that we labeled as the dominant.
-### The safest option is to remove them from any downstream analysis.
+
+
+
+
+
+
+
+
+
+
 
 
 

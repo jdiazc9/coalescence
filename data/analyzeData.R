@@ -2,7 +2,7 @@
 ### Feb 16 2021
 
 ### ----------------------------------------------------------------------
-### This scripts performs all the analyses and produces all the plots
+### This script performs all the analyses and produces all the plots
 ### in the paper.
 ###    1. Community composition (pie plots & rank plots of ESV frequency)
 ###    2. Characterization of isolated species from each community
@@ -12,6 +12,7 @@
 ### ----------------------------------------------------------------------
 
 rm(list=ls())
+source('isolates_abundance_from_ESVs.R')
 source('myFunctions.R')
 library(matlib)
 library(testthat)
@@ -24,7 +25,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- TRUE
+save_plots <- FALSE
 
 
 ### ----------------------------------------------------------------------
@@ -814,9 +815,9 @@ for (cs in carbon_sources) {
   for (i in 1:(length(community_names)-1)) {
     for (j in (i+1):length(community_names)) {
       
-      cs <- 'Glutamine'
-      i <- 2
-      j <- 4
+      #cs <- 'Glutamine'
+      #i <- 2
+      #j <- 4
       
       # communities
       comm_1 <- community_names[i] # by convention, community 1 will be the invasive and 2 the resident
@@ -842,38 +843,14 @@ for (cs in carbon_sources) {
         # deconvolution matrix (isolates-to-ESVs map)
         Q = isolates[['seq']][,c(dom_1,dom_2)]
         
-        # keep only sequences with abundance > 0
-        n <- rowSums(Q)>0 | rowSums(cc_pairwise)>0
-        Q <- Q[n,]
-        cc_pairwise <- cc_pairwise[n,]
-        
-        # deconvolute and get abundance of dom_1 and dom_2
-        f_pairwise <- Ginv(as.matrix(Q)) %*% as.matrix(cc_pairwise)
-        
-        # set to 0 negative values (check that they are not large, but rather small artifacts due to sequencing error)
-        if (F) {
-          if (any(f_pairwise<0)) {
-            print(c(cs,comm_1,comm_2))
-            print('some negative abundances')
-            print(f_pairwise[f_pairwise<0])
-          }
+        # fraction of dominant 1 (invasive) in pairwise competition
+        f_pairwise <- rep(NA,ncol(cc_pairwise))
+        for (k in 1:ncol(cc_pairwise)) {
+          doms_abundance_pairwise <- species_composition_from_sequencing(Q,cc_pairwise[,k,drop=FALSE])
+          doms_abundance_pairwise <- doms_abundance_pairwise[c(dom_1,dom_2),]
+          doms_abundance_pairwise <- doms_abundance_pairwise/sum(doms_abundance_pairwise)
+          f_pairwise[k] <- doms_abundance_pairwise[dom_1]
         }
-        f_pairwise[f_pairwise<0] <- 0
-        
-        # re-normalize (check that normalization is not too far off 1)
-        if (F) {
-          if (any(abs(colSums(f_pairwise) - 1)>0.05)) {
-            print(c(cs,comm_1,comm_2))
-            print('some normalization issues')
-            print(colSums(f_pairwise)[abs(colSums(f_pairwise) - 1)>0.05])
-          }
-        }
-        f_pairwise <- f_pairwise/matrix(rep(colSums(f_pairwise),nrow(f_pairwise)),
-                                        nrow=nrow(f_pairwise),
-                                        byrow=T)
-        
-        # fraction of dominant 1 (invasive)
-        f_pairwise <- f_pairwise[1,]
         
         # find all instances of community coalescence
         wells_coalescence <- metadata[((metadata$Comm1 == comm_1 & metadata$Comm2 == comm_2) | (metadata$Comm1 == comm_2 & metadata$Comm2 == comm_1)) &
@@ -965,14 +942,12 @@ for (cs in carbon_sources) {
         # invasive dominant ESV composition
         Q = isolates[['seq']]
         
-        # keep only sequences that we can map to isolates
-        n <- rowSums(Q)>0
-        Q <- Q[n,]
-        cc_singleinv <- cc_singleinv[n,,drop=FALSE]
-        
-        # deconvolute and get abundance of dom_1
-        f_singleinv <- Ginv(as.matrix(Q)) %*% as.matrix(cc_singleinv)
-        f_singleinv <- f_singleinv[1,]
+        # fraction of dominant 1 (invasive) invading resident community alone
+        f_singleinv <- rep(NA,ncol(cc_singleinv))
+        for (k in 1:ncol(cc_singleinv)) {
+          doms_abundance_singleinv <- species_composition_from_sequencing(Q,cc_singleinv[,k,drop=FALSE])
+          f_singleinv[k] <- doms_abundance_singleinv[dom_1,]
+        }
         
         # add to plotting table
         plot_this <- rbind(plot_this,

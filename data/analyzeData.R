@@ -25,7 +25,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- FALSE
+save_plots <- TRUE
 
 
 ### ----------------------------------------------------------------------
@@ -863,7 +863,7 @@ for (cs in carbon_sources) {
         cc_coalesced <- otus[,wells_coalescence$Sample,drop=F]
         rownames(cc_coalesced) <- otus$seq_id
         
-        # composition of invasive and resident comunnities (average across replicates)
+        # composition of invasive and resident communities (average across replicates)
         cc_invasive <- as.data.frame(rowMeans(communities[[cs]][[comm_1]]))
         cc_resident <- as.data.frame(rowMeans(communities[[cs]][[comm_2]]))
         
@@ -949,6 +949,13 @@ for (cs in carbon_sources) {
           f_singleinv[k] <- doms_abundance_singleinv[dom_1,]
         }
         
+        # fraction of dominant 1 (invasive) invading resident community with cohort
+        f_multiinv <- rep(NA,ncol(cc_coalesced))
+        for (k in 1:ncol(cc_coalesced)) {
+          doms_abundance_multiinv <- species_composition_from_sequencing(Q,cc_coalesced[,k,drop=FALSE])
+          f_multiinv[k] <- doms_abundance_multiinv[dom_1,]
+        }
+        
         # add to plotting table
         plot_this <- rbind(plot_this,
                            data.frame(
@@ -970,7 +977,8 @@ for (cs in carbon_sources) {
                              q_jensen_shannon_cohort = q_jensen_shannon_cohort,
                              q_jaccard_cohort = q_jaccard_cohort,
                              q_endemic_cohort = q_endemic_cohort,
-                             f_singleinv = f_singleinv
+                             f_singleinv = f_singleinv,
+                             f_multiinv = f_multiinv
                            ))
         
       }
@@ -990,6 +998,13 @@ plot_this$carbon_source <- factor(plot_this$carbon_source,levels=c('Glutamine','
 plot_this$community_1 <- factor(plot_this$community_1,levels=community_names)
 plot_this$community_2 <- factor(plot_this$community_2,levels=community_names)
 plot_this$metric <- factor(plot_this$metric,levels=unique(plot_this$metric))
+
+# parameters for annotations of plots
+poly <- list(w=0.15,
+             aperture=0.15,
+             color=c(rgb(220,245,220,maxColorValue=255),
+                     rgb(230,230,230,maxColorValue=255),
+                     rgb(250,220,220,maxColorValue=255)))
 
 # make plots
 myplots[['q-vs-pairwise_bray-curtis']] <-
@@ -1094,11 +1109,53 @@ myplots[['q-vs-pairwise_cohorts']] <-
                                       color='transparent')) +
   coord_fixed()
 
+myplots[['alone-vs-together']] <-
+  ggplot(data=plot_this,
+         aes(x=f_singleinv,y=f_multiinv,
+             color=carbon_source)) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           y=c(-0.1,poly$w,1.1,1.1,-0.1),
+           fill=poly$color[1]) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,1.1,1.1,-0.1),
+           y=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           fill=poly$color[3]) +
+  annotate('polygon',
+           x=c(-0.1,1.1,1.1,1.1-1.2*poly$aperture,-0.1),
+           y=c(-0.1,1.1-1.2*poly$aperture,1.1,1.1,-0.1),
+           fill=poly$color[2]) +
+  geom_abline(intercept=0,
+              slope=1,
+              color='black', 
+              linetype='dashed',
+              size=1) +
+  geom_point(size=2) +
+  scale_y_continuous(name='Frequency of invasive dominant species\ninvading with cohort',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of invasive dominant species\ninvading alone',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position='right',
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),) +
+  coord_fixed(xlim=c(0,1),
+              ylim=c(0,1))
+
 # display and save plots
 if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis']])
   print(myplots[['q-vs-pairwise_other-metrics']])
   print(myplots[['q-vs-pairwise_cohorts']])
+  print(myplots[['alone-vs-together']])
 }
 if (save_plots) {
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis.pdf'),
@@ -1117,6 +1174,12 @@ if (save_plots) {
          plot=myplots[['q-vs-pairwise_cohorts']],
          device='pdf',
          height=180,
+         width=180,
+         units='mm')
+  ggsave(file.path('.','plots','alone-vs-together.pdf'),
+         plot=myplots[['alone-vs-together']],
+         device='pdf',
+         height=120,
          width=180,
          units='mm')
 }

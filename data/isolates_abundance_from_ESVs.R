@@ -152,16 +152,18 @@ rownames(cc_inferred_3) <- colnames(Q)
 rm(list=ls())
 
 # define function
-species_composition_from_sequencing <- function(Q,seq) {
+species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
   
   # inputs as matrices
   Q <- as.matrix(Q)
   seq <- as.matrix(seq)
   
   # remove sequences that are not represented
-  n <- rowSums(Q) >0 | seq>0
-  Q <- Q[n,]
-  seq <- seq[n,]
+  if (remove_unused_seqs) {
+    n <- rowSums(Q) >0 | seq>0
+    Q <- Q[n,]
+    seq <- seq[n,]
+  }
   
   # add pseudo-species corresponding to sequences not in Q
   n <- rownames(Q)[rowSums(Q) == 0]

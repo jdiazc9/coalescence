@@ -815,13 +815,6 @@ for (cs in carbon_sources) {
   for (i in 1:(length(community_names)-1)) {
     for (j in (i+1):length(community_names)) {
       
-      print(cs)
-      print(c(i,j))
-      
-      # cs <- 'Glutamine'
-      # i <- 1
-      # j <- 2
-      
       # communities
       comm_1 <- community_names[i] # by convention, community 1 will be the invasive and 2 the resident
       comm_2 <- community_names[j]

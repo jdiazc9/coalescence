@@ -42,6 +42,10 @@ jaccard <- function(p,q,threshold=1e-4) sum(p>threshold & q>threshold)/sum(p>thr
 # again it makes sense to use a threshold (see jaccard similarity)
 endemic <- function(p,q,pq,threshold=1e-4) { # p: invasive, q: resident, pq: coalesced
   
+  p <- as.array(unlist(p))
+  q <- as.array(unlist(q))
+  pq <- as.array(unlist(pq))
+  
   # fraction of p endemic species that are in pq
   f_end_p <- sum(p>threshold & q<=threshold & pq>threshold)/sum(p>threshold & q<=threshold)
   

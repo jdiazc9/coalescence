@@ -259,7 +259,7 @@ myplots[['community-compostion_pieplots-all']] <-
 
 # plot ranks
 myplots[['community-compostion_rankplots']] <-
-  ggplot(data=plot_this,
+  ggplot(data=plot_this[plot_this$fraction>=1e-4 & plot_this$rank<=20,],
          aes(x=rank,y=fraction,
              group=interaction(carbon_source,community,sample),
              color=carbon_source)) +
@@ -815,9 +815,12 @@ for (cs in carbon_sources) {
   for (i in 1:(length(community_names)-1)) {
     for (j in (i+1):length(community_names)) {
       
-      #cs <- 'Glutamine'
-      #i <- 2
-      #j <- 4
+      print(cs)
+      print(c(i,j))
+      
+      # cs <- 'Glutamine'
+      # i <- 1
+      # j <- 2
       
       # communities
       comm_1 <- community_names[i] # by convention, community 1 will be the invasive and 2 the resident
@@ -840,7 +843,7 @@ for (cs in carbon_sources) {
         # composition of pairwise competition wells
         cc_pairwise <- otus[,wells_pairwise$Sample,drop=F]
         
-        # deconvolution matrix (isolates-to-ESVs map)
+        # deconvolution matrix (isolates-to-ESVs map of dominants)
         Q = isolates[['seq']][,c(dom_1,dom_2)]
         
         # fraction of dominant 1 (invasive) in pairwise competition
@@ -867,18 +870,43 @@ for (cs in carbon_sources) {
         cc_invasive <- as.data.frame(rowMeans(communities[[cs]][[comm_1]]))
         cc_resident <- as.data.frame(rowMeans(communities[[cs]][[comm_2]]))
         
+        # get species composition from ESV composition for invasive, resident and coalesced communities
+        Q <- isolates[['seq']]
+        
+        cc_invasive <- species_composition_from_sequencing(Q,cc_invasive)
+        cc_resident <- species_composition_from_sequencing(Q,cc_resident)
+        
+        cc_coalesced <- lapply(1:ncol(cc_coalesced),FUN=function(k) species_composition_from_sequencing(Q,cc_coalesced[,k,drop=FALSE]))
+        cc_coalesced <- merge(cc_coalesced[[1]],
+                              cc_coalesced[[2]],
+                              by='row.names',
+                              all=T)
+        rownames(cc_coalesced) <- cc_coalesced$Row.names
+        cc_coalesced <- cc_coalesced[,2:3]
+        
+        # discard species with abundance 0 in all communities
+        all_comms <- merge(cc_invasive,cc_resident,by='row.names',all=T)
+        rownames(all_comms) <- all_comms$Row.names
+        all_comms <- all_comms[,2:3]
+        
+        all_comms <- merge(all_comms,cc_coalesced,by='row.names',all=T)
+        rownames(all_comms) <- all_comms$Row.names
+        all_comms <- all_comms[,2:5]
+        all_comms[is.na(all_comms)] <- 0
+        
+        n <- rowSums(all_comms)>0
+        cc_invasive <- all_comms[n,1,drop=FALSE]
+        cc_resident <- all_comms[n,2,drop=FALSE]
+        cc_coalesced <- all_comms[n,3:4,drop=FALSE]
+        
+        # check that the row ordering is correct
+        stopifnot(all(rownames(cc_invasive)==rownames(cc_resident)))
+        stopifnot(all(rownames(cc_invasive)==rownames(cc_coalesced)))
+        
         # compositions of community cohorts (dominants removed)
-        cc_coalesced_cohort <- cc_coalesced
-        
-        n <- rownames(Q)[Q[,dom_1] > 0]
-        cc_invasive_cohort <- cc_invasive
-        cc_invasive_cohort[n,] <- 0
-        cc_coalesced_cohort[n,] <- 0
-        
-        n <- rownames(Q)[Q[,dom_2] > 0]
-        cc_resident_cohort <- cc_resident
-        cc_resident_cohort[n,] <- 0
-        cc_coalesced_cohort[n,] <- 0
+        cc_invasive_cohort <- cc_invasive[!rownames(cc_invasive) %in% c(dom_1,dom_2),,drop=FALSE]
+        cc_resident_cohort <- cc_resident[!rownames(cc_resident) %in% c(dom_1,dom_2),,drop=FALSE]
+        cc_coalesced_cohort <- cc_coalesced[!rownames(cc_coalesced) %in% c(dom_1,dom_2),,drop=FALSE]
         
         # re-normalize cohort compositions
         cc_invasive_cohort <- cc_invasive_cohort/matrix(rep(colSums(cc_invasive_cohort),nrow(cc_invasive_cohort)),
@@ -950,11 +978,7 @@ for (cs in carbon_sources) {
         }
         
         # fraction of dominant 1 (invasive) invading resident community with cohort
-        f_multiinv <- rep(NA,ncol(cc_coalesced))
-        for (k in 1:ncol(cc_coalesced)) {
-          doms_abundance_multiinv <- species_composition_from_sequencing(Q,cc_coalesced[,k,drop=FALSE])
-          f_multiinv[k] <- doms_abundance_multiinv[dom_1,]
-        }
+        f_multiinv <- as.numeric(cc_coalesced[dom_1,])
         
         # add to plotting table
         plot_this <- rbind(plot_this,
@@ -1131,11 +1155,11 @@ myplots[['alone-vs-together']] <-
               linetype='dashed',
               size=1) +
   geom_point(size=2) +
-  scale_y_continuous(name='Frequency of invasive dominant species\ninvading with cohort',
+  scale_y_continuous(name='Frequency of dominant\nspecies invading with cohort',
                      limits=c(-1,2),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
-  scale_x_continuous(name='Frequency of invasive dominant species\ninvading alone',
+  scale_x_continuous(name='Frequency of dominant\nspecies invading alone',
                      limits=c(-1,2),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
@@ -1179,8 +1203,8 @@ if (save_plots) {
   ggsave(file.path('.','plots','alone-vs-together.pdf'),
          plot=myplots[['alone-vs-together']],
          device='pdf',
-         height=120,
-         width=180,
+         height=100,
+         width=160,
          units='mm')
 }
 

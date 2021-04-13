@@ -7,6 +7,7 @@
 ### noise introduced by e.g. sequencing error.
 ### ----------------------------------------------------------------------
 
+rm(list=ls())
 library(matlib)
 library(nloptr)
 
@@ -55,17 +56,18 @@ for (i in 1:length(n)) {
 }
 
 # mock community composition
-set.seed(0)
-cc <- matrix(runif(ncol(Q)),ncol=1)
+set.seed(1)
+cc <- matrix(10^runif(ncol(Q),min=-5,max=-1),ncol=1)
 rownames(cc) <- colnames(Q)
+cc[sample(1:nrow(cc),3),] <- 0
 cc <- cc/sum(cc)
 
 # mock sequencing data
 seq <- Q %*% cc
 
 # add noise to sequencing data
-seq_noise <- seq + (0.3)*matrix(runif(nrow(Q)),ncol=1)
-seq_noise[seq_noise<0] <- 0
+seq_noise <- seq*matrix(1 + rnorm(nrow(seq),mean=0,sd=0.1),ncol=1) + matrix(rnorm(nrow(seq),mean=0,sd=0.05),ncol=1)
+seq_noise[seq_noise<0] <- -seq_noise[seq_noise<0]
 seq_noise <- seq_noise/sum(seq_noise)
 
 ### If there was no noise (sequencing error etc.) then it would be straightforward to
@@ -152,7 +154,7 @@ rownames(cc_inferred_3) <- colnames(Q)
 rm(list=ls())
 
 # define function
-species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
+species_composition_from_sequencing_old <- function(Q,seq,remove_unused_seqs=TRUE) {
   
   # inputs as matrices
   Q <- as.matrix(Q)
@@ -170,19 +172,22 @@ species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
   if (length(n)) {
     Q <- cbind(Q,matrix(0,nrow=nrow(Q),ncol=length(n)))
     for (i in 1:length(n)) {
-      colnames(Q)[ncol(Q) - length(n) + i] <- paste('pseu_',i,sep='')
+      colnames(Q)[ncol(Q) - length(n) + i] <- n[i]
       Q[n[i],ncol(Q) - length(n) + i] <- 1
     }
   }
   
+  # inverse of Q
+  invQ <- Ginv(Q)
+  
   # define function to minimize and constraint function
-  eval_f <- function(x) sum((Ginv(Q) %*% seq - x)^2)
-  eval_grad_f <- function(x) -2*(Ginv(Q) %*% seq - x)
+  eval_f <- function(x) sum((invQ %*% seq - x)^2)
+  eval_grad_f <- function(x) -2*(invQ %*% seq - x)
   eval_h <- function(x) sum(x) - 1
   eval_jac_h <- function(x) rep(1,length(x))
   
   # initial guess
-  x0 <- Ginv(Q) %*% seq
+  x0 <- invQ %*% seq
   x0[x0<0] <- 0
   x0 <- x0/sum(x0)
   
@@ -205,6 +210,66 @@ species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
                 ub = rep(1,ncol(Q)),
                 eval_g_eq = eval_h,
                 eval_jac_g_eq = eval_jac_h,
+                opts = opts)
+  
+  # return solution
+  species_composition <- matrix(res$solution,ncol=1,)
+  rownames(species_composition) <- colnames(Q)
+  
+  return(species_composition)
+  
+}
+
+# define function (II)
+species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
+  
+  # inputs as matrices
+  Q <- as.matrix(Q)
+  seq <- as.matrix(seq)
+  
+  # remove sequences that are not represented
+  if (remove_unused_seqs) {
+    n <- rowSums(Q) >0 | seq>0
+    Q <- Q[n,]
+    seq <- seq[n,]
+  }
+  
+  # add pseudo-species corresponding to sequences not in Q
+  n <- rownames(Q)[rowSums(Q) == 0]
+  if (length(n)) {
+    Q <- cbind(Q,matrix(0,nrow=nrow(Q),ncol=length(n)))
+    for (i in 1:length(n)) {
+      colnames(Q)[ncol(Q) - length(n) + i] <- n[i]
+      Q[n[i],ncol(Q) - length(n) + i] <- 1
+    }
+  }
+  
+  # define function to minimize and constraint function
+  eval_f <- function(x) sum((Q %*% x - seq)^2)
+  eval_h <- function(x) sum(x) - 1
+  
+  # initial guess
+  x0 <- Ginv(Q) %*% seq
+  x0[x0<0] <- 0
+  x0 <- x0/sum(x0)
+  
+  # options to pass to nloptr
+  local_opts <- list('algorithm' = 'NLOPT_LD_MMA',
+                     'xtol_rel' = 1.0e-7)
+  opts <- list('algorithm' = 'NLOPT_GN_ISRES',
+               'xtol_rel' = 1.0e-8,
+               'maxeval' = 1000,
+               local_opts = local_opts,
+               'check_derivatives' = FALSE,
+               'check_derivatives_print' = 'all',
+               'print_level' = 0)
+  
+  # solve optimization problem
+  res <- nloptr(x0=x0,
+                eval_f = eval_f,
+                lb = rep(0,ncol(Q)),
+                ub = rep(1,ncol(Q)),
+                eval_g_eq = eval_h,
                 opts = opts)
   
   # return solution

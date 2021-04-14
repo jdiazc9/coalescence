@@ -1,0 +1,301 @@
+\documentclass[a4paper,10pt]{article}
+
+% packages
+\usepackage[utf8]{inputenc} % allows usage of spanish special characters
+\usepackage[spanish,english]{babel} % english dictionary for proper hyphenation
+\usepackage{amsmath} % math expressions
+\usepackage{txfonts} % nice fonts 
+\usepackage{authblk} % author affiliations
+\usepackage{graphicx} % images
+\usepackage{float} % image positioning
+\usepackage{multirow} % allows merging cells in tables
+\usepackage{mathtools} % nice matrices
+\usepackage{rotating} % rotated text
+\usepackage{caption} % customization of figure/table captions
+\usepackage{subcaption} % collages of multiple images
+%% \usepackage[hidelinks]{hyperref} % hyperlinks
+\usepackage{hyperref} % hyperlinks
+\usepackage{nameref} % cross-references between draft and supplementary material
+\usepackage{zref-xr,zref-user} % more cross-references formatting
+\usepackage[square,numbers,sort&compress]{natbib}
+\usepackage{xcolor} % text color
+\usepackage[margin=3cm]{geometry} % margins
+
+\usepackage{pdflscape} %% Landscape
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\usepackage{savesym}
+\savesymbol{iint}
+\restoresymbol{TXF}{iint}
+%% \usepackage{pdfpages} %% to include a pdf file
+
+% customization
+\setcounter{Maxaffil}{0} % affiliations
+\renewcommand\Affilfont{\itshape\small} % style of affiliations text
+\makeatletter\renewcommand{\@biblabel}[1]{#1.}\makeatother % change [number] for number. in reference list
+\newcommand{\idea}[1]{\textcolor{red}{#1}}
+\newcommand{\mr}{\textcolor{red}{\textbf{[missing ref(s)]}}}
+\newcommand{\Burl}[1]{\url{#1}}
+\zxrsetup{toltxlabel} % cross references: draft & suppl mat
+\zexternaldocument*[M-]{draft}
+\hypersetup{
+  colorlinks = true,
+  citecolor=  black,
+  linkcolor = {blue},
+  filecolor = cyan % controls color of external ref, if used
+}
+\renewcommand{\thefigure}{\textbf{S\arabic{figure}}} % preceed the Suppl Mat figures with S
+\renewcommand{\thetable}{\textbf{S\arabic{table}}} % preceed the Suppl Mat tables with S
+\renewcommand{\theequation}{S\arabic{equation}} % preceed the Suppl Mat equations with S
+\captionsetup[figure]{font=small, labelfont={bf}, labelformat={default},
+   labelsep=period, name={Fig.}} % custom figure captions
+\captionsetup[table]{font=small, labelfont={bf}, labelformat={default},
+   labelsep=period, name={Table}} % custom table captions
+ 
+% title, authors, affiliations
+\title{Supplementary Material for ``Provisional Title'' }
+\author[1,2]{Authors}
+\author[1,$\dagger$]{Álvaro Sánchez}
+\affil[1]{Department of Ecology \& Evolutionary Biology and Microbial
+  Sciences Institute, Yale University, New Haven, CT, USA}
+\affil[2]{Other affiliations...}
+\affil[$\dagger$]{To whom correspondence should be addressed: \normalfont alvaro.sanchez@yale.edu}
+\date{}
+
+\newcommand\legendtreefigs{Internal nodes show the partitioning variables   and the values that lead to each partition; light blue denotes the   values or categories that lead down the left split and salmon the values   or categories that lead down the right split (partitioning criteria are   also shown in the edges leading down a node). Leaves or terminal nodes   show (weighted) boxplots of the dependent variable for the observations   that belong that fall in that leave and, as label, the name of the node   ax_3,nd the sample size (sum of weighted observations and \% of the total   data set for the fit). The dot plots underneath the boxplots show the   mean JS for all the methods for that leave.}   
+
+
+
+  
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+
+\section{Supplementary Methods}\label{supp-methods}
+
+\subsection{Data processing}\label{supp-methods:data-proc}
+
+Thresholds for vector similarity in ESV space, etc.
+
+\subsubsection{Special cases}\label{supp-methods:data-proc:special}
+
+Blablabla.
+
+\subsection{Inferring species abundance from sequencing data}
+\label{supp-methods:species-from-seq}
+
+Consider a community of $N$ species with relative abundances represented
+by the components of a vector $\mathbf{x} = \left( x_1, x_2, \dotsc,
+x_N\right)$ such that $x_i$ is the relative abundance of the $i$-th species.
+Naturally, the conditions
+%
+\begin{equation}
+\sum_i x_i = 1
+\label{supp-eqn:normx_1}
+\end{equation}
+%
+and
+%
+\begin{equation}
+0 \leq x_i \leq 1 \; \textrm{for all} \; i
+\label{supp-eqn:normx_2}
+\end{equation}
+%
+are satisfied.
+
+Performing 16S rRNA gene sequencing on such a community yields a list of
+sequences (exact sequence variants or ESVs) and their respective abundance.
+Normalizing by the total number of sequences, we can obtain a vector $\mathbf{s}
+= \left( s_1, s_2, \dotsc \right)$ that also satisfies the normalization
+conditions of equations \ref{supp-eqn:normx_1} and \ref{supp-eqn:normx_2}.
+Only if there are as many ESVs as species $\mathbf{s}$ has length $N$
+(the same as as $\mathbf{x}$), but in the most general case it is possible that
+a) multiple species share a same ESV and/or b) species carrying multiple copies
+of the 16S rRNA gene have different sequences for each copy\mr. We denote
+the length of $\mathbf{s}$ as $M$, which need not be equal to $N$.
+
+By sequencing each species individually, we can build a $M \times N$ 
+matrix $\mathbf{Q}$ such
+that the element in the $(i,j)$ position, $q_{ij}$, represents the frequency of
+the $i$-th ESV when the $j$-th species is sequenced. $\mathbf{Q}$ can be used
+to determine the fraction of sequences of a given ESV that are obtained from
+sequencing a community with any arbitrary composition. In other words,
+$\mathbf{Q}$ maps $\mathbf{x}$ to $\mathbf{s}$:
+
+\begin{equation}
+\mathbf{Q} \cdot \mathbf{x} = \mathbf{s}
+\label{supp-eqn:Qxs}
+\end{equation}
+
+Note that equation \ref{supp-eqn:Qxs} is only true if all species have the same
+number of copies of the 16S rRNA gene. Otherwise, species with high copy numbers
+will yield more sequences, thus leading to an over-representation and vice-versa.
+Information on the 16S copy number for every species in the communities would be
+required to overcome this limitation, but this is not feasible when dealing with
+highly diverse communities. For our purpose in this
+work, we will need to assume that the copy numbers of the 16S are relatively
+conserved across species and equation \ref{supp-eqn:Qxs} holds. Additionally,
+we have sequencing data from a subset of the species in our
+communities, but not from all of them. This means that we cannot build a complete
+$\mathbf{Q}$ matrix. To address this, we first identify every ESV obtained
+from community sequencing that we cannot map back to (at least) one of the
+species for which we have single-species sequencing information. We then
+assume that each
+of those ESVs maps uniquely to a single species. This gives us a $\mathbf{Q}$
+matrix of the form:
+
+\begin{equation}
+\mathbf{Q} = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\; \; \;
+\rotatebox{90}{\scriptsize species 1} \; \; \; & 
+\rotatebox{90}{\scriptsize species 2} \; \; \; &
+\rotatebox{90}{\scriptsize species 3} \; \; &
+\cdots \; \; &
+\rotatebox{90}{\scriptsize species $N-2$} \! \! & 
+\rotatebox{90}{\scriptsize species $N-1$} \! \! &
+\rotatebox{90}{\scriptsize species $N$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[r]
+\rotatebox{0}{\scriptsize sequence 1} \\
+\rotatebox{0}{\scriptsize sequence 2} \\
+\rotatebox{0}{\scriptsize sequence 3} \\
+\vdots \; \; \; \\
+\rotatebox{0}{\scriptsize sequence $M-2$} \\ 
+\rotatebox{0}{\scriptsize sequence $M-1$} \\
+\rotatebox{0}{\scriptsize sequence $M$}
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+q_{11} & q_{12} & q_{13} &  & 0 & 0 & 0 \\
+q_{21} & q_{22} & q_{23} & \cdots & 0 & 0 & 0 \\
+q_{31} & q_{32} & q_{33} &  & 0 & 0 & 0 \\
+ & \vdots &  & \ddots  &  &  &  \\
+0 & 0 & 0 &  & 1 & 0 & 0 \\ 
+0 & 0 & 0 &  & 0 & 1 & 0 \\ 
+0 & 0 & 0 &  & 0 & 0 & 1 
+\end{pmatrix}
+
+\end{matrix}
+\label{supp-eqn:Q_modified}
+\end{equation}
+%
+While a one-to-one mapping between species and ESVs may not be true in all cases,
+in practice the ESVs for which we make this assumption have low relative
+abundances in the communities, minimizing the impact of any potential artifact.
+
+Having built our $\mathbf{Q}$ matrix according to equation
+\ref{supp-eqn:Q_modified}, obtaining species abundances from sequencing data
+is relatively straigthforward: we need to find the $\mathbf{x}$ that satisfies
+equation \ref{supp-eqn:Qxs} for a given $\mathbf{s}$. However, in some cases
+sequencing noise can introduce deviations in $\mathbf{s}$ that make it so the
+vector $\mathbf{x}$ that solves equation \ref{supp-eqn:Qxs} does not meet the
+boundary conditions in equation \ref{supp-eqn:normx_2}, i.e., some $x_i$ may be
+negative or greater than 1. These cases are obviously problematic, but we can
+avoid them by accounting for potential deviations in $\mathbf{s}$. We do this
+by solving the following nonlinear optimization problem. We want to obtain an estimate of the true community composition $\mathbf{x}$
+(that we will denote as $\mathbf{\hat{x}}$) so that the product
+$\mathbf{Q} \cdot \mathbf{\hat{x}}$ is as close as possible to $\mathbf{s}$ while
+having $\mathbf{\hat{x}}$ satisfy the normalization condition in equation
+\ref{supp-eqn:normx_1} and the boundary conditions in equation
+\ref{supp-eqn:normx_2}. For every possible $\mathbf{\hat{x}}$, we define a vector
+$\mathbf{\epsilon} = \mathbf{\epsilon} \left( \mathbf{\hat{x}} \right) = 
+\left( \epsilon_1, \epsilon_2, \cdots, \epsilon_M \right)$ as
+
+\begin{equation}
+\mathbf{\epsilon} \left( \mathbf{\hat{x}} \right) =
+\mathbf{Q} \cdot \mathbf{\hat{x}} - \mathbf{s}
+\end{equation}
+%
+and a function $f \left( \mathbf{\hat{x}} \right)$ as
+
+\begin{equation}
+f \left( \mathbf{\hat{x}} \right) = \sum_i \epsilon_i^2
+\end{equation}
+%
+We also define a function $h \left( \mathbf{\hat{x}} \right)$ as
+
+\begin{equation}
+h \left( \mathbf{\hat{x}} \right) = 1 - \mathbf{\hat{x}}
+\end{equation}
+%
+The best estimation for the species composition of a community will be the
+$\mathbf{\hat{x}}$ that minimizes $f \left( \mathbf{\hat{x}} \right)$ while
+satisfying the normalization condition (eq. \ref{supp-eqn:normx_1}) and the
+boundary conditions (eq. \ref{supp-eqn:normx_2}). We solve
+this problem using the \texttt{nloptr} package for R\mr, passing it
+$f \left( \mathbf{\hat{x}} \right)$ as the function to minimze and
+$h \left( \mathbf{\hat{x}} \right) = 0$ as an equality constraint, as well as
+0 and 1
+as the lower and upper bounds for the entries of $\mathbf{\hat{x}}$. Further
+details can be found in the code for the analysis (see section 
+\nameref{supp-datacode} of this Supplementary Material).
+
+\clearpage
+
+\section{Data \& code availability}
+\label{supp-datacode}
+
+Data and code for the analyses in this article, as well as code for the
+\texttt{community-simulator} package updated with the new functionalities,
+is available at \url{https://github.com/jdiazc9/coalescence}.
+
+\clearpage
+
+\section{Supplementary Results}\label{supp-results}
+
+Blabla
+
+\subsection{Linear mixed-effects model trees}
+\label{suppl-linear-mixed-model-results}
+
+Blabla
+
+\clearpage
+
+\section{Supplementay Figures}\label{supp-figs}
+
+Blablabla.
+
+\clearpage
+
+% references
+{\small
+  %% \bibliography{refs}
+  \bibliography{extracted-supp}
+% \bibliographystyle{unsrt}
+%% \bibliographystyle{mystyle}
+\bibliographystyle{mybibwithurl}
+}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -100,8 +100,8 @@ rownames(cc_inferred_2) <- colnames(Q)
 ###
 ### We start by defining the function to minimize as a function of cc_true (here denoted as x)
 ### and its gradient
-eval_f <- function(x) sum((Ginv(Q) %*% seq_noise - x)^2)
-eval_grad_f <- function(x) -2*(Ginv(Q) %*% seq_noise - x)
+eval_f <- function(x) sum((Q %*% x - seq_noise)^2)
+eval_grad_f <- function(x) 2*(t(Q %*% x - seq_noise) %*% Q)
 
 ### Our initial 'guess' would just be the result of doing Ginv(Q) %*% seq_noise, correcting
 ### negative values and mantaining normalization
@@ -179,7 +179,9 @@ species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
   
   # define function to minimize and constraint function
   eval_f <- function(x) sum((Q %*% x - seq)^2)
+  eval_grad_f <- function(x) 2*(t(Q %*% x - seq) %*% Q)
   eval_h <- function(x) sum(x) - 1
+  eval_jac_h <- function(x) rep(1,length(x))
   
   # initial guess
   x0 <- Ginv(Q) %*% seq
@@ -189,7 +191,7 @@ species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
   # options to pass to nloptr
   local_opts <- list('algorithm' = 'NLOPT_LD_MMA',
                      'xtol_rel' = 1.0e-7)
-  opts <- list('algorithm' = 'NLOPT_GN_ISRES',
+  opts <- list('algorithm' = 'NLOPT_LD_AUGLAG',
                'xtol_rel' = 1.0e-8,
                'maxeval' = 1000,
                local_opts = local_opts,
@@ -200,13 +202,15 @@ species_composition_from_sequencing <- function(Q,seq,remove_unused_seqs=TRUE) {
   # solve optimization problem
   res <- nloptr(x0=x0,
                 eval_f = eval_f,
+                eval_grad_f = eval_grad_f,
                 lb = rep(0,ncol(Q)),
                 ub = rep(1,ncol(Q)),
                 eval_g_eq = eval_h,
+                eval_jac_g_eq = eval_jac_h,
                 opts = opts)
   
   # return solution
-  species_composition <- matrix(res$solution,ncol=1,)
+  species_composition <- matrix(res$solution,ncol=1)
   rownames(species_composition) <- colnames(Q)
   
   return(species_composition)

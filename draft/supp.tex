@@ -20,6 +20,7 @@
 \usepackage[square,numbers,sort&compress]{natbib}
 \usepackage{xcolor} % text color
 \usepackage[margin=3cm]{geometry} % margins
+\usepackage[nottoc,numbib]{tocbibind} % add references to table of contents
 
 \usepackage{pdflscape} %% Landscape
 \usepackage{dcolumn}
@@ -33,6 +34,7 @@
 \setcounter{Maxaffil}{0} % affiliations
 \renewcommand\Affilfont{\itshape\small} % style of affiliations text
 \makeatletter\renewcommand{\@biblabel}[1]{#1.}\makeatother % change [number] for number. in reference list
+\addto{\captionsenglish}{\renewcommand{\bibname}{Supplementary References}}
 \newcommand{\idea}[1]{\textcolor{red}{#1}}
 \newcommand{\mr}{\textcolor{red}{\textbf{[missing ref(s)]}}}
 \newcommand{\Burl}[1]{\url{#1}}
@@ -51,18 +53,21 @@
    labelsep=period, name={Fig.}} % custom figure captions
 \captionsetup[table]{font=small, labelfont={bf}, labelformat={default},
    labelsep=period, name={Table}} % custom table captions
- 
+\hypersetup{citecolor={blue}}
+
 % title, authors, affiliations
 \title{Supplementary Material for ``Provisional Title'' }
-\author[1,2]{Authors}
-\author[1,$\dagger$]{Álvaro Sánchez}
-\affil[1]{Department of Ecology \& Evolutionary Biology and Microbial
-  Sciences Institute, Yale University, New Haven, CT, USA}
-\affil[2]{Other affiliations...}
+\author[1,2,3]{Authors}
+\author[1,2,$\dagger$]{Álvaro Sánchez}
+\affil[1]{Department of Ecology \& Evolutionary Biology,
+Yale University, New Haven, CT, USA}
+\affil[2]{Microbial Sciences Institute,
+Yale University, New Haven, CT, USA}
+\affil[3]{Other affiliations...}
 \affil[$\dagger$]{To whom correspondence should be addressed: \normalfont alvaro.sanchez@yale.edu}
 \date{}
 
-\newcommand\legendtreefigs{Internal nodes show the partitioning variables   and the values that lead to each partition; light blue denotes the   values or categories that lead down the left split and salmon the values   or categories that lead down the right split (partitioning criteria are   also shown in the edges leading down a node). Leaves or terminal nodes   show (weighted) boxplots of the dependent variable for the observations   that belong that fall in that leave and, as label, the name of the node   ax_3,nd the sample size (sum of weighted observations and \% of the total   data set for the fit). The dot plots underneath the boxplots show the   mean JS for all the methods for that leave.}   
+\newcommand\legendtreefigs{Internal nodes show the partitioning variables   and the values that lead to each partition; light blue denotes the   values or categories that lead down the left split and salmon the values   or categories that lead down the right split (partitioning criteria are   also shown in the edges leading down a node). Leaves or terminal nodes   show (weighted) boxplots of the dependent variable for the observations   that belong that fall in that leave and, as label, the name of the node   ax_3,nd the sample size (sum of weighted observations and \% of the total   data set for the fit). The dot plots underneath the boxplots show the mean JS for all the methods for that leave.}   
 
 
 
@@ -73,12 +78,60 @@
 \tableofcontents
 \newpage
 
-
 \section{Supplementary Methods}\label{supp-methods}
 
 \subsection{Data processing}\label{supp-methods:data-proc}
 
-Thresholds for vector similarity in ESV space, etc.
+\subsubsection{Examining community composition}
+\label{supp-methods:data-proc:community-composition}
+
+We first analyze the composition of the communities assembled in each carbon
+source by examining the relative abundances of the exact sequence variants
+(ESVs) obtained from 16S rRNA gene sequencing. We define a vector $\mathbf{s}
+= \left( s_1, s_2, \cdots, s_M \right)$ such that $s_i$ represents the relative
+abundance
+of the $i$-th ESV, being $M$ the total number of unique ESVs. We assembled
+a total of 16 communities, 8 in glutamine
+and 8 in citrate (see Methods \mr), with 3 biological replicates of each. We
+start
+by comparing the composition of replicate communities in terms of their ESV
+relative abundances. To do this, we measure the distance $d$ between two
+communities (with ESV abundances $\mathbf{s}$ and $\mathbf{s}'$ respectively) as
+
+\begin{equation}
+d \left( \mathbf{s}, \mathbf{s}' \right) =
+\sqrt{\sum_i{\left(s_i - s'_i\right)^2}}
+\label{supp-eqn:esvdist}
+\end{equation}
+%
+We compute all the distances across replicates of the same community, obtaining
+a set of 48 distances (16 communities $\times$ 3 pairwise distances between the
+three replicates) that we will denote as $\left\{d\right\}$
+
+\begin{equation} 
+\left\{d\right\} = 
+\left\{ d\left(\mathrm{community} \; i \; \mathrm{replicate} \; j,
+\mathrm{community} \; i \; \mathrm{replicate} \; j' \right) \;
+\text{for all $i$, $j$, $j' \neq j$} \right\}
+\end{equation}
+%
+We then define a threshold $d_T$ as
+
+\begin{equation}
+d_T = \mathrm{Q}4 \left( \left\{d\right\} \right) + 
+\mathrm{IQR} \left( \left\{d\right\} \right)
+\label{supp-eqn:threshold}
+\end{equation}
+%
+Where Q4 and IQR represent the fourth quantile and the interquartile range
+respectively. Note that this threshold is analogous to the one used in
+standard boxplots to identify outliers.
+
+Finally, we discard the samples that are at a distance larger than $d_T$ from
+all other replicates of the same community. These are replicate 2 of community
+1 in glutamine and replicate 2 of community 8 in citrate (see Figure S1 \mr).
+The remaining replicates were used in further analyses. We took the average
+ESV abundance across replicates when indicated.
 
 \subsubsection{Special cases}\label{supp-methods:data-proc:special}
 
@@ -115,7 +168,7 @@ Only if there are as many ESVs as species does $\mathbf{s}$ have length $N$
 (the same as $\mathbf{x}$), but in the most general case it is possible that
 \textit{a)} multiple species share a same ESV and/or \textit{b)} species carrying
 multiple copies
-of the 16S rRNA gene have different sequences for each copy\mr. We denote
+of the 16S rRNA gene have different sequences for each copy \cite{Vetrovsky2013}. We denote
 the length of $\mathbf{s}$ as $M$, which need not be equal to $N$.
 
 By sequencing each species individually, we can build a $M \times N$ 
@@ -228,21 +281,22 @@ f \left( \mathbf{\hat{x}} \right) =
 \sum_i \varepsilon_i^2 \left( \mathbf{\hat{x}} \right)
 \end{equation}
 %
-We can also define a function $\mathbf{h} \left( \mathbf{\hat{x}} \right)$ as
+We can also define a function $h \left( \mathbf{\hat{x}} \right)$ as
 
 \begin{equation}
-\mathbf{h} \left( \mathbf{\hat{x}} \right) = 1 - \mathbf{\hat{x}}
+h \left( \mathbf{\hat{x}} \right) = 1 - \sum_i\hat{x}_i
 \end{equation}
 %
 The best estimation for the species composition of a community will be the
 $\mathbf{\hat{x}}$ that minimizes $f \left( \mathbf{\hat{x}} \right)$ while
 satisfying the normalization condition (eq. \ref{supp-eqn:normx_1}) and the
 boundary conditions (eq. \ref{supp-eqn:normx_2}). We solve
-this problem using the \texttt{nloptr} package for R\mr, passing it
+this problem using the \texttt{nloptr} package for R \cite{nloptr}, passing it
 $f \left( \mathbf{\hat{x}} \right)$ as the function to minimize,
-$\mathbf{h} \left( \mathbf{\hat{x}} \right) = 0$ as an equality constraint,
+$h \left( \mathbf{\hat{x}} \right) = 0$ as an equality constraint,
 and 0 and 1
-as the lower and upper bounds for the entries of $\mathbf{\hat{x}}$. Further
+as the lower and upper bounds for the entries of $\mathbf{\hat{x}}$, and using
+the augmented Lagrangian algorithm \cite{auglag1,auglag2}. Further
 details can be found in the code for the analysis (see section 
 \nameref{supp-datacode} of this Supplementary Material).
 
@@ -275,13 +329,9 @@ Blablabla.
 \clearpage
 
 % references
-%{\small
-  %% \bibliography{refs}
-%  \bibliography{extracted-supp}
-% \bibliographystyle{unsrt}
-%% \bibliographystyle{mystyle}
-%\bibliographystyle{mybibwithurl}
-%}
+\bibliographystyle{mystyle}
+%\bibliographystyle{unsrt}
+\bibliography{refs}
 
 \end{document}
 

@@ -1,0 +1,44 @@
+% Encoding: UTF-8
+
+@Article{Vetrovsky2013,
+  author  = {Tom{\' a}{\v s} V{\v e}trovsk{\' y} and Petr Baldrian},
+  title   = {The Variability of the 16S rRNA Gene in Bacterial Genomes and Its Consequences for Bacterial Community Analyses},
+  journal = {PLoS ONE},
+  year    = {2013},
+  volume  = {8},
+  number  = {2},
+  pages   = {e57923},
+  doi     = {10.1371/journal.pone.0057923},
+}
+
+@Article{nloptr,
+  author  = {Steven G. Johnson},
+  title   = {The NLopt nonlinear-optimization package},
+  journal = {{ }},
+  year    = {{ }},
+}
+
+@MISC{auglag2,
+    author = {E. G. Birgin and et al.},
+    title = {Improving ultimate convergence of an Augmented Lagrangian method},
+    year = {2007}
+}
+
+@Article{auglag1,
+    author = {Conn, Andrew R. and Gould, Nicholas I. M. and Toint, Philippe},
+    title = {A Globally Convergent Augmented Lagrangian Algorithm for Optimization with General Constraints and Simple Bounds},
+    journal = {SIAM Journal on Numerical Analysis},
+    volume = {28},
+    number = {2},
+    pages = {545-572},
+    year = {1991},
+    doi = {10.1137/0728030},
+    URL = {
+        https://doi.org/10.1137/0728030
+    },
+    eprint = { 
+        https://doi.org/10.1137/0728030
+    }
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

@@ -1,0 +1,24 @@
+\begin{thebibliography}{1}
+
+\bibitem{Vetrovsky2013}
+V{\v e}trovsk{\' y} T and Baldrian P (2013).
+\newblock The Variability of the 16S rRNA Gene in Bacterial Genomes and Its
+  Consequences for Bacterial Community Analyses.
+\newblock \emph{PLoS ONE} \textbf{8(2)}:e57923
+
+\bibitem{nloptr}
+Johnson SG.
+\newblock The NLopt nonlinear-optimization package
+
+\bibitem{auglag1}
+Conn AR, Gould NIM and Toint P (1991).
+\newblock A Globally Convergent Augmented Lagrangian Algorithm for Optimization
+  with General Constraints and Simple Bounds.
+\newblock \emph{SIAM Journal on Numerical Analysis} \textbf{28(2)}:545--572
+
+\bibitem{auglag2}
+Birgin E and Martínez J (2008).
+\newblock Improving ultimate convergence of an augmented Lagrangian method.
+\newblock \emph{Optimization Methods and Software} \textbf{23(2)}:177--195
+
+\end{thebibliography}

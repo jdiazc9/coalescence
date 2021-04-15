@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc} % allows usage of spanish special characters
 \usepackage[spanish,english]{babel} % english dictionary for proper hyphenation
 \usepackage{amsmath} % math expressions
+\usepackage{upgreek} % upright greek letters for math
 \usepackage{txfonts} % nice fonts 
 \usepackage{authblk} % author affiliations
 \usepackage{graphicx} % images
@@ -13,7 +14,6 @@
 \usepackage{rotating} % rotated text
 \usepackage{caption} % customization of figure/table captions
 \usepackage{subcaption} % collages of multiple images
-%% \usepackage[hidelinks]{hyperref} % hyperlinks
 \usepackage{hyperref} % hyperlinks
 \usepackage{nameref} % cross-references between draft and supplementary material
 \usepackage{zref-xr,zref-user} % more cross-references formatting
@@ -111,9 +111,10 @@ sequences (exact sequence variants or ESVs) and their respective abundance.
 Normalizing by the total number of sequences, we can obtain a vector $\mathbf{s}
 = \left( s_1, s_2, \dotsc \right)$ that also satisfies the normalization
 conditions of equations \ref{supp-eqn:normx_1} and \ref{supp-eqn:normx_2}.
-Only if there are as many ESVs as species $\mathbf{s}$ has length $N$
-(the same as as $\mathbf{x}$), but in the most general case it is possible that
-a) multiple species share a same ESV and/or b) species carrying multiple copies
+Only if there are as many ESVs as species does $\mathbf{s}$ have length $N$
+(the same as $\mathbf{x}$), but in the most general case it is possible that
+\textit{a)} multiple species share a same ESV and/or \textit{b)} species carrying
+multiple copies
 of the 16S rRNA gene have different sequences for each copy\mr. We denote
 the length of $\mathbf{s}$ as $M$, which need not be equal to $N$.
 
@@ -198,35 +199,39 @@ Having built our $\mathbf{Q}$ matrix according to equation
 \ref{supp-eqn:Q_modified}, obtaining species abundances from sequencing data
 is relatively straigthforward: we need to find the $\mathbf{x}$ that satisfies
 equation \ref{supp-eqn:Qxs} for a given $\mathbf{s}$. However, in some cases
-sequencing noise can introduce deviations in $\mathbf{s}$ that make it so the
+sequencing error can introduce deviations in $\mathbf{s}$ that make it so the
 vector $\mathbf{x}$ that solves equation \ref{supp-eqn:Qxs} does not meet the
 boundary conditions in equation \ref{supp-eqn:normx_2}, i.e., some $x_i$ may be
 negative or greater than 1. These cases are obviously problematic, but we can
 avoid them by accounting for potential deviations in $\mathbf{s}$. We do this
-by solving the following nonlinear optimization problem. We want to obtain an estimate of the true community composition $\mathbf{x}$
-(that we will denote as $\mathbf{\hat{x}}$) so that the product
-$\mathbf{Q} \cdot \mathbf{\hat{x}}$ is as close as possible to $\mathbf{s}$ while
+by solving the following nonlinear optimization problem: we want to obtain an
+estimate of the true community composition
+(we will denote the estimate as $\mathbf{\hat{x}}$) so that the product
+$\mathbf{Q} \cdot \mathbf{\hat{x}}$ is as close as possible to the $\mathbf{s}$
+obtained from sequencing while
 having $\mathbf{\hat{x}}$ satisfy the normalization condition in equation
 \ref{supp-eqn:normx_1} and the boundary conditions in equation
-\ref{supp-eqn:normx_2}. For every possible $\mathbf{\hat{x}}$, we define a vector
-$\mathbf{\epsilon} = \mathbf{\epsilon} \left( \mathbf{\hat{x}} \right) = 
-\left( \epsilon_1, \epsilon_2, \cdots, \epsilon_M \right)$ as
+\ref{supp-eqn:normx_2}. For every possible $\mathbf{\hat{x}}$, we can define a vector
+$\boldsymbol{\upvarepsilon} = \boldsymbol{\upvarepsilon} \left( \mathbf{\hat{x}} \right) = 
+\left( \varepsilon_1, \varepsilon_2, \cdots, \varepsilon_M \right)$ as
 
 \begin{equation}
-\mathbf{\epsilon} \left( \mathbf{\hat{x}} \right) =
+\boldsymbol{\upvarepsilon} \left( \mathbf{\hat{x}} \right) =
 \mathbf{Q} \cdot \mathbf{\hat{x}} - \mathbf{s}
 \end{equation}
 %
 and a function $f \left( \mathbf{\hat{x}} \right)$ as
 
 \begin{equation}
-f \left( \mathbf{\hat{x}} \right) = \sum_i \epsilon_i^2
+f \left( \mathbf{\hat{x}} \right) =
+\left| \boldsymbol{\upvarepsilon} \left( \mathbf{\hat{x}} \right) \right| ^2 =
+\sum_i \varepsilon_i^2 \left( \mathbf{\hat{x}} \right)
 \end{equation}
 %
-We also define a function $h \left( \mathbf{\hat{x}} \right)$ as
+We can also define a function $\mathbf{h} \left( \mathbf{\hat{x}} \right)$ as
 
 \begin{equation}
-h \left( \mathbf{\hat{x}} \right) = 1 - \mathbf{\hat{x}}
+\mathbf{h} \left( \mathbf{\hat{x}} \right) = 1 - \mathbf{\hat{x}}
 \end{equation}
 %
 The best estimation for the species composition of a community will be the
@@ -234,9 +239,9 @@ $\mathbf{\hat{x}}$ that minimizes $f \left( \mathbf{\hat{x}} \right)$ while
 satisfying the normalization condition (eq. \ref{supp-eqn:normx_1}) and the
 boundary conditions (eq. \ref{supp-eqn:normx_2}). We solve
 this problem using the \texttt{nloptr} package for R\mr, passing it
-$f \left( \mathbf{\hat{x}} \right)$ as the function to minimze and
-$h \left( \mathbf{\hat{x}} \right) = 0$ as an equality constraint, as well as
-0 and 1
+$f \left( \mathbf{\hat{x}} \right)$ as the function to minimize,
+$\mathbf{h} \left( \mathbf{\hat{x}} \right) = 0$ as an equality constraint,
+and 0 and 1
 as the lower and upper bounds for the entries of $\mathbf{\hat{x}}$. Further
 details can be found in the code for the analysis (see section 
 \nameref{supp-datacode} of this Supplementary Material).
@@ -256,8 +261,8 @@ is available at \url{https://github.com/jdiazc9/coalescence}.
 
 Blabla
 
-\subsection{Linear mixed-effects model trees}
-\label{suppl-linear-mixed-model-results}
+\subsection{Example subsection}
+\label{supp-results:example}
 
 Blabla
 
@@ -270,13 +275,13 @@ Blablabla.
 \clearpage
 
 % references
-{\small
+%{\small
   %% \bibliography{refs}
-  \bibliography{extracted-supp}
+%  \bibliography{extracted-supp}
 % \bibliographystyle{unsrt}
 %% \bibliographystyle{mystyle}
-\bibliographystyle{mybibwithurl}
-}
+%\bibliographystyle{mybibwithurl}
+%}
 
 \end{document}
 

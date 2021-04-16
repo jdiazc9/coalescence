@@ -2,10 +2,10 @@
 \contentsline {section}{\numberline {1}Supplementary Methods}{2}{section.1}%
 \contentsline {subsection}{\numberline {1.1}Data processing}{2}{subsection.1.1}%
 \contentsline {subsubsection}{\numberline {1.1.1}Examining community composition}{2}{subsubsection.1.1.1}%
-\contentsline {subsubsection}{\numberline {1.1.2}Special cases}{2}{subsubsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.2}Inferring species abundance from sequencing data}{2}{subsection.1.2}%
-\contentsline {section}{\numberline {2}Data \& code availability}{4}{section.2}%
-\contentsline {section}{\numberline {3}Supplementary Results}{5}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Example subsection}{5}{subsection.3.1}%
-\contentsline {section}{\numberline {4}Supplementay Figures}{6}{section.4}%
-\contentsline {section}{\numberline {5}Supplementary References}{7}{section.5}%
+\contentsline {subsubsection}{\numberline {1.1.2}Characterization of dominant species}{2}{subsubsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.2}Inferring species abundances from sequencing data}{3}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Data \& code availability}{5}{section.2}%
+\contentsline {section}{\numberline {3}Supplementary Results}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Example subsection}{6}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Supplementay Figures}{7}{section.4}%
+\contentsline {section}{\numberline {5}Supplementary References}{8}{section.5}%

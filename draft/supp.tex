@@ -118,12 +118,12 @@ three replicates) that we will denote as $\left\{d\right\}$
 We then define a threshold $d_T$ as
 
 \begin{equation}
-d_T = \mathrm{Q}4 \left( \left\{d\right\} \right) + 
-\mathrm{IQR} \left( \left\{d\right\} \right)
+d_T = \mathrm{Q}3 \left( \left\{d\right\} \right) + 
+1.5 \; \mathrm{IQR} \left( \left\{d\right\} \right)
 \label{supp-eqn:threshold}
 \end{equation}
 %
-Where Q4 and IQR represent the fourth quantile and the interquartile range
+Where Q3 and IQR represent the third quartile and the interquartile range
 respectively. Note that this threshold is analogous to the one used in
 standard boxplots to identify outliers.
 
@@ -133,9 +133,16 @@ all other replicates of the same community. These are replicate 2 of community
 The remaining replicates were used in further analyses. We took the average
 ESV abundance across replicates when indicated.
 
-\subsubsection{Special cases}\label{supp-methods:data-proc:special}
+\subsubsection{Characterizing dominant species}\label{supp-methods:data-proc:doms}
 
-Blablabla.
+As described in the main text Methods \mr, communities were plated and the most
+abundant species (as determined by counting of colony morphotypes) was isolated
+and allowed to regrow in monoculture prior to sequencing. We then characterize
+the isolated species to, first, make sure that they were dominant in the communities
+they were isolated from, and second, identify those instances where two or more
+communities share the same dominant.
+
+Since we assembled 16 communities, we have 16 isolates. We will denote as 
 
 \subsection{Inferring species abundance from sequencing data}
 \label{supp-methods:species-from-seq}

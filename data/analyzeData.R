@@ -27,6 +27,9 @@ if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
 save_plots <- TRUE
 
+# general options
+deconvolute_ESVs <- FALSE # should species abundance be estimated from ESV abundance?
+
 
 ### ----------------------------------------------------------------------
 ### LOAD AND FORMAT DATA
@@ -784,12 +787,51 @@ dominants[['Citrate']] <- list(isolate_2 = c('Community3','Community5'),
                                isolate_8 = 'Community4',
                                other = c('Community6','Community8'))
 
+### Now we have an additional decision to make. Isolates 2, 4 and 6 share a same
+### ESV (even though isolates 4 and 6 carry additional copies of the 16S rRNA
+### gene mapping to different ESVs). We can use the matrix in
+###    > isolates[['seq']]
+### to deconvolute ESV abundances into species abundances in those samples
+### containing isolates 2, 4 and 6 (see isolates_abundance_from_ESVs.R).
+### However, this procedure is not standard and nothing similar seems to have
+### been described in the literature. The standard approach would be to just
+### consider isolates 2, 4 and 6 as indistinguishable, which would give us:
+
+# should we deconvolute ESV abundance into species abundance? if not...
+if (!deconvolute_ESVs) {
+  
+  # unify isolates 2, 4 and 6 in deconvolution matrix
+  isolates[['seq']] <- isolates[['seq']][,
+                                         ! colnames(isolates[['seq']]) %in% c('isolate_4','isolate_6')]
+  
+  # merge isolates groups
+  for (cs in carbon_sources) {
+    isolates[['groups']][[cs]][['isolate_2']] <- c(isolates[['groups']][[cs]][['isolate_2']],
+                                                   isolates[['groups']][[cs]][['isolate_4']],
+                                                   isolates[['groups']][[cs]][['isolate_6']])
+    isolates[['groups']][[cs]][['isolate_4']] <- NULL
+    isolates[['groups']][[cs]][['isolate_6']] <- NULL
+  }
+  
+  # merge dominants
+  dominants[['Glutamine']] <- list(isolate_1 = 'Community1',
+                                   isolate_2 = c('Community2','Community4','Community6'),
+                                   isolate_3 = 'Community3',
+                                   isolate_5 = c('Community7','Community8'),
+                                   other = 'Community5')
+  dominants[['Citrate']] <- list(isolate_2 = c('Community1','Community3','Community5'),
+                                 isolate_7 = c('Community2','Community7'),
+                                 isolate_8 = 'Community4',
+                                 other = c('Community6','Community8'))
+  
+}
+
 
 ### ----------------------------------------------------------------------
 ### PAIRWISE COMPETITION VS. COALESCENCE VS. DOMINANT INVADING ALONE
 ### ----------------------------------------------------------------------
 
-# intialize plotting table
+# initialize plotting table
 plot_this <- data.frame(carbon_source = character(0),
                         community_1 = character(0),
                         community_2 = character(0),

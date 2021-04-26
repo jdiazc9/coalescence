@@ -10,4 +10,21 @@ V{\v e}trovsk{\' y} T and Baldrian P (2013).
 Johnson SG.
 \newblock The NLopt nonlinear-optimization package
 
+\bibitem{Marsland2020}
+Marsland R, Cui W, Goldford J and Mehta P (2020).
+\newblock The Community Simulator: A Python package for microbial ecology.
+\newblock \emph{PLoS ONE} \textbf{15(3)}:e0230430
+
+\bibitem{Goldford2018}
+Goldford JE, Lu N, Baji{\'c} D, Estrela S, Tikhonov M, Sanchez-Gorostiaga A,
+  Segr{\`e} D, Mehta P and Sanchez A (2018).
+\newblock Emergent simplicity in microbial community assembly.
+\newblock \emph{Science} \textbf{361(6401)}:469--474
+
+\bibitem{Marsland2019}
+III RM, Cui W, Goldford J, Sanchez A, Korolev K and Mehta P (2019).
+\newblock Available energy fluxes drive a transition in the diversity,
+  stability, and functional structure of microbial communities.
+\newblock \emph{PLoS Computational Biology} \textbf{15(2)}:e1006793
+
 \end{thebibliography}

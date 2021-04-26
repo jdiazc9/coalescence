@@ -11,34 +11,84 @@
   doi     = {10.1371/journal.pone.0057923},
 }
 
-@Article{nloptr,
+@Misc{nloptr,
   author  = {Steven G. Johnson},
   title   = {The NLopt nonlinear-optimization package},
-  journal = {{ }},
-  year    = {{ }},
 }
 
-@MISC{auglag2,
-    author = {E. G. Birgin and et al.},
-    title = {Improving ultimate convergence of an Augmented Lagrangian method},
-    year = {2007}
+@Article{auglag2,
+  author = {E.G. Birgin and J.M. Martínez},
+  title = {Improving ultimate convergence of an augmented Lagrangian method},
+  journal = {Optimization Methods and Software},
+  volume = {23},
+  number = {2},
+  pages = {177-195},
+  year  = {2008},
+  publisher = {Taylor & Francis},
+  doi = {10.1080/10556780701577730},
+  URL = {
+    https://doi.org/10.1080/10556780701577730
+  },
+  eprint = {
+    https://doi.org/10.1080/10556780701577730
+  }
 }
 
 @Article{auglag1,
-    author = {Conn, Andrew R. and Gould, Nicholas I. M. and Toint, Philippe},
-    title = {A Globally Convergent Augmented Lagrangian Algorithm for Optimization with General Constraints and Simple Bounds},
-    journal = {SIAM Journal on Numerical Analysis},
-    volume = {28},
-    number = {2},
-    pages = {545-572},
-    year = {1991},
-    doi = {10.1137/0728030},
-    URL = {
-        https://doi.org/10.1137/0728030
-    },
-    eprint = { 
-        https://doi.org/10.1137/0728030
-    }
+  author = {Conn, Andrew R. and Gould, Nicholas I. M. and Toint, Philippe},
+  title = {A Globally Convergent Augmented Lagrangian Algorithm for Optimization with General Constraints and Simple Bounds},
+  journal = {SIAM Journal on Numerical Analysis},
+  volume = {28},
+  number = {2},
+  pages = {545-572},
+  year = {1991},
+  doi = {10.1137/0728030},
+  URL = {
+    https://doi.org/10.1137/0728030
+  },
+  eprint = { 
+    https://doi.org/10.1137/0728030
+  }
+}
+
+@Article{Marsland2020,
+  author  = {Robert Marsland and Wenping Cui and Joshua Goldford and Pankaj Mehta},
+  title   = {The Community Simulator: A Python package for microbial ecology},
+  journal = {PLoS ONE},
+  year    = {2020},
+  volume  = {15},
+  number  = {3},
+  pages   = {e0230430},
+  doi     = {10.1371/journal.pone.0230430},
+  url     = {https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0230430},
+}
+
+@article {Goldford2018,
+	author = {Goldford, Joshua E. and Lu, Nanxi and Baji{\'c}, Djordje and Estrela, Sylvie and Tikhonov, Mikhail and Sanchez-Gorostiaga, Alicia and Segr{\`e}, Daniel and Mehta, Pankaj and Sanchez, Alvaro},
+	title = {Emergent simplicity in microbial community assembly},
+	volume = {361},
+	number = {6401},
+	pages = {469--474},
+	year = {2018},
+	doi = {10.1126/science.aat1168},
+	publisher = {American Association for the Advancement of Science},
+	abstract = {Under natural conditions, bacteria form mixed, interacting communities. Understanding how such communities assemble and stabilize is important in a range of contexts, from biotechnological applications to what happens in our guts. Goldford et al. sampled the microbial communities from soil and plants containing hundreds to thousands of sequence variants. The organisms were passaged after culture in low concentrations of single carbon sources and were cross-fed with each other{\textquoteright}s metabolites; then, the resulting communities were sequenced using 16S ribosomal RNA, and the outcomes were modeled mathematically. The mix of species that survived under steady conditions converged reproducibly to reflect the experimentally imposed conditions rather than the mix of species initially inoculated{\textemdash}although at coarse phylogenetic levels, taxonomic patterns persisted.Science, this issue p. 469A major unresolved question in microbiome research is whether the complex taxonomic architectures observed in surveys of natural communities can be explained and predicted by fundamental, quantitative principles. Bridging theory and experiment is hampered by the multiplicity of ecological processes that simultaneously affect community assembly in natural ecosystems. We addressed this challenge by monitoring the assembly of hundreds of soil- and plant-derived microbiomes in well-controlled minimal synthetic media. Both the community-level function and the coarse-grained taxonomy of the resulting communities are highly predictable and governed by nutrient availability, despite substantial species variability. By generalizing classical ecological models to include widespread nonspecific cross-feeding, we show that these features are all emergent properties of the assembly of large microbial communities, explaining their ubiquity in natural microbiomes.},
+	issn = {0036-8075},
+	URL = {https://science.sciencemag.org/content/361/6401/469},
+	eprint = {https://science.sciencemag.org/content/361/6401/469.full.pdf},
+	journal = {Science}
+}
+
+@Article{Marsland2019,
+  author  = {Robert Marsland III and Wenping Cui and Joshua Goldford and Alvaro Sanchez and Kirill Korolev and Pankaj Mehta},
+  title   = {Available energy fluxes drive a transition in the diversity, stability, and functional structure of microbial communities},
+  journal = {PLoS Computational Biology},
+  year    = {2019},
+  volume  = {15},
+  number  = {2},
+  pages   = {e1006793},
+  doi     = {10.1371/journal.pcbi.1006793},
+  url     = {https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006793},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}

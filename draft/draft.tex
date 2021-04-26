@@ -48,9 +48,6 @@
   linkcolor = {blue},
   filecolor = cyan % controls color of external ref, if used
 }
-\renewcommand{\thefigure}{\textbf{S\arabic{figure}}} % preceed the Suppl Mat figures with S
-\renewcommand{\thetable}{\textbf{S\arabic{table}}} % preceed the Suppl Mat tables with S
-\renewcommand{\theequation}{S\arabic{equation}} % preceed the Suppl Mat equations with S
 \captionsetup[figure]{font=small, labelfont={bf}, labelformat={default},
    labelsep=period, name={Fig.}} % custom figure captions
 \captionsetup[table]{font=small, labelfont={bf}, labelformat={default},
@@ -96,6 +93,57 @@ This is an example cite \cite{Vetrovsky2013,nloptr}
 \section{Discussion}\label{discussion}
 
 \section{Methods}\label{methods}
+
+\subsection{Simulations}\label{methods:sim}
+
+We used the Community Simulator package \cite{Marsland2020} and included new
+features for our simulations. In the package,
+species are characterized by their resource uptake rates ($c_{i\alpha}$ for
+species $i$ and resource $\alpha$), and they all
+share a common metabolic matrix $\mathbf{D}$.
+The element $D_{\alpha\beta}$
+of this matrix represents the fraction of energy in the form of resource $\alpha$
+secreted when resource $\beta$ is consumed.
+Here we implemented a new operation mode
+in which species can secrete different metabolites (and/or
+in different abundances) when consuming a same resource. Experimental observations
+support the idea of distinct species producing different sets of byproducts when
+growing in the same primary resource \mr. We let $D_{i\alpha\beta}$ denote the
+fraction of energy in the form of resource $\alpha$ secreted \textit{by species
+i} when consuming resource $\beta$ ---note that now $D_{i\alpha\beta}$ need not be
+equal to $D_{j\alpha\beta}$ if $i \neq j$, unlike in the original Community
+Simulator. In the package's underlying Microbial Consumer Resource Model
+\cite{Goldford2018,Marsland2019}, this just means that the energy flux
+$J^{out}_{i\beta}$ now takes the form
+
+\begin{equation}
+J^{out}_{i\beta} = \sum_\alpha D_{i\beta\alpha} l_\alpha J^{in}_{i_\alpha}
+\label{eq:jout}
+\end{equation}
+%
+The documentation for the Community Simulator package contains a detailed
+description of the model, parameters and package use. For the updated package with
+this new functionality, see \nameref{datacode}.
+
+For the simulations here,
+we first generate a library of 660 species (divided into three specialist
+families of 200 memebers each
+and a generalist family of 50 members)
+and 30 resources (divided into three classes of 10 members each).
+We randomly sample 50 species from each pool in equal ratios to seed
+100 resident and
+100 invasive communities respectively.
+We then grow and dilute the communities serially,
+replenishing the primary
+resource after each dilution.
+We repeat the process 20 times to ensure generational equilibrium is
+achieved.
+
+\section{Data \& code availability}\label{datacode}
+
+Experimental data and code for the analysis, as well as code for the simulations
+and the updated Community Simulator package with instructions to use the
+new features can be found in \url{github.com/jdiazc9/coalescence}.
 
 \section{Figures}\label{figs}
 

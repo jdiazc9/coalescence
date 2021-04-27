@@ -67,8 +67,6 @@ Yale University, New Haven, CT, USA}
 \affil[$\dagger$]{To whom correspondence should be addressed: \normalfont alvaro.sanchez@yale.edu}
 \date{}
 
-\newcommand\legendtreefigs{Internal nodes show the partitioning variables   and the values that lead to each partition; light blue denotes the   values or categories that lead down the left split and salmon the values   or categories that lead down the right split (partitioning criteria are   also shown in the edges leading down a node). Leaves or terminal nodes   show (weighted) boxplots of the dependent variable for the observations   that belong that fall in that leave and, as label, the name of the node   ax_3,nd the sample size (sum of weighted observations and \% of the total   data set for the fit). The dot plots underneath the boxplots show the mean JS for all the methods for that leave.}   
-
 
 
   
@@ -94,6 +92,42 @@ This is an example cite \cite{Vetrovsky2013,nloptr}
 
 \section{Methods}\label{methods}
 
+\subsection{Stabilization of environmental communities in simple synthetic environments}
+\label{methods:community-assembly}
+
+Communities were stabilized \textit{ex situ} as described in \cite{Goldford2018}.
+In short, environmental samples (soil, leaves...) within one meter radius in eight different
+geographical locations were collected with sterile
+tweezers or spatulas into 50mL sterile tubes (Fig. \mr).
+One gram of each sample was allowed to
+sit at room temperature in 10mL of phosphate buffered saline (1$\times$PBS) containing
+200$\upmu$g/mL cycloheximide to suppress eukaryotic growth.
+After 48h, samples were mixed 1:1 with 80\% glycerol and kept frozen at -80$^\circ$C.
+Starting microbial communities were prepared by scrapping the frozen stocks into
+200$\upmu$L of 1$\times$PBS and adding a volume of 4$\upmu$L to 500$\upmu$L
+of synthetic minimal media (1$\times$M9) supplemented with 200$\upmu$g/mL cycloheximide
+and 0.07 C-mol/L glutamine or sodium citrate as the carbon source in 96 deep-well plates
+(1.2mL; VWR).
+Cultures were then incubated still at 30$^\circ$C to allow for re-growth.
+After 48h, samples were fully homogenized and biomass increase was followed by measuring
+the optical density (620nm) of 100$\upmu$L of the cultures in a Multiskan FC plate reader
+(Thermo Scientific).
+Communities were stabilized \cite{Goldford2018} by passaging 4$\upmu$L of the cultures into
+500$\upmu$L of fresh media (1$\times$M9 with the carbon source)  every 48h for a total of
+12 transfers at a dilution factor of 1:100,
+roughly equivalent to 80 generations per culture (Fig. \mr).
+Cycloheximide was not added to the media after the first two transfers.
+
+\subsection{Isolation of dominant species}\label{methods:dominants}
+
+For each community, the most abundant colony morphotype at the end of the ninth transfer
+was selected, resuspended in 100$\upmu$L 1$\times$PBS and serially diluted (1:10).
+Next, 20$\upmu$L of the cells diluted to $10^{-6}$ were plated in the corresponding synthetic
+minimal media and allowed to regrow at 30$^\circ$C for 48h. Dominants were then inoculated
+into 500$\upmu$L of fresh media and incubated still at 30$^\circ$C for 48h.
+After this period, the communities stabilized for eleven transfers and the isolated dominants
+were ready for the competition experiments (Fig \mr) at the onset of the twelfth transfer.
+
 \subsection{Simulations}\label{methods:sim}
 
 We used the Community Simulator package \cite{Marsland2020} and included new
@@ -108,28 +142,29 @@ Here we implemented a new operation mode
 in which species can secrete different metabolites (and/or
 in different abundances) when consuming a same resource. Experimental observations
 support the idea of distinct species producing different sets of byproducts when
-growing in the same primary resource \mr. We let $D_{i\alpha\beta}$ denote the
+growing in the same primary resource \mr. We call $D_{i\alpha\beta}$ to the
 fraction of energy in the form of resource $\alpha$ secreted \textit{by species
 i} when consuming resource $\beta$ ---note that now $D_{i\alpha\beta}$ need not be
 equal to $D_{j\alpha\beta}$ if $i \neq j$, unlike in the original Community
 Simulator. In the package's underlying Microbial Consumer Resource Model
 \cite{Goldford2018,Marsland2019}, this just means that the energy flux
-$J^{out}_{i\beta}$ now takes the form
+$J^{\mathrm{out}}_{i\beta}$ now takes the form
 
 \begin{equation}
-J^{out}_{i\beta} = \sum_\alpha D_{i\beta\alpha} l_\alpha J^{in}_{i_\alpha}
+J^{\mathrm{out}}_{i\beta} = \sum_\alpha D_{i\beta\alpha} l_\alpha J^{\mathrm{in}}_{i\alpha}
 \label{eq:jout}
 \end{equation}
 %
-The documentation for the Community Simulator package contains a detailed
-description of the model, parameters and package use. For the updated package with
-this new functionality, see \nameref{datacode}.
+The documentation for the Community Simulator contains detailed
+descriptions of the model, parameters and package use. For the updated package with
+the new functionality, see \nameref{datacode}.
 
-For the simulations here,
+For our simulations,
 we first generate a library of 660 species (divided into three specialist
-families of 200 memebers each
-and a generalist family of 50 members)
+families of 200 members each
+and a generalist family of 60 members)
 and 30 resources (divided into three classes of 10 members each).
+We split this library into two non-overlapping pools of 330 species each.
 We randomly sample 50 species from each pool in equal ratios to seed
 100 resident and
 100 invasive communities respectively.
@@ -137,7 +172,16 @@ We then grow and dilute the communities serially,
 replenishing the primary
 resource after each dilution.
 We repeat the process 20 times to ensure generational equilibrium is
-achieved.
+achieved \cite{Goldford2018}.
+We then perform the \textit{in silico} experiments by using the
+generationally stable communities to seed 100 coalesced communities
+that we again stabilize as described previously.
+Similarly, we identify the dominant (most
+abundant) species of every resident and invasive community to carry out pairwise
+competition and single invasion simulations.
+Most parameters are set to the defaults of the original Community Simulator
+package. Table \mr shows those that are given non-default values to ensure
+enough variation in the primary communities.
 
 \section{Data \& code availability}\label{datacode}
 

@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{Vetrovsky2013}
 V{\v e}trovsk{\' y} T and Baldrian P (2013).
@@ -10,19 +10,74 @@ V{\v e}trovsk{\' y} T and Baldrian P (2013).
 Johnson SG.
 \newblock The NLopt nonlinear-optimization package
 
-\bibitem{Marsland2020}
-Marsland R, Cui W, Goldford J and Mehta P (2020).
-\newblock The Community Simulator: A Python package for microbial ecology.
-\newblock \emph{PLoS ONE} \textbf{15(3)}:e0230430
-
 \bibitem{Goldford2018}
 Goldford JE, Lu N, Baji{\'c} D, Estrela S, Tikhonov M, Sanchez-Gorostiaga A,
   Segr{\`e} D, Mehta P and Sanchez A (2018).
 \newblock Emergent simplicity in microbial community assembly.
 \newblock \emph{Science} \textbf{361(6401)}:469--474
 
+\bibitem{Kozich2013}
+Kozich JJ, Westcott SL, Baxter NT, Highlander SK and Schloss PD (2013).
+\newblock Development of a Dual-Index Sequencing Strategy and Curation Pipeline
+  for Analyzing Amplicon Sequence Data on the MiSeq Illumina Sequencing
+  Platform.
+\newblock \emph{Applied and Environmental Microbiology}
+  \textbf{79(17)}:5112--5120
+
+\bibitem{Caporaso2010}
+Caporaso JG, Kuczynski J, Stombaugh J, Bittinger K, Bushman FD, Costello EK,
+  Fierer N, Peña AG, Goodrich JK et~al. (2010).
+\newblock QIIME allows analysis of high-throughput community sequencing data.
+\newblock \emph{Nature Methods} \textbf{7}:335–336
+
+\bibitem{Callahan2017}
+Callahan BJ, McMurdie PJ and Holmes SP (2017).
+\newblock Exact sequence variants should replace operational taxonomic units in
+  marker-gene data analysis.
+\newblock \emph{The ISME Journal} \textbf{11}:2639–2643
+
+\bibitem{Wang2007}
+Wang Q, Garrity GM, Tiedje JM and Cole JR (2007).
+\newblock Na{\"\i}ve Bayesian Classifier for Rapid Assignment of rRNA Sequences
+  into the New Bacterial Taxonomy.
+\newblock \emph{Applied and Environmental Microbiology}
+  \textbf{73(16)}:5261--5267
+
+\bibitem{Quast2013}
+Quast C, Pruesse E, Yilmaz P, Gerken J, Schweer T, Yarza P, Peplies J and
+  Gl{\"o}ckner FO (2013).
+\newblock The SILVA ribosomal RNA gene database project: improved data
+  processing and web-based tools.
+\newblock \emph{Nucleic Acids Research} \textbf{41(D1)}:D590–D596
+
+\bibitem{Bray1957}
+Curtis JT and Bray JR (1957).
+\newblock An Ordination of the Upland Forest Communities of Southern Wisconsin.
+\newblock \emph{Ecological Monographs} \textbf{27(4)}:325--349
+
+\bibitem{Lin1991}
+Lin J (1991).
+\newblock Divergence measures based on the Shannon entropy.
+\newblock \emph{IEEE Transactions on Information Theory}
+  \textbf{37(1)}:145--151
+
+\bibitem{Kullback1951}
+Kullback S and Leibler RA (1951).
+\newblock {On Information and Sufficiency}.
+\newblock \emph{The Annals of Mathematical Statistics} \textbf{22(1)}:79 -- 86
+
+\bibitem{Jaccard1912}
+Jaccard P (1912).
+\newblock The distribution of the flora in the alpine zone.
+\newblock \emph{New Phytologist} \textbf{11(2)}:37--50
+
+\bibitem{Marsland2020}
+Marsland R, Cui W, Goldford J and Mehta P (2020).
+\newblock The Community Simulator: A Python package for microbial ecology.
+\newblock \emph{PLoS ONE} \textbf{15(3)}:e0230430
+
 \bibitem{Marsland2019}
-III RM, Cui W, Goldford J, Sanchez A, Korolev K and Mehta P (2019).
+{Marsland III} R, Cui W, Goldford J, Sanchez A, Korolev K and Mehta P (2019).
 \newblock Available energy fluxes drive a transition in the diversity,
   stability, and functional structure of microbial communities.
 \newblock \emph{PLoS Computational Biology} \textbf{15(2)}:e1006793

@@ -12,6 +12,7 @@
 \usepackage{multirow} % allows merging cells in tables
 \usepackage{makecell} % more table customization
 \usepackage{mathtools} % nice matrices
+\usepackage{units} % nice fractions
 \usepackage{rotating} % rotated text
 \usepackage{caption} % customization of figure/table captions
 \usepackage{subcaption} % collages of multiple images
@@ -49,7 +50,7 @@
   filecolor = cyan % controls color of external ref, if used
 }
 \captionsetup[figure]{font=small, labelfont={bf}, labelformat={default},
-   labelsep=period, name={Fig.}} % custom figure captions
+   labelsep=period, name={Figure}} % custom figure captions
 \captionsetup[table]{font=small, labelfont={bf}, labelformat={default},
    labelsep=period, name={Table}} % custom table captions
 \hypersetup{citecolor={blue}}
@@ -82,17 +83,17 @@ The abstract goes here.
   
 \end{abstract}
 
-\section{Introduction}\label{intro}
+\section*{Introduction}\label{intro}
 
 This is an example cite \cite{Vetrovsky2013,nloptr}
 
-\section{Results}\label{results}
+\section*{Results \& Discussion}\label{results-discussion}
 
-\section{Discussion}\label{discussion}
+This is how you refer to the \nameref{intro}.
 
-\section{Methods}\label{methods}
+\section*{Methods}\label{methods}
 
-\subsection{Stabilization of environmental communities in simple synthetic environments}
+\subsection*{Stabilization of environmental communities in simple synthetic environments}
 \label{methods:community-assembly}
 
 Communities were stabilized \textit{ex situ} as described in \cite{Goldford2018}.
@@ -118,7 +119,7 @@ Communities were stabilized \cite{Goldford2018} by passaging 4$\upmu$L of the cu
 roughly equivalent to 80 generations per culture (Fig. \mr).
 Cycloheximide was not added to the media after the first two transfers.
 
-\subsection{Isolation of dominant species}\label{methods:dominants}
+\subsection*{Isolation of dominant species}\label{methods:dominants}
 
 For each community, the most abundant colony morphotype at the end of the ninth transfer
 was selected, resuspended in 100$\upmu$L 1$\times$PBS and serially diluted (1:10).
@@ -128,7 +129,165 @@ into 500$\upmu$L of fresh media and incubated still at 30$^\circ$C for 48h.
 After this period, the communities stabilized for eleven transfers and the isolated dominants
 were ready for the competition experiments (Fig \mr) at the onset of the twelfth transfer.
 
-\subsection{Simulations}\label{methods:sim}
+\subsection*{Dominant-dominant and community-community competitions}
+\label{methods:competitions}
+
+All possible pairwise dominant-dominant and community-community
+competition experiments
+were performed by mixing equal volumes (4$\upmu$L) of each of the eight
+communities or eight dominants at the onset of the twelfth transfer.
+Competitions were set up in their native media,
+i.e. in 500$\upmu$L of 1$\times$M9 supplemented with 0.07 C-mol/L of
+either glutamine or citrate in 96 deep-well plates.
+Plates were incubated at 30$^\circ$C for 48h.
+Pairwise competitions were further propagated for seven serial transfers
+(roughly 42 generations; Fig. \mr) by transferring 8$\upmu$L of
+each culture to fresh media (500$\upmu$L).
+
+\subsection*{Determination of community composition by 16S sequencing}
+\label{methods:sequencing}
+
+The sequencing protocol was identical to that described in \cite{Goldford2018}.
+Community samples were collected by spinning down at 3500rpm for 25min
+in a bench-top centrifuge at room temperature;
+cell pellets were stored at -80$^\circ$C before processing.
+To maximize Gram-positive bacteria cell wall lysis,
+the cell pellets were re-suspended and incubated at 37$^\circ$C for 30min
+in enzymatic lysis buffer (20mM Tris-HCl, 2mM sodium EDTA, 1.2\% Triton X-100)
+and 20 mg/mL of lysozyme from chicken egg white (Sigma-Aldrich).
+After cell lysis, the DNA extraction and purification was performed using the
+DNeasy 96 protocol for animal tissues (Qiagen).
+The clean DNA in 100$\upmu$L elution buffer of 10mM Tris-HCl, 0.5mM EDTA
+at pH 9.0 was quantified using Quan-iT PicoGreen dsDNA Assay Kit
+(Molecular Probes, Inc.)
+and normalized to 5ng/$\upmu$L in nuclease-free water (Qiagen)
+for subsequent 16S rRNA illumina sequencing.
+16S rRNA amplicon library preparation was performed following a dual-index
+paired-end approach \cite{Kozich2013}.
+Briefly, PCR amplicon libraries of V4 regions of the 16S rRNA were prepared 
+sing dual-index primers (F515/R805), then pooled and sequenced
+using the Illumina MiSeq chemistry and platform.
+Each sample went through a 30-cycle PCR in duplicate of 20$\upmu$L
+reaction volumes using 5ng of DNA each, dual index primers, and AccuPrime Pfx SuperMix (Invitrogen).
+The thermocycling procedure includes a 2min initial denaturation step at
+95$^\circ$C, and 30 cycles of the following PCR scheme:
+(a) 20 second denaturation at 95$^\circ$C,
+(b) 15 second annealing at 55$^\circ$C,
+and (c) 5 minute extension at 72$^\circ$C.
+The duplicate PCR products of each sample were pooled, purified, and normalized
+using SequalPrep PCR cleanup and normalization kit (Invitrogen).
+Barcoded amplicon libraries were then pooled and sequenced using
+Illumina Miseq v2 reagent kit, which generated 2$\times$250bp paired-end reads
+at the Yale Center for Genome Analysis (YCGA).
+The sequencing reads were demultiplexed on QIIME 1.9.0 \cite{Caporaso2010}.
+The barcodes, indexes, and primers were removed from raw reads,
+producing FASTQ files with both the forward and reverse reads for each sample,
+ready for DADA2 analysis \cite{Callahan2017}.
+DADA2 version 1.1.6 was used to infer unique biological exact sequence variants
+(ESVs) for each sample
+and na{\"i}ve Bayes was used to assign taxonomy using the SILVA version 123
+database \cite{Wang2007,Quast2013}.
+
+\subsection*{Metrics of community distance}
+\label{methods:metrics}
+
+Beta-diversity indexes between the invasive and coalesced communities
+or the resident and coalesced communities were performed using Bray–Curtis or
+Jensen-Shannon similarity metrics. For two abrbitrary communities with
+ESV abundances represented by the vectors
+$\mathbf{x} = \left( x_1, x_2, \cdots, x_N \right)$
+and
+$\mathbf{y} = \left( y_1, y_2, \cdots, y_N \right)$
+(where $x_i$ and $y_i$ represent the relative abundance of the $i$th ESV in
+each community respectively and $N$ is the total number of ESVs), the Bray-Curtis
+similarity $\mathrm{BC} \left( \mathbf{x}, \mathbf{y} \right)$ is calculated as
+\cite{Bray1957}
+
+\begin{equation}
+\mathrm{BC} \left( \mathbf{x}, \mathbf{y} \right) = 
+\sum_i \mathrm{min} \left( x_i , y_i \right)
+\label{eq:bray-curtis}
+\end{equation}
+%
+and the Jensen-Shannon similarity
+$\mathrm{JS} \left( \mathbf{x}, \mathbf{y} \right)$
+is defined as one minus the Jensen-Shannon distance (which is, in turn,
+the square root of the Jensen-Shannon divergence \cite{Lin1991})
+
+\begin{equation}
+\mathrm{JS} \left( \mathbf{x}, \mathbf{y} \right) = 
+1 - \sqrt{\frac{1}{2}\mathrm{KL} \left( \mathbf{x}, \mathbf{m} \right) +
+\frac{1}{2}\mathrm{KL} \left( \mathbf{y}, \mathbf{m} \right)}
+\label{eq:jensen-shannon}
+\end{equation}
+%
+where $\mathbf{m} = \left( \mathbf{x} + \mathbf{y} \right)/2$ and KL denotes the
+Kullback-Leibler divergence \cite{Kullback1951}
+
+\begin{equation}
+\mathrm{KL} \left( \mathbf{x}, \mathbf{y} \right) = 
+\sum_i x_i \; \mathrm{log_2} \left( \frac{x_i}{y_i} \right)
+\label{eq:kullback-leibler}
+\end{equation}
+
+Additionally, we used alternative metrics that do not account for the specific
+fractions of each ESV (that is, only discern whether a ESV is present or absent
+in a community). These are the Jaccard similarity
+$\mathrm{J} \left( \mathbf{x}, \mathbf{y} \right)$ \cite{Jaccard1912}
+and the fraction of the endemic cohort of the invasive community
+that persists in the coalesced one,
+denoted as
+$\mathrm{E} \left( \mathbf{x}_\mathrm{I},
+\mathbf{x}_\mathrm{R},
+\mathbf{x}_\mathrm{C} \right)$
+where the subindices I, R and C correspond to the invasive, resident and coalesced
+communities respectively.
+
+\begin{equation}
+\mathrm{J} \left( \mathbf{x}, \mathbf{y} \right) = 
+\frac{\left|\; \mathbf{x} \cap \mathbf{y} \;\right|}
+{\left|\; \mathbf{x} \cup \mathbf{y} \;\right|}
+\label{eq:jaccard}
+\end{equation}
+
+\begin{equation}
+\mathrm{E} \left( \mathbf{x}_\mathrm{I},
+\mathbf{x}_\mathrm{R},
+\mathbf{x}_\mathrm{C} \right) = 
+\left.
+\sum_i
+f \left( x_{\mathrm{I}i}, x_{\mathrm{R}i}, x_{\mathrm{C}i} \right)
+\;
+\middle/
+\;
+\sum_i
+g \left( x_{\mathrm{I}i}, x_{\mathrm{R}i} \right)
+\right.
+\label{eq:endemic}
+\end{equation}
+%
+where we have defined
+
+\begin{equation}
+\begin{split}
+f \left( x_{\mathrm{I}i}, x_{\mathrm{R}i}, x_{\mathrm{C}i} \right) & =
+\begin{cases}
+    1 & \text{if } x_{\mathrm{I}i} > 0 \text{ and }
+                   x_{\mathrm{R}i} = 0 \text{ and }
+                   x_{\mathrm{C}i} > 0 \\
+    0 & \text{otherwise}
+\end{cases} \\
+g \left( x_{\mathrm{I}i}, x_{\mathrm{R}i} \right) & =
+\begin{cases}
+    1 & \text{if } x_{\mathrm{I}i} > 0 \text{ and }
+                   x_{\mathrm{R}i} = 0 \\
+    0 & \text{otherwise}
+\end{cases}
+\end{split}
+\label{eq:endemic-f}
+\end{equation}
+
+\subsection*{Simulations}\label{methods:sim}
 
 We used the Community Simulator package \cite{Marsland2020} and included new
 features for our simulations. In the package,
@@ -183,13 +342,27 @@ Most parameters are set to the defaults of the original Community Simulator
 package. Table \mr shows those that are given non-default values to ensure
 enough variation in the primary communities.
 
-\section{Data \& code availability}\label{datacode}
+\section*{Data \& code availability}\label{datacode}
 
 Experimental data and code for the analysis, as well as code for the simulations
-and the updated Community Simulator package with instructions to use the
+and the updated Community Simulator package with instructions for the
 new features can be found in \url{github.com/jdiazc9/coalescence}.
 
-\section{Figures}\label{figs}
+\section*{Acknowledgements}
+
+The authors wish to thank Joshua Goldford, Pankaj Mehta, Wenping Cui,
+Robert Marsland and all members of the Sanchez laboratory
+for many helpful discussions.
+We also wish to express our gratitude to the Goodman laboratory at Yale
+for technical help during the early stages of this project.
+The funding for this work partly results from a Scialog Program
+sponsored jointly by the Research Corporation for Science Advancement and
+the Gordon and Betty Moore Foundation through grants to Yale University by the
+Research Corporation and the Simons Foundation.
+
+\clearpage
+
+\section*{Figures}\label{figs}
 
 % references
 \clearpage

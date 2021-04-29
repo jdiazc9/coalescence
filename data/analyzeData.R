@@ -266,7 +266,7 @@ myplots[['community-compostion_rankplots']] <-
          aes(x=rank,y=fraction,
              group=interaction(carbon_source,community,sample),
              color=carbon_source)) +
-    geom_line(size=0.5) +
+    geom_line(size=0.25) +
     scale_y_continuous(trans='log10',
                        name='Relative abundance',
                        limits=10^c(-4,0),
@@ -282,10 +282,13 @@ myplots[['community-compostion_rankplots']] <-
     theme_bw() +
     theme(panel.grid=element_blank(),
           legend.title=element_blank(),
-          legend.position=c(0.7,0.9),
+          legend.position=c(0.6,0.9),
           legend.background=element_rect(fill='transparent'),
           text=element_text(size=15),
-          axis.text=element_text(size=15))
+          axis.text=element_text(size=15),
+          axis.line=element_blank(), #axis.line=element_line(size=0.25),
+          axis.ticks=element_line(size=0.25),
+          panel.border=element_rect(size=0.25))
 
 # display and save plots
 if (display_plots) {
@@ -302,8 +305,8 @@ if (save_plots) {
   ggsave(file.path('.','plots','community-compostion_rankplots.pdf'),
          plot=myplots[['community-compostion_rankplots']],
          device='pdf',
-         height=90,
-         width=90,
+         height=70,
+         width=70,
          units='mm')
 }
 

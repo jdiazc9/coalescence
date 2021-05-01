@@ -90,6 +90,8 @@ This is an example cite \cite{Vetrovsky2013,nloptr}
 
 This is how you refer to the \nameref{intro}.
 
+\clearpage
+
 \section*{Methods}\label{methods}
 
 \subsection*{Stabilization of environmental communities in simple synthetic environments}
@@ -191,8 +193,8 @@ database \cite{Wang2007,Quast2013}.
 \label{methods:metrics}
 
 Beta-diversity indexes between the invasive and coalesced communities
-or the resident and coalesced communities were performed using Bray–Curtis or
-Jensen-Shannon similarity metrics. For two abrbitrary communities with
+or the resident and coalesced communities were computed using various
+similarity metrics. For two arbitrary communities with
 ESV abundances represented by the vectors
 $\mathbf{x} = \left( x_1, x_2, \cdots, x_N \right)$
 and
@@ -208,7 +210,7 @@ similarity $\mathrm{BC} \left( \mathbf{x}, \mathbf{y} \right)$ is calculated as
 \label{eq:bray-curtis}
 \end{equation}
 %
-and the Jensen-Shannon similarity
+The Jensen-Shannon similarity
 $\mathrm{JS} \left( \mathbf{x}, \mathbf{y} \right)$
 is defined as one minus the Jensen-Shannon distance (which is, in turn,
 the square root of the Jensen-Shannon divergence \cite{Lin1991})
@@ -228,19 +230,9 @@ Kullback-Leibler divergence \cite{Kullback1951}
 \sum_i x_i \; \mathrm{log_2} \left( \frac{x_i}{y_i} \right)
 \label{eq:kullback-leibler}
 \end{equation}
-
-Additionally, we used alternative metrics that do not account for the specific
-fractions of each ESV (that is, only discern whether a ESV is present or absent
-in a community). These are the Jaccard similarity
+%
+The Jaccard similarity is given by
 $\mathrm{J} \left( \mathbf{x}, \mathbf{y} \right)$ \cite{Jaccard1912}
-and the fraction of the endemic cohort of the invasive community
-that persists in the coalesced one,
-denoted as
-$\mathrm{E} \left( \mathbf{x}_\mathrm{I},
-\mathbf{x}_\mathrm{R},
-\mathbf{x}_\mathrm{C} \right)$
-where the subindices I, R and C correspond to the invasive, resident and coalesced
-communities respectively.
 
 \begin{equation}
 \mathrm{J} \left( \mathbf{x}, \mathbf{y} \right) = 
@@ -248,6 +240,33 @@ communities respectively.
 {\left|\; \mathbf{x} \cup \mathbf{y} \;\right|}
 \label{eq:jaccard}
 \end{equation}
+%
+For all the metrics above, we quantify the relative similarity between the invasive
+and the coalesced communities using relative metrics (Q):
+
+\begin{equation}
+\mathrm{Q} \left( \mathbf{x}_\mathrm{I},
+\mathbf{x}_\mathrm{R},
+\mathbf{x}_\mathrm{C} \right) = 
+\frac{\mathrm{F} \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)}
+{\mathrm{F} \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)
++
+\mathrm{F} \left( \mathbf{x}_\mathrm{R},\mathbf{x}_\mathrm{C}\right)}
+\label{eq:q}
+\end{equation}
+%
+where the subindices I, R and C correspond to the invasive, resident and coalesced
+communities respectively, and F represents one of BC (Bray-Curtis similarity), JS
+(Jensen-Shannon similarity) or J (Jaccard similarity) defined in equations
+\ref{eq:bray-curtis} to \ref{eq:jaccard}.
+
+Additionally, we quantify coalescence outcomes by examining the fraction of the endemic
+cohort of the invasive community that persists in the coalesced one. We denote this
+metric as
+$\mathrm{E} \left( \mathbf{x}_\mathrm{I},
+\mathbf{x}_\mathrm{R},
+\mathbf{x}_\mathrm{C} \right)$.
+
 
 \begin{equation}
 \mathrm{E} \left( \mathbf{x}_\mathrm{I},
@@ -375,7 +394,7 @@ Research Corporation and the Simons Foundation.
 \centering
 \includegraphics[width=12cm,keepaspectratio]{figs/fig1.pdf}
 \caption{\textbf{Overview of the experimental protocol.}
-\textbf{a.}~Environmental samples obtained from eight different locations were used
+\textbf{a.}~Environmental samples collected from eight different locations were used
 to inoculate our communities.
 \textbf{b.}~Communities were stabilized in serial batch culture bioreactors
 \cite{Goldford2018} in minimal synthetic media with glutamine or citrate as the
@@ -391,7 +410,11 @@ Community compositions are skewed and long-tailed.
 i.e. the dominant co-selecting the cohort, or from the bottom-up, i.e. the cohort co-selecting
 the dominant. Both forms of co-selection can be positive (recruitment) or negative
 (antagonism).
-\textbf{f.}~Illustration of the protocol of our coalescence experiments.}
+\textbf{f.}~Illustration of the protocol of our coalescence experiments. All pairs of
+communities were inoculated into fresh minimal media supplemented with the same carbon
+source where communities had been previously stabilized. The coalesced (C) and original
+resident (R) and invasive (I) communities were then serially diluted and allowed to grow
+for seven additional transfers.}
 \label{fig1}
 \end{figure}
 

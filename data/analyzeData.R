@@ -286,7 +286,7 @@ myplots[['community-compostion_rankplots']] <-
           legend.background=element_rect(fill='transparent'),
           text=element_text(size=15),
           axis.text=element_text(size=15),
-          axis.line=element_blank(), #axis.line=element_line(size=0.25),
+          axis.line=element_blank(),
           axis.ticks=element_line(size=0.25),
           panel.border=element_rect(size=0.25))
 
@@ -1062,7 +1062,7 @@ plot_this$community_2 <- factor(plot_this$community_2,levels=community_names)
 plot_this$metric <- factor(plot_this$metric,levels=unique(plot_this$metric))
 
 # parameters for annotations of plots
-poly <- list(w=0.15,
+poly <- list(w=0.10,
              aperture=0.15,
              color=c(rgb(220,245,220,maxColorValue=255),
                      rgb(230,230,230,maxColorValue=255),
@@ -1073,15 +1073,18 @@ myplots[['q-vs-pairwise_bray-curtis']] <-
   ggplot(data=plot_this[plot_this$metric=='q_bray_curtis',],
          aes(x=f_pairwise,y=value,
              color=carbon_source)) +
-  geom_point(size=2) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
   geom_smooth(formula = y ~ x,
               method = 'lm',
-              se = FALSE) +
+              se = FALSE,
+              size = 0.5) +
   scale_y_continuous(name='Q\nCoalesced - Invasive',
                      limits=c(0,1),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
-  scale_x_continuous(name='Frequency of invasive dominant species\nin pairwise competition',
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
                      limits=c(0,1),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
@@ -1092,22 +1095,28 @@ myplots[['q-vs-pairwise_bray-curtis']] <-
         legend.position=c(0.2,0.9),
         legend.background=element_rect(fill='transparent'),
         text=element_text(size=15),
-        axis.text=element_text(size=15),) +
-  coord_fixed() +
-  ggtitle('Bray-Curtis similarity')
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed() # +
+  # ggtitle('Bray-Curtis similarity')
 
 myplots[['q-vs-pairwise_other-metrics']] <-
   ggplot(data=plot_this[plot_this$metric!='q_bray_curtis' & !grepl('cohort',plot_this$metric),],
          aes(x=f_pairwise,y=value,
              color=carbon_source)) +
-  geom_point(size=2) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
   geom_smooth(formula = y ~ x,
               method = 'lm',
-              se = FALSE) +
+              se = FALSE,
+              size = 0.5) +
   facet_grid(~ metric,
              labeller=labeller(metric=setNames(c('Jaccard similarity',
-                                                 'Jensen-Shannon similarity\n(1 - distance)',
-                                                 'Endemic species overlap'),
+                                                 'Jensen-Shannon\nsimilarity\n(1 - distance)',
+                                                 'Endemic species\nsurvival'),
                                                c('q_jaccard',
                                                  'q_jensen_shannon',
                                                  'q_endemic')))) +
@@ -1125,6 +1134,9 @@ myplots[['q-vs-pairwise_other-metrics']] <-
         legend.title=element_blank(),
         legend.background=element_rect(fill='transparent'),
         text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
         axis.text=element_text(size=15),
         strip.text=element_text(hjust=-0.01,
                                 vjust=-0.01),
@@ -1136,16 +1148,19 @@ myplots[['q-vs-pairwise_cohorts']] <-
   ggplot(data=plot_this[grepl('cohort',plot_this$metric),],
          aes(x=f_pairwise,y=value,
              color=carbon_source)) +
-  geom_point(size=2) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
   geom_smooth(formula = y ~ x,
               method = 'lm',
-              se = FALSE) +
+              se = FALSE,
+              size = 0.5) +
   facet_wrap(~ metric,
              nrow=2,
              labeller=labeller(metric=setNames(c('Bray-Curtis similarity',
                                                  'Jaccard similarity',
                                                  'Jensen-Shannon similarity\n(1 - distance)',
-                                                 'Endemic species overlap'),
+                                                 'Endemic species survival'),
                                                c('q_bray_curtis_cohort',
                                                  'q_jaccard_cohort',
                                                  'q_jensen_shannon_cohort',
@@ -1165,6 +1180,9 @@ myplots[['q-vs-pairwise_cohorts']] <-
         legend.background=element_rect(fill='transparent'),
         text=element_text(size=15),
         axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
         strip.text=element_text(hjust=-0.01,
                                 vjust=-0.01),
         strip.background=element_rect(fill='transparent',
@@ -1191,13 +1209,15 @@ myplots[['alone-vs-together']] <-
               slope=1,
               color='black', 
               linetype='dashed',
-              size=1) +
-  geom_point(size=2) +
+              size=0.25) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
   scale_y_continuous(name='Frequency of dominant\nspecies invading with cohort',
                      limits=c(-1,2),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
-  scale_x_continuous(name='Frequency of dominant\nspecies invading alone',
+  scale_x_continuous(name='Frequency of dominant\nspecies invading alone\n ',
                      limits=c(-1,2),
                      breaks=c(0,0.5,1),
                      labels=c('0','0.5','1')) +
@@ -1205,10 +1225,13 @@ myplots[['alone-vs-together']] <-
   theme_bw() +
   theme(panel.grid=element_blank(),
         legend.title=element_blank(),
-        legend.position='right',
+        legend.position=c(0.2,0.9),
         legend.background=element_rect(fill='transparent'),
         text=element_text(size=15),
-        axis.text=element_text(size=15),) +
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
   coord_fixed(xlim=c(0,1),
               ylim=c(0,1))
 
@@ -1223,14 +1246,14 @@ if (save_plots) {
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis.pdf'),
          plot=myplots[['q-vs-pairwise_bray-curtis']],
          device='pdf',
-         height=120,
-         width=120,
+         height=90,
+         width=90,
          units='mm')
   ggsave(file.path('.','plots','q-vs-pairwise_other-metrics.pdf'),
          plot=myplots[['q-vs-pairwise_other-metrics']],
          device='pdf',
-         height=120,
-         width=240,
+         height=90,
+         width=180,
          units='mm')
   ggsave(file.path('.','plots','q-vs-pairwise_cohorts.pdf'),
          plot=myplots[['q-vs-pairwise_cohorts']],
@@ -1241,17 +1264,111 @@ if (save_plots) {
   ggsave(file.path('.','plots','alone-vs-together.pdf'),
          plot=myplots[['alone-vs-together']],
          device='pdf',
-         height=100,
-         width=160,
+         height=90,
+         width=90,
          units='mm')
 }
 
 
+### ----------------------------------------------------------------------
+### SIMULATIONS DATA
+### ----------------------------------------------------------------------
 
+# load data from simulations
+plot_this <- read.table('simul_data.txt',header=TRUE)
 
+# make plots
+myplots[['q-vs-pairwise_bray-curtis_simul']] <-
+  ggplot(data=plot_this[!is.na(plot_this$f_pairwise),],
+         aes(x=f_pairwise,y=q_bray_curtis)) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5,
+             color='black') +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color='black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed() # +
+# ggtitle('Bray-Curtis similarity')
 
+myplots[['alone-vs-together_simul']] <-
+  ggplot(data=plot_this,
+         aes(x=f_singleinv,y=f_coalescence)) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           y=c(-0.1,poly$w,1.1,1.1,-0.1),
+           fill=poly$color[1]) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,1.1,1.1,-0.1),
+           y=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           fill=poly$color[3]) +
+  annotate('polygon',
+           x=c(-0.1,1.1,1.1,1.1-1.2*poly$aperture,-0.1),
+           y=c(-0.1,1.1-1.2*poly$aperture,1.1,1.1,-0.1),
+           fill=poly$color[2]) +
+  geom_abline(intercept=0,
+              slope=1,
+              color='black', 
+              linetype='dashed',
+              size=0.25) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5,
+             color='black') +
+  scale_y_continuous(name='Frequency of dominant\nspecies invading with cohort',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of dominant\nspecies invading alone\n ',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed(xlim=c(0,1),
+              ylim=c(0,1))
 
-
+# display and save plots
+if (display_plots) {
+  print(myplots[['q-vs-pairwise_bray-curtis_simul']])
+  print(myplots[['alone-vs-together_simul']])
+}
+if (save_plots) {
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_simul']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm')
+  ggsave(file.path('.','plots','alone-vs-together_simul.pdf'),
+         plot=myplots[['alone-vs-together_simul']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm')
+}
 
 
 

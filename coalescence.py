@@ -233,12 +233,12 @@ def mysim(p,q,pq):
 # assumptions
 
 """
-# defaults for this simulations (these work)
+# quasi-default assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 20 # number of communities
-assumptions['S'] = 100 # number of species sampled at initialization
-assumptions['SA'] = [100, 100, 100] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 30 # number of generalists
+assumptions['n_wells'] = 100 # number of communities
+assumptions['S'] = 50 # number of species sampled at initialization
+assumptions['SA'] = [400, 400, 400] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 120 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -265,8 +265,8 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 assumptions = community_simulator.usertools.a_default.copy()
 assumptions['n_wells'] = 100 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
-assumptions['SA'] = [200, 200, 200] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 60 # 30 # number of generalists
+assumptions['SA'] = [400, 400, 400] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 120 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
@@ -282,7 +282,7 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.8 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species

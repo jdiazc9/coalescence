@@ -301,13 +301,13 @@ if (save_plots) {
          device='pdf',
          height=297,
          width=210,
-         units='mm')
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','community-compostion_rankplots.pdf'),
          plot=myplots[['community-compostion_rankplots']],
          device='pdf',
          height=70,
          width=70,
-         units='mm')
+         units='mm',dpi=600)
 }
 
 ### Pie plots show that community compositions are very conserved across
@@ -712,7 +712,7 @@ if (save_plots) {
          device='pdf',
          height=270,
          width=300,
-         units='mm')
+         units='mm',dpi=600)
 }
 
 ### Our criterion will be so that we mantain maximum consistency with the experimental
@@ -1248,25 +1248,25 @@ if (save_plots) {
          device='pdf',
          height=90,
          width=90,
-         units='mm')
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','q-vs-pairwise_other-metrics.pdf'),
          plot=myplots[['q-vs-pairwise_other-metrics']],
          device='pdf',
          height=90,
          width=180,
-         units='mm')
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','q-vs-pairwise_cohorts.pdf'),
          plot=myplots[['q-vs-pairwise_cohorts']],
          device='pdf',
          height=180,
          width=180,
-         units='mm')
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','alone-vs-together.pdf'),
          plot=myplots[['alone-vs-together']],
          device='pdf',
          height=90,
          width=90,
-         units='mm')
+         units='mm',dpi=600)
 }
 
 
@@ -1361,13 +1361,13 @@ if (save_plots) {
          device='pdf',
          height=90,
          width=90,
-         units='mm')
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','alone-vs-together_simul.pdf'),
          plot=myplots[['alone-vs-together_simul']],
          device='pdf',
          height=90,
          width=90,
-         units='mm')
+         units='mm',dpi=1000)
 }
 
 

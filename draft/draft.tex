@@ -54,6 +54,25 @@
    labelsep=period, name={Table}} % custom table captions
 \hypersetup{citecolor={blue}}
 \definecolor{lightgray}{gray}{0.9}
+\newcommand{\figref}[2][]{%
+  \hyperref[{#2}]{%
+    Figure~\ref*{#2}%
+    \ifx\\#1\\%
+    \else
+      #1%
+    \fi
+  }%
+}
+\newcommand{\tableref}[1]{%
+  \hyperref[{#1}]{%
+   Table~\ref*{#1}%
+  }%
+}
+\newcommand{\methodsref}[1]{%
+  \hyperref[{#1}]{%
+   Methods:~\nameref*{#1}%
+  }%
+}
 
 % title, authors, affiliations
 \title{Provisional Title}
@@ -84,11 +103,14 @@ The abstract goes here.
 
 \section*{Introduction}\label{intro}
 
-This is an example cite \cite{Vetrovsky2013,nloptr}
+This is an example cite \cite{Vetrovsky2013,nloptr}.
+This is how you refer to \figref{fig1}.
+This is how you refer to \figref[a]{fig1}.
+This is how you refer to \tableref{fig1}.
+This is how you refer to the section \nameref{methods:sim} of the \nameref{methods}.
+This is a cleaner way to refer to the \methodsref{methods:sim}.
 
 \section*{Results \& Discussion}\label{results-discussion}
-
-This is how you refer to the \nameref{intro}.
 
 \clearpage
 
@@ -201,24 +223,24 @@ and
 $\mathbf{y} = \left( y_1, y_2, \cdots, y_N \right)$
 (where $x_i$ and $y_i$ represent the relative abundance of the $i$th ESV in
 each community respectively and $N$ is the total number of ESVs), the Bray-Curtis
-similarity $\mathrm{BC} \left( \mathbf{x}, \mathbf{y} \right)$ is calculated as
+similarity $BC \left( \mathbf{x}, \mathbf{y} \right)$ is calculated as
 \cite{Bray1957}
 
 \begin{equation}
-\mathrm{BC} \left( \mathbf{x}, \mathbf{y} \right) = 
+BC \left( \mathbf{x}, \mathbf{y} \right) = 
 \sum_i \mathrm{min} \left( x_i , y_i \right)
 \label{eq:bray-curtis}
 \end{equation}
 %
 The Jensen-Shannon similarity
-$\mathrm{JS} \left( \mathbf{x}, \mathbf{y} \right)$
+$JS \left( \mathbf{x}, \mathbf{y} \right)$
 is defined as one minus the Jensen-Shannon distance (which is, in turn,
 the square root of the Jensen-Shannon divergence \cite{Lin1991})
 
 \begin{equation}
-\mathrm{JS} \left( \mathbf{x}, \mathbf{y} \right) = 
-1 - \sqrt{\frac{1}{2}\mathrm{KL} \left( \mathbf{x}, \mathbf{m} \right) +
-\frac{1}{2}\mathrm{KL} \left( \mathbf{y}, \mathbf{m} \right)}
+JS \left( \mathbf{x}, \mathbf{y} \right) = 
+1 - \sqrt{\frac{1}{2}KL \left( \mathbf{x}, \mathbf{m} \right) +
+\frac{1}{2}KL \left( \mathbf{y}, \mathbf{m} \right)}
 \label{eq:jensen-shannon}
 \end{equation}
 %
@@ -226,50 +248,36 @@ where $\mathbf{m} = \left( \mathbf{x} + \mathbf{y} \right)/2$ and KL denotes the
 Kullback-Leibler divergence \cite{Kullback1951}
 
 \begin{equation}
-\mathrm{KL} \left( \mathbf{x}, \mathbf{y} \right) = 
+KL \left( \mathbf{x}, \mathbf{y} \right) = 
 \sum_i x_i \; \mathrm{log_2} \left( \frac{x_i}{y_i} \right)
 \label{eq:kullback-leibler}
 \end{equation}
 %
 The Jaccard similarity is given by
-$\mathrm{J} \left( \mathbf{x}, \mathbf{y} \right)$ \cite{Jaccard1912}
+$J \left( \mathbf{x}, \mathbf{y} \right)$ \cite{Jaccard1912}
 
 \begin{equation}
-\mathrm{J} \left( \mathbf{x}, \mathbf{y} \right) = 
+J \left( \mathbf{x}, \mathbf{y} \right) = 
 \frac{\left|\; \mathbf{x} \cap \mathbf{y} \;\right|}
 {\left|\; \mathbf{x} \cup \mathbf{y} \;\right|}
 \label{eq:jaccard}
 \end{equation}
 %
-For all the metrics above, we quantify the relative similarity between the invasive
-and the coalesced communities using relative metrics (Q):
-
-\begin{equation}
-\mathrm{Q} \left( \mathbf{x}_\mathrm{I},
-\mathbf{x}_\mathrm{R},
-\mathbf{x}_\mathrm{C} \right) = 
-\frac{\mathrm{F} \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)}
-{\mathrm{F} \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)
-+
-\mathrm{F} \left( \mathbf{x}_\mathrm{R},\mathbf{x}_\mathrm{C}\right)}
-\label{eq:q}
-\end{equation}
-%
-where the subindices I, R and C correspond to the invasive, resident and coalesced
-communities respectively, and F represents one of BC (Bray-Curtis similarity), JS
-(Jensen-Shannon similarity) or J (Jaccard similarity) defined in equations
-\ref{eq:bray-curtis} to \ref{eq:jaccard}.
-
 Additionally, we quantify coalescence outcomes by examining the fraction of the endemic
-cohort of the invasive community that persists in the coalesced one. We denote this
+cohort of the original communities that persists in the coalesced one. We call
+$E \left( \mathbf{x}, \mathbf{y} \right)$ to the fraction of endemic species of
+$\mathbf{x}$ that are also found in $\mathbf{y}$.
+
+\iffalse
+
+We denote this
 metric as
-$\mathrm{E} \left( \mathbf{x}_\mathrm{I},
+$E \left( \mathbf{x}_\mathrm{I},
 \mathbf{x}_\mathrm{R},
 \mathbf{x}_\mathrm{C} \right)$.
 
-
 \begin{equation}
-\mathrm{E} \left( \mathbf{x}_\mathrm{I},
+E \left( \mathbf{x}_\mathrm{I},
 \mathbf{x}_\mathrm{R},
 \mathbf{x}_\mathrm{C} \right) = 
 \left.
@@ -304,6 +312,26 @@ g \left( x_{\mathrm{I}i}, x_{\mathrm{R}i} \right) & =
 \end{split}
 \label{eq:endemic-f}
 \end{equation}
+
+\fi
+
+For all the metrics above, we quantify the relative similarity between the invasive
+and the coalesced communities using relative metrics ($Q$):
+
+\begin{equation}
+Q \left( \mathbf{x}_\mathrm{I},
+\mathbf{x}_\mathrm{R},
+\mathbf{x}_\mathrm{C} \right) = 
+\frac{F \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)}
+{F \left( \mathbf{x}_\mathrm{I},\mathbf{x}_\mathrm{C}\right)
++
+F \left( \mathbf{x}_\mathrm{R},\mathbf{x}_\mathrm{C}\right)}
+\label{eq:q}
+\end{equation}
+%
+where the subindices I, R and C correspond to the invasive, resident and coalesced
+communities respectively, and $F$ represents one of $BC$ (Bray-Curtis similarity), $JS$
+(Jensen-Shannon similarity), $J$ (Jaccard similarity) or $E$ (endemic survival) defined above.
 
 \subsection*{Simulations}\label{methods:sim}
 
@@ -392,7 +420,7 @@ Research Corporation and the Simons Foundation.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=12cm,keepaspectratio]{figs/fig1.pdf}
+\includegraphics[width=10cm,keepaspectratio]{figs/fig1.pdf}
 \caption{\textbf{Overview of the experimental protocol.}
 \textbf{a.}~Environmental samples collected from eight different locations were used
 to inoculate our communities.
@@ -416,6 +444,33 @@ source where communities had been previously stabilized. The coalesced (C) and o
 resident (R) and invasive (I) communities were then serially diluted and allowed to grow
 for seven additional transfers.}
 \label{fig1}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=15cm,keepaspectratio]{figs/fig2.pdf}
+\caption{\textbf{Co-selection in microbial community coalescence.}
+\textbf{a.}~Coalescence outcomes are quantified by the relative Bray-Curtis similarity
+($Q$) between the coalesced and invasive communities (\methodsref{methods:metrics}).
+These outcomes are predicted by the pairwise competition between the invasive and
+resident dominant
+species ($R^2=X$ for glutamine and $X$ for citrate). This is consistent with a scenario of
+top-down positive co-selection where dominants recruit their cohorts for the final
+coalesced community.
+\textbf{b.}~We represent the frequency reached by
+the invasive dominant species when they invade the resident communities on their own versus
+when they are in the company of their cohort.
+Three scenarios are possible: green and red
+shaded areas represent limit cases of positive (recruitment) or negative (antagonism)
+bottom-up co-selection, gray area corresponds to situations where invasive dominant
+species can invade with equal success regardless of the presence of their cohorts.
+Data shows that positive co-selection is common, whereas antagonistic
+co-selection is rare in our experiments.
+\textbf{c-d.} Simulations of community coalescence with a consumer-resource model
+are able to capture these trends.}
+\label{fig2}
 \end{figure}
 
 \clearpage

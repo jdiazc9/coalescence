@@ -254,7 +254,7 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
@@ -282,7 +282,7 @@ assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
 
-assumptions['sparsity'] = 0.6 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
+assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species

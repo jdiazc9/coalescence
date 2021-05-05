@@ -263,10 +263,10 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # try these assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 100 # number of communities
+assumptions['n_wells'] = 50 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
-assumptions['SA'] = [400, 400, 400] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 120 # 30 # number of generalists
+assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
+assumptions['Sgen'] = 240 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 

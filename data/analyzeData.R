@@ -1190,7 +1190,11 @@ myplots[['q-vs-pairwise_cohorts']] <-
   coord_fixed()
 
 myplots[['alone-vs-together']] <-
-  ggplot(data=plot_this,
+  ggplot(data=unique(plot_this[,c('carbon_source',
+                                  'community_1',
+                                  'community_2',
+                                  'f_singleinv',
+                                  'f_multiinv')]),
          aes(x=f_singleinv,y=f_multiinv,
              color=carbon_source)) +
   annotate('polygon',
@@ -1367,7 +1371,7 @@ if (save_plots) {
          device='pdf',
          height=90,
          width=90,
-         units='mm',dpi=1000)
+         units='mm',dpi=600)
 }
 
 

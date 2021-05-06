@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep 23 18:28:37 2020
-
 @author: Juan
 """
 
@@ -149,7 +148,7 @@ def bray_curtis(p,q):
     c = sum([min(p[i],q[i]) for i in range(len(p)) if p[i]>0 and q[i]>0])
     
     # Bray-Curtis similarity
-    bc = 1 - 2*c/(sum(p) + sum(q))
+    bc = 2*c/(sum(p) + sum(q))
     return bc
 
 # Kullback-Leibler divergence - using log2 so result is within [0,1]
@@ -241,19 +240,16 @@ assumptions['SA'] = [400, 400, 400] # [100, 100, 100] # number of species per sp
 assumptions['Sgen'] = 120 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
-
 assumptions['response'] = 'type I'
 assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
 assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
 assumptions['supply'] = 'off'
 assumptions['R0_food'] = 1000
 assumptions['m'] = 0 # turn off mortality (?)
-
 assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
 assumptions['c0'] = 0.0 # background consumption rate in binary model
 assumptions['c1'] = 1.0 # specific consumption rate in binary model
 assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
-
 assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
 assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
@@ -302,6 +298,7 @@ def dRdt(N,R,params):
 dynamics = [dNdt,dRdt]
 
 # plot matrices c and D
+'''
 fig,ax=plt.subplots()
 sns.heatmap(params['c'],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
 ax.set_title('consumer matrix c')
@@ -318,6 +315,7 @@ fig,ax=plt.subplots()
 sns.heatmap(Dplot,cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
 ax.set_title('metabolic matrix D')
 fig
+'''
 
 # make species pools
 pool_overlap = 0.0 # 0: no overlap, 1: full overlap (same pool)
@@ -366,14 +364,14 @@ invasive_plate = community_simulator.Community(init_state_invasive,
                                                scale=1e6)
 
 # plot initial state
-fig, ax = myStackPlot(resident_plate.N)
+#fig, ax = myStackPlot(resident_plate.N)
 
 # stabilize plates
 N_resident, R_resident = stabilizeCommunities(resident_plate)
 N_invasive, R_invasive = stabilizeCommunities(invasive_plate)
 
 # plot communities after stabilization
-fig, ax = myStackPlot(N_resident)
+#fig, ax = myStackPlot(N_resident)
 
 # plot species abundance histogram
 # fig, ax = plt.subplots()
@@ -383,7 +381,7 @@ fig, ax = myStackPlot(N_resident)
 # fig
 
 # plot ranks
-rankPlot(N_resident)
+#rankPlot(N_resident)
 
 # make and stabilize coalescence plate
 N0_coalescence = (N_resident + N_invasive)/2*(1/100) # added dilution factor
@@ -514,7 +512,7 @@ for i in range(assumptions['n_wells']):
     C = N_coalescence.iloc[:,i].tolist()
     
     # i-th element of Q
-    Q[i] = mysim(I,R,C)['jensen_shannon']
+    Q[i] = mysim(I,R,C)['bray_curtis']
     
 # get fraction in pairwise competition
 f_pairwise = ['NA' for i in range(assumptions['n_wells'])]
@@ -875,10 +873,10 @@ def buc_vs_ci():
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
-kratio_hist()
-kratio_vs_ci()
-buc_hist()
-buc_vs_ci()
+#kratio_hist()
+#kratio_vs_ci()
+#buc_hist()
+#buc_vs_ci()
 
 
 
@@ -888,14 +886,12 @@ buc_vs_ci()
 # test how much time it takes to propagate a plate for T=1
 import time
 plate = resident_plate.copy()
-
 start_time = time.time()
 plate.Propagate(1)
 print("%s s" % (time.time() - start_time))
 """
 
 print("%s s" % (time.time() - start_time))
-
 
 
 

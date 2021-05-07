@@ -19,10 +19,13 @@
 \usepackage{hyperref} % hyperlinks
 \usepackage{nameref} % cross-references between draft and supplementary material
 \usepackage{zref-xr,zref-user} % more cross-references formatting
+\zxrsetup{toltxlabel}
+\zexternaldocument*{supp}
 \usepackage[square,numbers,sort&compress]{natbib}
 \usepackage[table,xcdraw]{xcolor} % text and table background colors
 \usepackage[margin=3cm]{geometry} % margins
 \usepackage{lineno} % line numbers
+\usepackage{textcomp} % special characters (some references break if this isn't loaded?)
 
 \usepackage{pdflscape} %% Landscape
 \usepackage{dcolumn}
@@ -101,14 +104,45 @@ The abstract goes here.
   
 \end{abstract}
 
-\section*{Introduction}\label{intro}
+\section*{Test section}
 
-This is an example cite \cite{Vetrovsky2013,nloptr}.
+This is an example cite \cite{Luo2020,Vass2021}.
 This is how you refer to \figref{fig1}.
 This is how you refer to \figref[a]{fig1}.
 This is how you refer to \tableref{fig1}.
+This is how you refer to \figref{figS1}.
 This is how you refer to the section \nameref{methods:sim} of the \nameref{methods}.
 This is a cleaner way to refer to the \methodsref{methods:sim}.
+
+\section*{Introduction}\label{intro}
+
+Microbial communities often invade one another.
+This has been observed, for instance, 
+in river courses where terrestrial microbial communities mix with aquatic microorganisms
+\cite{Luo2020,Vass2021}
+or in soil communities being invaded by aerially dispersed bacteria and funghi \cite{Evans2019}.
+The human digestive system can even get invaded several times a day by the microbial consortia
+that reside on the ingested food.
+Ecologists have long contemplated the idea that interactions between multiple co-invading species
+can produce correlated invasional outcomes
+\cite{Gilpin1994,Grosholz2005,Green2011,Livingston2013,Rillig2015,OLoughlin2017}.
+One example is the hypothesis known as \textit{invasional meltdown}, which proposes that
+positive interactions between co-invading species can enhance their invasive success and
+facilitate future invasions \cite{Simberloff1999,Simberloff2006,Gurevitch2006}.
+
+The phenomenon by which entire microbiomes invade one another has been termed
+\textit{community coalescence} \cite{Rillig2015}.
+In spite of its clear potential importance, the role of coalescence in microbiome assembly is
+only beginning to be addressed and little is known about the mechanisms that govern it and its
+potential implications.
+Early mathematical models of community-community invasions \cite{Gilpin1994,Toquenaga1997},
+as well as more recent work including environmental construction (e.g., consumer-resource models)
+\cite{Tikhonov2016,Tikhonov2017,Lechon2021}, suggest that high-order invasion effects are common
+during community coalescence. Communities that have a previous history of coexistence may exhibit an
+emergent ``cohesiveness'' which produces correlated invasional outcomes among species from the
+same community \cite{Livingston2013,Sierocinski2017}.
+The situation where ecological partners in the invading community recruit one another into the final
+coalesced community has been called \textit{ecological co-selection} \cite{Rillig2017,Sierocinski2017}.
 
 \section*{Results \& Discussion}\label{results-discussion}
 
@@ -411,7 +445,6 @@ Research Corporation and the Simons Foundation.
 % references
 \clearpage
 \bibliographystyle{mystyle}
-%\bibliographystyle{unsrt}
 \bibliography{refs}
 
 \clearpage
@@ -420,6 +453,7 @@ Research Corporation and the Simons Foundation.
 
 \begin{figure}[!h]
 \centering
+\internallinenumbers
 \includegraphics[width=10cm,keepaspectratio]{figs/fig1.pdf}
 \caption{\textbf{Overview of the experimental protocol.}
 \textbf{a.}~Environmental samples collected from eight different locations were used
@@ -450,6 +484,7 @@ for seven additional transfers.}
 
 \begin{figure}[!h]
 \centering
+\internallinenumbers
 \includegraphics[width=15cm,keepaspectratio]{figs/fig2.pdf}
 \caption{\textbf{Co-selection in microbial community coalescence.}
 \textbf{a.}~Coalescence outcomes are quantified by the relative Bray-Curtis similarity
@@ -458,7 +493,7 @@ These outcomes are predicted by the pairwise competition between the invasive an
 resident dominant
 species ($R^2=0.15$ for glutamine and $R^2=0.57$ for citrate). This is consistent with a scenario of
 top-down positive co-selection where dominants recruit their cohorts for the final
-coalesced community.
+coalesced community. Two biological replicates per experiment are plotted individually.
 \textbf{b.}~We represent the frequency reached by
 the invasive dominant species when they invade the resident communities on their own versus
 when they are in the company of their cohort.
@@ -468,12 +503,66 @@ bottom-up co-selection, gray area corresponds to situations where invasive domin
 species can invade with equal success regardless of the presence of their cohorts.
 Data shows that positive co-selection is common, whereas antagonistic
 co-selection is rare in our experiments.
+Two biological replicates per experiment are plotted individually.
 \textbf{c-d.} Simulations of community coalescence with a consumer-resource model
 are able to capture these trends.}
 \label{fig2}
 \end{figure}
 
 \clearpage
+
+\section*{Supplementary Figures}
+
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0} 
+
+\begin{figure}[!h]
+\centering
+\internallinenumbers
+\includegraphics[width=15cm,keepaspectratio]{figs/figS1.pdf}
+\caption{\textbf{Community compositions after seven additional transfers without coalescence.}
+Each color of the pie plots corresponds to a different exact sequence variant
+(\methodsref{methods:sequencing}).
+Replicate 2 of community 1 from glutamine,
+as well as replicate 2 of community 8 from citrate (highlighted) were removed based on their
+dissimilarity to the other two replicates (details in code for data analysis, see
+\nameref{datacode}).
+Communities clustered in dashed boxes shared the same dominant species as revealed by
+sequencing data.
+For communities enclosed in red boxes, sequencing data showed that the species isolated by plating
+was not detectable in the community after seven additional transfers (i.e. the dominant was
+incorrectly identified) and were therefore excluded from downstream analyses.}
+\label{figS1}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+\centering
+\internallinenumbers
+\includegraphics[width=12.5cm,keepaspectratio]{figs/figS2.pdf}
+\caption{\textbf{Alternative metrics of community distance.}
+Quantifying coalescence outcomes using different metrics of community similarity
+(\methodsref{methods:metrics}) gives similar results to those shown in \figref[a]{fig2}.
+Metrics that account for the relative species abundances (\textbf{a.} Jensen-Shannon similarity or
+\figref[a]{fig2} Bray-Curtis similarity) yield higher correlations than less quantitative metrics that only
+account for species presence/absence (\textbf{b.} Jaccard similarity or \textbf{c.} Fraction of endemic
+invasive species persisting in the coalesced community).}
+\label{figS2}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+\centering
+\internallinenumbers
+\includegraphics[width=10cm,keepaspectratio]{figs/figS3.pdf}
+\caption{\textbf{Dominant species have limited effects on coalescence outcomes.}
+We repeated the analyses shown in \figref[a]{fig2} and \figref{figS2}, but this time we removed the
+dominants from the compositional data prior to quantifying community distances.
+The trends observed before are maintained.}
+\label{figS3}
+\end{figure}
 
 \end{document}
 

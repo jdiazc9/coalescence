@@ -229,42 +229,12 @@ def mysim(p,q,pq):
 
 ### SEED AND STABILIZE COMMUNITIES
 
-# assumptions
-
-"""
-# quasi-default assumptions
+# general assumptions
 assumptions = community_simulator.usertools.a_default.copy()
 assumptions['n_wells'] = 100 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
-assumptions['SA'] = [400, 400, 400] # [100, 100, 100] # number of species per specialist family
-assumptions['Sgen'] = 120 # 30 # number of generalists
-assumptions['l'] = 0.8 # leakage fraction
-assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
-assumptions['response'] = 'type I'
-assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
-assumptions['sampling'] = 'Gamma' # 'Binary', 'Gaussian', 'Uniform' or 'Gamma' (sampling of the matrix c)
-assumptions['supply'] = 'off'
-assumptions['R0_food'] = 1000
-assumptions['m'] = 0 # turn off mortality (?)
-assumptions['q'] = 0.9 #0.9 # preference strength (0 for generalist and 1 for specialist)
-assumptions['c0'] = 0.0 # background consumption rate in binary model
-assumptions['c1'] = 1.0 # specific consumption rate in binary model
-assumptions['sigc'] = 3 #3 # standard deviation of sum of consumption rates for Gaussian and Gamma models
-assumptions['sparsity'] = 0.9 #0.05 # variability in secretion fluxes among resources (must be less than 1)  
-assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the same type as the consumed one
-assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
-assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
-assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
-"""
-
-# try these assumptions
-assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 50 # number of communities
-assumptions['S'] = 50 # number of species sampled at initialization
-assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 240 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
-assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 
 assumptions['response'] = 'type I'
 assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
@@ -283,6 +253,17 @@ assumptions['fs'] = 0.45 #0.45 # fraction of secretion flux to resources of the 
 assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
 assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
+
+# assumptions that depend on the nature of the supplied primary resource
+# 'complex' resource
+#assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
+#assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
+# 'simple' resource
+#assumptions['SA'] = 2400 # [100, 100, 100] # number of species per specialist family
+#assumptions['MA'] = 30 # [30, 30, 30] # number of resources per resource class
+# 'intermediate' resource
+assumptions['SA'] = [1200, 1200] # [100, 100, 100] # number of species per specialist family
+assumptions['MA'] = [15, 15] # [30, 30, 30] # number of resources per resource class
 
 print(assumptions)
 

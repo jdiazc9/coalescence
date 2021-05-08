@@ -85,22 +85,22 @@
 
 @Article{Callahan2017,
   author  = {Benjamin J Callahan and Paul J McMurdie and Susan P Holmes},
-  journal = {The ISME Journal},
   title   = {Exact sequence variants should replace operational taxonomic units in marker-gene data analysis},
+  journal = {The ISME Journal},
   year    = {2017},
-  pages   = {2639-2643},
   volume  = {11},
+  pages   = {2639–2643},
   doi     = {https://doi.org/10.1038/ismej.2017.119},
   url     = {https://www.nature.com/articles/ismej2017119},
 }
 
 @Article{Caporaso2010,
   author  = {J Gregory Caporaso and Justin Kuczynski and Jesse Stombaugh and Kyle Bittinger and Frederic D Bushman and Elizabeth K Costello and Noah Fierer and Antonio Gonzalez Peña and Julia K Goodrich and Jeffrey I Gordon and Gavin A Huttley and Scott T Kelley and Dan Knights and Jeremy E Koenig and Ruth E Ley and Catherine A Lozupone and Daniel McDonald and Brian D Muegge and Meg Pirrung and Jens Reeder and Joel R Sevinsky and Peter J Turnbaugh and William A Walters and Jeremy Widmann and Tanya Yatsunenko and Jesse Zaneveld and Rob Knight},
-  journal = {Nature Methods},
   title   = {QIIME allows analysis of high-throughput community sequencing data},
+  journal = {Nature Methods},
   year    = {2010},
-  pages   = {335-336},
   volume  = {7},
+  pages   = {335–336},
   doi     = {10.1038/nmeth.f.303},
   url     = {https://www.nature.com/articles/nmeth.f.303},
 }
@@ -162,16 +162,16 @@
 }
 
 @Article{Kullback1951,
-  author    = {S. Kullback and R. A. Leibler},
-  journal   = {The Annals of Mathematical Statistics},
-  title     = {{On Information and Sufficiency}},
-  year      = {1951},
-  number    = {1},
-  pages     = {79-86},
-  volume    = {22},
-  doi       = {10.1214/aoms/1177729694},
-  publisher = {Institute of Mathematical Statistics},
-  url       = {https://doi.org/10.1214/aoms/1177729694},
+author = {S. Kullback and R. A. Leibler},
+title = {{On Information and Sufficiency}},
+volume = {22},
+journal = {The Annals of Mathematical Statistics},
+number = {1},
+publisher = {Institute of Mathematical Statistics},
+pages = {79 -- 86},
+year = {1951},
+doi = {10.1214/aoms/1177729694},
+URL = {https://doi.org/10.1214/aoms/1177729694}
 }
 
 @ARTICLE{Lin1991,
@@ -384,7 +384,7 @@
   year      = {2019},
   month     = {jul},
   number    = {3},
-  pages     = {905-916},
+  pages     = {905--916},
   volume    = {22},
   doi       = {10.1111/1462-2920.14707},
   publisher = {Wiley},

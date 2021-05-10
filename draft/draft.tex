@@ -72,8 +72,8 @@
   }%
 }
 \newcommand{\methodsref}[1]{%
-  \hyperref[{#1}]{%
-   Methods:~\nameref*{#1}%
+  \hyperref[{methods:#1}]{%
+   Methods:~\nameref*{methods:#1}%
   }%
 }
 
@@ -94,7 +94,7 @@ Yale University, New Haven, CT, USA}
   
 \begin{document}
 
-\linenumbers
+%\linenumbers
 
 \maketitle
 
@@ -103,16 +103,6 @@ Yale University, New Haven, CT, USA}
 The abstract goes here.
   
 \end{abstract}
-
-\section*{Test section}
-
-This is an example cite \cite{Luo2020,Vass2021}.
-This is how you refer to \figref{fig1}.
-This is how you refer to \figref[a]{fig1}.
-This is how you refer to \tableref{fig1}.
-This is how you refer to \figref{figS1}.
-This is how you refer to the section \nameref{methods:sim} of the \nameref{methods}.
-This is a cleaner way to refer to the \methodsref{methods:sim}.
 
 \section*{Introduction}\label{intro}
 
@@ -167,17 +157,88 @@ as illustrated in \figref[e]{fig1}.
 Which of these situations are typically found in nature?
 Addressing this question has been experimentally challenging in the past \cite{Rillig2017,Sierocinski2017}.
 
-\vspace{1.5cm}
-
-Check this reference \cite{Castledine2020}
-
-Uncovering the rules of microbial community invasions \cite{Vila2019}
+In previous work, we have shown that a large amount of soil and plant microbiomes can be cultured
+\textit{ex situ} in synthetic minimal environments with a single supplied limiting resource under serial
+growth-dilution cycles \cite{Goldford2018} (\figref[a-b]{fig1}). Under these conditions, environmental
+microbiomes spontaneously re-assemble into complex multi-species communities sustained by dense
+cross-feeding facilitation networks \cite{Goldford2018}. In addition,
+and just like in natural assemblies,
+species abundance distributions
+in these communities are generally long-tailed and uneven (\figref[d]{fig1} and \figref{figS1}),
+with the dominant (most abundant) species typically comprising most of the biomass ($\text{median}=46\%$,
+\figref{figS1}). Because these communities are easy to manipulate and grow in high throughput, and
+are largely made up by culturable members, they represent good test cases to investigate ecological
+co-selection during community coalescence. Here we focus on the dominants and ask whether they can
+co-select or be co-selected by the sub-dominant species in their communities (henceforth referred to as
+their \textit{cohorts}, \figref[c]{fig1}).
+Our results confirm that positive top-down co-selection is common, but its effects are weak.
+In contrast, bottom-up co-selection can be very strong, and positive co-selection is far more common
+than negative co-selection.
+We then turn to a microbial consumer-resource model (microCRM)
+\cite{Goldford2018,Marsland2019,Marsland2020}
+that is able to capture the dynamics of microbial communities dominated by metabolic interactions,
+as is the case for the ones assembled in our experimental conditions \cite{Goldford2018}.
+We show that the empirically observed trends in ecological co-selection are reproduced
+with minimal model assumptions, and that
+tuning the complexity of the metabolic interactions in our \textit{in silico} communities can modulate
+the recurrence of top-down or bottom-up co-selection.
+Our findings indicate that collective interactions play an important role at dictating community structure
+during coalescence.
 
 \section*{Results \& Discussion}\label{results-discussion}
 
-Resource availability modulates biodiversity–invasion relationships by altering competitive interactions \cite{Yang2017}
+We collected eight natural microbiomes from different soil and plant environmental samples
+(\figref[a]{fig1})
+and used them to inoculate our synthetic communities, which were stabilized 
+in serial batch-culture biorreactors for 84 generations in synthetic minimal media containing either
+glutamine or citrate as the only supplied carbon source
+(\figref[b]{fig1}, \methodsref{community-assembly}).
+We isolated the dominant species of every community
+(\methodsref{dominants})
+and identified them by Sanger-sequencing their 16S rRNA gene
+(\methodsref{sequencing}), which correctly matched the dominant
+Exact Sequence Variant (ESV) \cite{Callahan2016,Callahan2017} found through
+community-level 16S illumina sequencing
+(\figref{figS1}).
+These dominants remained at high frequency after seven additional transfers
+with the exception of two of the citrate communities and one of the glutamine
+communities (where the dominants were presumably a transiently dominating species)
+that were excluded from further analysis
+(\figref{figS1}).
+Similarly, pairs of communities where the dominants shared a same 16S sequence
+and had similar colony morphology were excluded
+(\figref{figS1}).
 
-Resource pulses can alleviate the biodiversity–invasion relationship in soil microbial communities \cite{Mallon2015}
+\subsubsection*{Top-dow co-selection is weak}
+
+If communities being coalesced were highly cohesive from the top-down,
+the dominant species would co-select the rarer members of its community during coalescence
+(\figref[e]{fig1}, left panels).
+In this scenario, we would expect the outcome of community coalescence to be predicted by
+which of the two dominants is most competitive in pairwise competition.
+Coalescence outcomes can be quantified by the similarity between the coalesced and the
+invasive communities
+(\methodsref{metrics}).
+To test this hypothesis, we performed all pairwise competitions between dominant species
+in glutamine and citrate environments by mixing them 1:1 on their native media and propagating
+the cultures for seven serial transfers, roughly 42 generations
+(\methodsref{competitions}).
+We then performed all possible pairwise community coalescence experiments by mixing
+equal volumes of the communities and propagating the resulting cultures for seven extra
+transfers
+(\figref[f]{fig1}).
+The frequencies of all species in both community-community and dominant-dominant competitions
+were determined by 16S illumina sequencing
+(\methodsref{sequencing}).
+We found that the pairwise competitive ability of an invasive dominant
+is only weakly predictive of the performance of the invasive community in coalescence,
+as quantified by the relative Bray-Curtis similarity between the coalesced and invasive communities
+(\figref[a]{fig2}, $R^2=0.15$, $p<$ for glutamine and $R^2=0.15$, $p<$ for citrate).
+Alternative quantifications of community distance also yield weak effects,
+and even more so when the metric used
+accounts only for the presence/absence of specific species and not for their relative abundance in
+the communities
+(\figref{figS2}).
 
 \clearpage
 
@@ -521,7 +582,7 @@ for seven additional transfers.}
 \includegraphics[width=15cm,keepaspectratio]{figs/fig2.pdf}
 \caption{\textbf{Co-selection in microbial community coalescence.}
 \textbf{a.}~Coalescence outcomes are quantified by the relative Bray-Curtis similarity
-($Q$) between the coalesced and invasive communities (\methodsref{methods:metrics}).
+($Q$) between the coalesced and invasive communities (\methodsref{metrics}).
 These outcomes are predicted by the pairwise competition between the invasive and
 resident dominant
 species ($R^2=0.15$ for glutamine and $R^2=0.57$ for citrate). This is consistent with a scenario of
@@ -555,7 +616,7 @@ are able to capture these trends.}
 \includegraphics[width=15cm,keepaspectratio]{figs/figS1.pdf}
 \caption{\textbf{Community compositions after seven additional transfers without coalescence.}
 Each color of the pie plots corresponds to a different exact sequence variant
-(\methodsref{methods:sequencing}).
+(\methodsref{sequencing}).
 Replicate 2 of community 1 from glutamine,
 as well as replicate 2 of community 8 from citrate (highlighted) were removed based on their
 dissimilarity to the other two replicates (details in code for data analysis, see
@@ -576,7 +637,7 @@ incorrectly identified) and were therefore excluded from downstream analyses.}
 \includegraphics[width=12.5cm,keepaspectratio]{figs/figS2.pdf}
 \caption{\textbf{Alternative metrics of community distance.}
 Quantifying coalescence outcomes using different metrics of community similarity
-(\methodsref{methods:metrics}) gives similar results to those shown in \figref[a]{fig2}.
+(\methodsref{metrics}) gives similar results to those shown in \figref[a]{fig2}.
 Metrics that account for the relative species abundances (\textbf{a.} Jensen-Shannon similarity or
 \figref[a]{fig2} Bray-Curtis similarity) yield higher correlations than less quantitative metrics that only
 account for species presence/absence (\textbf{b.} Jaccard similarity or \textbf{c.} Fraction of endemic
@@ -596,6 +657,23 @@ dominants from the compositional data prior to quantifying community distances.
 The trends observed before are maintained.}
 \label{figS3}
 \end{figure}
+
+\section*{Test section}
+
+This is an example cite \cite{Luo2020,Vass2021}.
+This is how you refer to \figref{fig1}.
+This is how you refer to \figref[a]{fig1}.
+This is how you refer to \tableref{fig1}.
+This is how you refer to \figref{figS1}.
+This is how you refer to the section \nameref{methods:sim} of the \nameref{methods}.
+This is a cleaner way to refer to the \methodsref{sim}.
+
+
+Check this reference \cite{Castledine2020}
+
+Resource availability modulates biodiversity–invasion relationships by altering competitive interactions \cite{Yang2017}
+
+Resource pulses can alleviate the biodiversity–invasion relationship in soil microbial communities \cite{Mallon2015}
 
 \end{document}
 

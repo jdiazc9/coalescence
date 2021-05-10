@@ -853,7 +853,9 @@ plot_this <- data.frame(carbon_source = character(0),
                         q_jensen_shannon_cohort = numeric(0),
                         q_jaccard_cohort = numeric(0),
                         q_endemic_cohort = numeric(0),
-                        f_singleinv = numeric(0))
+                        f_singleinv = numeric(0),
+                        f_multiinv = numeric(0),
+                        f_residentdom_multiinv = numeric(0))
 
 # run through carbon sources and communities
 for (cs in carbon_sources) {
@@ -1018,6 +1020,9 @@ for (cs in carbon_sources) {
         # fraction of dominant 1 (invasive) invading resident community with cohort
         f_multiinv <- as.numeric(cc_coalesced[dom_1,])
         
+        # fraction of dominant 2 (resident) when invasive community invades with cohort
+        f_residentdom_multiinv <- as.numeric(cc_coalesced[dom_2,])
+        
         # add to plotting table
         plot_this <- rbind(plot_this,
                            data.frame(
@@ -1040,7 +1045,8 @@ for (cs in carbon_sources) {
                              q_jaccard_cohort = q_jaccard_cohort,
                              q_endemic_cohort = q_endemic_cohort,
                              f_singleinv = f_singleinv,
-                             f_multiinv = f_multiinv
+                             f_multiinv = f_multiinv,
+                             f_residentdom_multiinv = f_residentdom_multiinv
                            ))
         
       }
@@ -1048,6 +1054,9 @@ for (cs in carbon_sources) {
     }
   }
 }
+
+# pseudo-pairwise competition of dominants with cohorts
+plot_this$f_multiinv_rel <- plot_this$f_multiinv/(plot_this$f_multiinv + plot_this$f_residentdom_multiinv)
 
 # check that sample positioning in wells is consistent
 stopifnot(all(plot_this$well_pairwise == plot_this$well_coalescence))
@@ -1189,6 +1198,41 @@ myplots[['q-vs-pairwise_cohorts']] <-
                                       color='transparent')) +
   coord_fixed()
 
+myplots[['pairwise-vs-coalescence']] <-
+  ggplot(data=unique(plot_this[,c('carbon_source','community_1','community_2','f_pairwise','f_multiinv_rel')]),
+       aes(x=f_pairwise,y=f_multiinv_rel,
+           color=carbon_source)) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5) +
+  scale_y_continuous(name='Frequency of\ninvasive dominant species\nin coalescence',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        strip.text=element_text(hjust=-0.01,
+                                vjust=-0.01),
+        strip.background=element_rect(fill='transparent',
+                                      color='transparent')) +
+  coord_fixed()
+
 myplots[['alone-vs-together']] <-
   ggplot(data=unique(plot_this[,c('carbon_source',
                                   'community_1',
@@ -1244,6 +1288,7 @@ if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis']])
   print(myplots[['q-vs-pairwise_other-metrics']])
   print(myplots[['q-vs-pairwise_cohorts']])
+  print(myplots[['pairwise-vs-coalescence']])
   print(myplots[['alone-vs-together']])
 }
 if (save_plots) {
@@ -1264,6 +1309,12 @@ if (save_plots) {
          device='pdf',
          height=180,
          width=180,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','pairwise-vs-coalescence.pdf'),
+         plot=myplots[['pairwise-vs-coalescence']],
+         device='pdf',
+         height=120,
+         width=120,
          units='mm',dpi=600)
   ggsave(file.path('.','plots','alone-vs-together.pdf'),
          plot=myplots[['alone-vs-together']],

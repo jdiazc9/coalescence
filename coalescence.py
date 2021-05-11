@@ -233,6 +233,7 @@ def mysim(p,q,pq):
 assumptions = community_simulator.usertools.a_default.copy()
 assumptions['n_wells'] = 100 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
+assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 240 # 30 # number of generalists
 assumptions['l'] = 0.8 # leakage fraction
 
@@ -256,14 +257,9 @@ assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means rand
 
 # assumptions that depend on the nature of the supplied primary resource
 # 'complex' resource
-#assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
 #assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 # 'simple' resource
-#assumptions['SA'] = 2400 # [100, 100, 100] # number of species per specialist family
-#assumptions['MA'] = 30 # [30, 30, 30] # number of resources per resource class
-# 'intermediate' resource
-assumptions['SA'] = [1200, 1200] # [100, 100, 100] # number of species per specialist family
-assumptions['MA'] = [15, 15] # [30, 30, 30] # number of resources per resource class
+assumptions['MA'] = 15 # [30, 30, 30] # number of resources per resource class
 
 print(assumptions)
 
@@ -542,6 +538,7 @@ kratio_resident = [math.log10(x) for x in kratio_resident]
 kratio_invasive = [math.log10(x) for x in kratio_invasive]
 kratio_diff = [kratio_invasive[i] - kratio_resident[i] for i in range(assumptions['n_wells'])]
 
+'''
 # get cohort invasiveness (ci)
 ci = ['NA' for i in range(assumptions['n_wells'])]
 N_cohortinv = N_cohortinv.droplevel(0)
@@ -584,6 +581,7 @@ J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
 J_out = {'common': lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T),
          'specific': lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
         }
+
 
 # resident plate
 plate = resident_plate.copy()
@@ -645,6 +643,7 @@ for i in range(assumptions['n_wells']):
    
 # difference in bottom-up cohesiveness
 buc_diff = [buc_invasive[j]-buc_resident[j] for j in range(assumptions['n_wells'])]
+'''
 
 
 
@@ -652,16 +651,19 @@ buc_diff = [buc_invasive[j]-buc_resident[j] for j in range(assumptions['n_wells'
 
 # all statistics
 s0 = ['NA' for i in range(assumptions['n_wells'])]
-stats = {'bray_curtis':s0,'jensen_shannon':s0,'jaccard':s0,'endemic':s0}
+stats = {'bray_curtis':s0.copy(),
+         'jensen_shannon':s0.copy(),
+         'jaccard':s0.copy(),
+         'endemic':s0.copy()}
 
-for s in list(stats.keys()):
+for s in stats.keys():
     for i in range(assumptions['n_wells']):
         
         # community compositions as lists
         R = N_resident.iloc[:,i].tolist()
         I = N_invasive.iloc[:,i].tolist()
         C = N_coalescence.iloc[:,i].tolist()
-    
+        
         stats[s][i] = mysim(I,R,C)[s]
 
 # final data frame
@@ -736,7 +738,8 @@ def cohort_vs_alone():
     ax.set_yticks([0,0.5,1])
     
     fig
-    
+
+'''
 # k-ratio histogram
 def kratio_hist():
     
@@ -849,15 +852,18 @@ def buc_vs_ci():
     ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
     
     fig
+'''
     
 
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
-#kratio_hist()
-#kratio_vs_ci()
-#buc_hist()
-#buc_vs_ci()
+'''
+kratio_hist()
+kratio_vs_ci()
+buc_hist()
+buc_vs_ci()
+'''
 
 
 

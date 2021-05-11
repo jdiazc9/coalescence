@@ -67,13 +67,13 @@ Kozich JJ, Westcott SL, Baxter NT, Highlander SK and Schloss PD (2013).
 Caporaso JG, Kuczynski J, Stombaugh J, Bittinger K, Bushman FD, Costello EK,
   Fierer N, Peña AG, Goodrich JK et~al. (2010).
 \newblock QIIME allows analysis of high-throughput community sequencing data.
-\newblock \emph{Nature Methods} \textbf{7}:335–336
+\newblock \emph{Nature Methods} \textbf{7}:335--336
 
 \bibitem{Callahan2017}
 Callahan BJ, McMurdie PJ and Holmes SP (2017).
 \newblock Exact sequence variants should replace operational taxonomic units in
   marker-gene data analysis.
-\newblock \emph{The ISME Journal} \textbf{11}:2639–2643
+\newblock \emph{The ISME Journal} \textbf{11}:2639--2643
 
 \bibitem{Wang2007}
 Wang Q, Garrity GM, Tiedje JM and Cole JR (2007).
@@ -87,7 +87,7 @@ Quast C, Pruesse E, Yilmaz P, Gerken J, Schweer T, Yarza P, Peplies J and
   Gl{\"o}ckner FO (2013).
 \newblock The SILVA ribosomal RNA gene database project: improved data
   processing and web-based tools.
-\newblock \emph{Nucleic Acids Research} \textbf{41(D1)}:D590–D596
+\newblock \emph{Nucleic Acids Research} \textbf{41(D1)}:D590--D596
 
 \bibitem{Bray1957}
 Curtis JT and Bray JR (1957).
@@ -103,7 +103,7 @@ Lin J (1991).
 \bibitem{Kullback1951}
 Kullback S and Leibler RA (1951).
 \newblock {On Information and Sufficiency}.
-\newblock \emph{The Annals of Mathematical Statistics} \textbf{22(1)}:79 -- 86
+\newblock \emph{The Annals of Mathematical Statistics} \textbf{22(1)}:79--86
 
 \bibitem{Jaccard1912}
 Jaccard P (1912).

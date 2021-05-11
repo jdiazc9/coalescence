@@ -1330,7 +1330,7 @@ if (save_plots) {
 ### ----------------------------------------------------------------------
 
 # load data from simulations
-plot_this <- read.table('simul_data_complex.txt',header=TRUE)
+plot_this <- read.table('simul_data_simple.txt',header=TRUE)
 
 # make plots
 myplots[['q-vs-pairwise_bray-curtis_simul']] <-

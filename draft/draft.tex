@@ -78,15 +78,27 @@
 }
 
 % title, authors, affiliations
-\title{Cohesiveness in microbial community coalescence}
-\author[1,2,3]{Authors}
+\title{Top-down versus bottom-up cohesiveness
+in microbial community coalescence}
+\author[1,2,*]{Juan Diaz-Colunga}
+\author[1,2,*]{Nanxi Lu}
+\author[1,2,*]{Alicia Sanchez-Gorostiaga}
+\author[3]{Joshua E. Goldford}
+\author[4,5]{Mikhail Tikhonov}
 \author[1,2,$\dagger$]{Álvaro Sánchez}
 \affil[1]{Department of Ecology \& Evolutionary Biology,
 Yale University, New Haven, CT, USA}
 \affil[2]{Microbial Sciences Institute,
 Yale University, New Haven, CT, USA}
-\affil[3]{Other affiliations...}
-\affil[$\dagger$]{To whom correspondence should be addressed: \normalfont alvaro.sanchez@yale.edu}
+\affil[3]{Cell Metabolism, Agios Pharmaceuticals, Inc.,
+Cambridge, MA, USA}
+\affil[4]{Department of Applied Physics,
+Stanford University, Stanford, CA, USA}
+\affil[5]{Department of Physics,
+Washington University, St. Louis, MO, USA}
+
+\affil[$\dagger$]{\normalfont To whom correspondence should be addressed: alvaro.sanchez@yale.edu}
+\affil[*]{\normalfont These authors contributed equally}
 \date{}
 
 
@@ -305,7 +317,8 @@ Alternatively, if both forms of bottom-up co-selection were weak, we would see a
 success of the dominant regardless of whether it is invading with its cohort
 (\figref[b]{fig2}, gray shaded region).
 
-We performed a new round of invasion experiments where each dominant invaded every
+To test which of these situations was more common in our conditions,
+we performed a new round of invasion experiments where each dominant invaded every
 other community in isolation (\methodsref{competitions}). The dominant-invaded
 communities were then propagated for seven serial transfers, and the final
 community compositions were determined by 16S Illumina sequencing.
@@ -327,8 +340,8 @@ observed in our experiments.
 
 \subsubsection*{Simulations of community coalescence with a consumer-resource model}
 
-We ran a set of simulations of community coalescence to better understand the mechanisms
-of ecological co-selection in our experiments. We used a microbial consumer-resource
+To better understand the mechanisms of ecological co-selection in our experiments,
+we ran a set of simulations of community coalescence. We used a microbial consumer-resource
 model (microCRM) \cite{Goldford2018,Marsland2019} implemented in the Community Simulator package
 for Python \cite{Marsland2020}. We chose this modeling framework because
 communities assembled under our experimental conditions (natural microbiomes re-assembled into
@@ -344,7 +357,7 @@ We also used sparse metabolic matrices, equivalent to assuming that species secr
 types of byproducts when consuming a resource. These assumptions are supported by the experimental
 observation that individual species can indeed secrete different sets of few metabolites
 to the environment when consuming a primary resource
-\cite{Harcombe2014,Pinu2018}.
+\cite{Harcombe2014,Pinu2018}. \mr cite Sylvie here?
 We reason that these choices are necessary to potentially generate community cohesiveness:
 if the secretions of all species were roughly similar, the effect of interchanging members of
 a community would be minimal. But in practice, species with a history of coexistence make up
@@ -394,19 +407,21 @@ of community coalescence experiments,
 and highlight the critical role played by the rarer, sub-dominant species in the generation
 of community cohesiveness.
 Our data suggests that the strength and direction of ecological co-selection is modulated
-by the supplied primary carbon source,
-which in turn shapes the cross-feeding network that dictates
-the structure of our communities \cite{Goldford2018,Estrela2020}.
+by the underlying metabolic network that shapes the structure of
+communities assembled in synthetic minimal conditions
+\cite{Goldford2018,Estrela2020}.
+The architecture of this network is dependent on the supplied primary carbon source.
 These observations,
 together with previous experimental results in different systems \cite{Sierocinski2017} as well as
 theoretical predictions
 \cite{Gilpin1994,Toquenaga1997,Tikhonov2016,Tikhonov2017,Vila2019,Lechon2021},
-suggest that collective interactions arising from metabolic feedbacks between microbes
+suggest that collective interactions between microbes
 and the environment should be generically expected to produce ecological co-selection
 during community coalescence.
 
-Further work is required to clarify the relationship between metabolic interactions,
-community structure, cohesiveness and co-selection.
+Further work will be necessary to clarify the relationship between
+metabolic feedbacks, community cohesiveness, and
+the strength and direction of ecological co-selection.
 The experimental system that we introduced in this work can be easily expanded so that
 large numbers of community coalescence experiments can be carried out in parallel.
 It thus represents a promising tool to explore the properties of microbial community
@@ -722,7 +737,7 @@ new features are deposited in \url{github.com/jdiazc9/coalescence}.
 
 \section*{Acknowledgements}
 
-The authors wish to thank Joshua Goldford, Pankaj Mehta, Wenping Cui,
+The authors wish to thank Pankaj Mehta, Wenping Cui,
 Robert Marsland and all members of the Sanchez laboratory
 for many helpful discussions.
 We also wish to express our gratitude to the Goodman laboratory at Yale

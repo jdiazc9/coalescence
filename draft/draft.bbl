@@ -1,14 +1,53 @@
 \begin{thebibliography}{10}
 
-\bibitem{Vetrovsky2013}
-V{\v e}trovsk{\' y} T and Baldrian P (2013).
-\newblock The Variability of the 16S rRNA Gene in Bacterial Genomes and Its
-  Consequences for Bacterial Community Analyses.
-\newblock \emph{PLoS ONE} \textbf{8(2)}:e57923
+\bibitem{Mansour2018}
+Mansour I, Heppell CM, Ryo M and Rillig MC (2018).
+\newblock Application of the microbial community coalescence concept to
+  riverine networks.
+\newblock \emph{Biological Reviews} \textbf{93(4)}:1832--1845
 
-\bibitem{nloptr}
-Johnson SG.
-\newblock The NLopt nonlinear-optimization package
+\bibitem{Luo2020}
+Luo X, Xiang X, Yang Y, Huang G, Fu K, Che R and Chen L (2020).
+\newblock Seasonal effects of river flow on microbial community coalescence and
+  diversity in a riverine network.
+\newblock \emph{{FEMS} Microbiology Ecology} \textbf{96(8)}:fiaa132
+
+\bibitem{Vass2021}
+Vass M, Sz{\'{e}}kely AJ, Lindström ES, Osman OA and Langenheder S (2021).
+\newblock Warming mediates the resistance of aquatic bacteria to invasion
+  during community coalescence.
+\newblock \emph{Molecular Ecology} \textbf{30(5)}:1345--1356
+
+\bibitem{Rillig2016}
+Rillig MC, Lehmann A, Aguilar-Trigueros CA, Antonovics J, Caruso T, Hempel S,
+  Lehmann J, Valyi K, Verbruggen E et~al. (2016).
+\newblock Soil microbes and community coalescence.
+\newblock \emph{Pedobiologia} \textbf{59(1-2)}:37--40
+
+\bibitem{Evans2019}
+Evans SE, Bell-Dereske LP, Dougherty KM and Kittredge HA (2019).
+\newblock Dispersal alters soil microbial community response to drought.
+\newblock \emph{Environmental Microbiology} \textbf{22(3)}:905--916
+
+\bibitem{Dutton2021}
+Dutton CL, Subalusky AL, Sanchez A, Estrela S, Lu N, Hamilton SK, Njoroge L,
+  Rosi EJ and Post DM (2021).
+\newblock The meta-gut: Hippo inputs lead to community coalescence of animal
+  and environmental microbiomes.
+\newblock \emph{biorXiv}
+
+\bibitem{Vandegrift2019}
+Vandegrift R, Fahimipour AK, Muscarella M, Bateman AC, Wymelenberg KVD and
+  Bohannan BJ (2019).
+\newblock Moving microbes: the dynamics of transient microbial residence on
+  human skin.
+\newblock \emph{biorXiv}
+
+\bibitem{Rillig2015}
+Rillig MC, Antonovics J, Caruso T, Lehmann A, Powell JR, Veresoglou SD and
+  Verbruggen E (2015).
+\newblock Interchange of entire communities: microbial community coalescence.
+\newblock \emph{Trends in Ecology {\&} Evolution} \textbf{30(8)}:470--476
 
 \bibitem{Gilpin1994}
 Gilpin M (1994).
@@ -16,12 +55,29 @@ Gilpin M (1994).
 \newblock \emph{Proceedings of the National Academy of Sciences}
   \textbf{91(8)}:3252--3254
 
+\bibitem{Simberloff1999}
+Simberloff D and Holle BV (1999).
+\newblock Positive Interactions of Nonindigenous Species: Invasional Meltdown?
+\newblock \emph{Biological Invasions} \textbf{1(1)}:21--32
+
 \bibitem{Grosholz2005}
 Grosholz ED (2005).
 \newblock Recent biological invasion may hasten invasional meltdown by
   accelerating historical introductions.
 \newblock \emph{Proceedings of the National Academy of Sciences}
   \textbf{102(4)}:1088--1091
+
+\bibitem{Simberloff2006}
+Simberloff D (2006).
+\newblock Invasional meltdown 6 years later: important phenomenon, unfortunate
+  metaphor, or both?
+\newblock \emph{Ecology Letters} \textbf{9(8)}:912--919
+
+\bibitem{Gurevitch2006}
+Gurevitch J (2006).
+\newblock Commentary on Simberloff (2006): Meltdowns, snowballs and positive
+  feedbacks.
+\newblock \emph{Ecology Letters} \textbf{9(8)}:919--921
 
 \bibitem{Green2011}
 Green PT, O{\textquotesingle}Dowd DJ, Abbott KL, Jeffery M, Retallick K and
@@ -49,11 +105,128 @@ O{\textquotesingle}Loughlin LS and Green PT (2017).
   invaders altering the properties of recipient ecosystems.
 \newblock \emph{Ecology and Evolution} \textbf{7(19)}:7628--7637
 
+\bibitem{Castledine2020}
+Castledine M, Sierocinski P, Padfield D and Buckling A (2020).
+\newblock Community coalescence: an eco-evolutionary perspective.
+\newblock \emph{Philosophical Transactions of the Royal Society B: Biological
+  Sciences} \textbf{375(1798)}:20190252
+
+\bibitem{Toquenaga1997}
+Toquenaga Y (1997).
+\newblock Historicity of a Simple Competition Model.
+\newblock \emph{Journal of Theoretical Biology} \textbf{187(2)}:175--181
+
+\bibitem{Tikhonov2016}
+Tikhonov M (2016).
+\newblock Community-level cohesion without cooperation.
+\newblock \emph{{eLife}} \textbf{5}:e15747
+
+\bibitem{Tikhonov2017}
+Tikhonov M and Monasson R (2017).
+\newblock Collective Phase in Resource Competition in a Highly Diverse
+  Ecosystem.
+\newblock \emph{Physical Review Letters} \textbf{118(4)}:048103
+
+\bibitem{Vila2019}
+Vila JCC, Jones ML, Patel M, Bell T and Rosindell J (2019).
+\newblock Uncovering the rules of microbial community invasions.
+\newblock \emph{Nature Ecology {\&} Evolution} \textbf{3(8)}:1162--1171
+
+\bibitem{Lechon2021}
+Lech{\'{o}}n P, Clegg T, Cook J, Smith TP and Pawar S (2021).
+\newblock The role of competition versus cooperation in microbial community
+  coalescence.
+\newblock \emph{biorXiv}
+
+\bibitem{Sierocinski2017}
+Sierocinski P, Milferstedt K, Bayer F, Gro{\ss}kopf T, Alston M, Bastkowski S,
+  Swarbreck D, Hobbs PJ, Soyer OS et~al. (2017).
+\newblock A Single Community Dominates Structure and Function of a Mixture of
+  Multiple Methanogenic Communities.
+\newblock \emph{Current Biology} \textbf{27(21)}:3390--3395.e4
+
+\bibitem{Rillig2017}
+Rillig MC and Mansour I (2017).
+\newblock Microbial Ecology: Community Coalescence Stirs Things Up.
+\newblock \emph{Current Biology} \textbf{27(23)}:R1280--R1282
+
+\bibitem{Louca2016}
+Louca S, Jacques SMS, Pires APF, Leal JS, Srivastava DS, Parfrey LW, Farjalla
+  VF and Doebeli M (2016).
+\newblock High taxonomic variability despite stable functional structure across
+  microbial communities.
+\newblock \emph{Nature Ecology {\&} Evolution} \textbf{1(1)}:0015
+
+\bibitem{Winfree2015}
+Winfree R, Fox JW, Williams NM, Reilly JR and Cariveau DP (2015).
+\newblock Abundance of common species, not species richness, drives delivery of
+  a real-world ecosystem service.
+\newblock \emph{Ecology Letters} \textbf{18(7)}:626--635
+
+\bibitem{Rosenzweig1994}
+Rosenzweig RF, Sharp RR, Treves DS and Adams J (1994).
+\newblock Microbial evolution in a simple unstructured environment: genetic
+  differentiation in Escherichia coli.
+\newblock \emph{Genetics} \textbf{137(4)}:903--917
+
 \bibitem{Goldford2018}
 Goldford JE, Lu N, Baji{\'c} D, Estrela S, Tikhonov M, Sanchez-Gorostiaga A,
   Segr{\`e} D, Mehta P and Sanchez A (2018).
 \newblock Emergent simplicity in microbial community assembly.
 \newblock \emph{Science} \textbf{361(6401)}:469--474
+
+\bibitem{Estrela2020}
+Estrela S, Vila JCC, Lu N, Bajic D, Rebolleda-Gomez M, Chang CY and Sanchez A
+  (2020).
+\newblock Metabolic rules of microbial community assembly.
+\newblock \emph{biorXiv}
+
+\bibitem{Marsland2019}
+{Marsland III} R, Cui W, Goldford J, Sanchez A, Korolev K and Mehta P (2019).
+\newblock Available energy fluxes drive a transition in the diversity,
+  stability, and functional structure of microbial communities.
+\newblock \emph{PLoS Computational Biology} \textbf{15(2)}:e1006793
+
+\bibitem{Marsland2020}
+Marsland R, Cui W, Goldford J and Mehta P (2020).
+\newblock The Community Simulator: A Python package for microbial ecology.
+\newblock \emph{PLoS ONE} \textbf{15(3)}:e0230430
+
+\bibitem{Dimroth2004}
+Dimroth P (2004).
+\newblock Molecular Basis for Bacterial Growth on Citrate or Malonate.
+\newblock \emph{{EcoSal} Plus} \textbf{1(1)}
+
+\bibitem{Forchhammer2007}
+Forchhammer K (2007).
+\newblock Glutamine signalling in bacteria.
+\newblock \emph{Frontiers in Bioscience} \textbf{12(1)}:358
+
+\bibitem{Callahan2016}
+Callahan BJ, McMurdie PJ, Rosen MJ, Han AW, Johnson AJA and Holmes SP (2016).
+\newblock {DADA}2: High-resolution sample inference from Illumina amplicon
+  data.
+\newblock \emph{Nature Methods} \textbf{13(7)}:581--583
+
+\bibitem{Callahan2017}
+Callahan BJ, McMurdie PJ and Holmes SP (2017).
+\newblock Exact sequence variants should replace operational taxonomic units in
+  marker-gene data analysis.
+\newblock \emph{The ISME Journal} \textbf{11}:2639--2643
+
+\bibitem{Harcombe2014}
+Harcombe WR, Riehl WJ, Dukovski I, Granger BR, Betts A, Lang AH, Bonilla G, Kar
+  A, Leiby N et~al. (2014).
+\newblock Metabolic Resource Allocation in Individual Microbes Determines
+  Ecosystem Interactions and Spatial Dynamics.
+\newblock \emph{Cell Reports} \textbf{7(4)}:1104--1115
+
+\bibitem{Pinu2018}
+Pinu FR, Granucci N, Daniell J, Han TL, Carneiro S, Rocha I, Nielsen J and
+  Villas-Boas SG (2018).
+\newblock Metabolite secretion in microorganisms: the theory of metabolic
+  overflow put to the test.
+\newblock \emph{Metabolomics} \textbf{14(4)}
 
 \bibitem{Kozich2013}
 Kozich JJ, Westcott SL, Baxter NT, Highlander SK and Schloss PD (2013).
@@ -68,12 +241,6 @@ Caporaso JG, Kuczynski J, Stombaugh J, Bittinger K, Bushman FD, Costello EK,
   Fierer N, Peña AG, Goodrich JK et~al. (2010).
 \newblock QIIME allows analysis of high-throughput community sequencing data.
 \newblock \emph{Nature Methods} \textbf{7}:335--336
-
-\bibitem{Callahan2017}
-Callahan BJ, McMurdie PJ and Holmes SP (2017).
-\newblock Exact sequence variants should replace operational taxonomic units in
-  marker-gene data analysis.
-\newblock \emph{The ISME Journal} \textbf{11}:2639--2643
 
 \bibitem{Wang2007}
 Wang Q, Garrity GM, Tiedje JM and Cole JR (2007).
@@ -109,16 +276,5 @@ Kullback S and Leibler RA (1951).
 Jaccard P (1912).
 \newblock The distribution of the flora in the alpine zone.
 \newblock \emph{New Phytologist} \textbf{11(2)}:37--50
-
-\bibitem{Marsland2020}
-Marsland R, Cui W, Goldford J and Mehta P (2020).
-\newblock The Community Simulator: A Python package for microbial ecology.
-\newblock \emph{PLoS ONE} \textbf{15(3)}:e0230430
-
-\bibitem{Marsland2019}
-{Marsland III} R, Cui W, Goldford J, Sanchez A, Korolev K and Mehta P (2019).
-\newblock Available energy fluxes drive a transition in the diversity,
-  stability, and functional structure of microbial communities.
-\newblock \emph{PLoS Computational Biology} \textbf{15(2)}:e1006793
 
 \end{thebibliography}

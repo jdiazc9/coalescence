@@ -664,4 +664,29 @@
   publisher = {Elsevier {BV}},
 }
 
+@Article{Pinu2018,
+  author    = {Farhana R. Pinu and Ninna Granucci and James Daniell and Ting-Li Han and Sonia Carneiro and Isabel Rocha and Jens Nielsen and Silas G. Villas-Boas},
+  journal   = {Metabolomics},
+  title     = {Metabolite secretion in microorganisms: the theory of metabolic overflow put to the test},
+  year      = {2018},
+  month     = {mar},
+  number    = {4},
+  volume    = {14},
+  doi       = {10.1007/s11306-018-1339-7},
+  publisher = {Springer Science and Business Media {LLC}},
+}
+
+@Article{MacArthur1970,
+  author    = {Robert MacArthur},
+  journal   = {Theoretical Population Biology},
+  title     = {Species packing and competitive equilibrium for many species},
+  year      = {1970},
+  month     = {may},
+  number    = {1},
+  pages     = {1--11},
+  volume    = {1},
+  doi       = {10.1016/0040-5809(70)90039-0},
+  publisher = {Elsevier {BV}},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}

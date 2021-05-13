@@ -26,14 +26,7 @@
 \usepackage[margin=3cm]{geometry} % margins
 \usepackage{lineno} % line numbers
 \usepackage{textcomp} % special characters (some references break if this isn't loaded?)
-
-\usepackage{pdflscape} %% Landscape
-\usepackage{dcolumn}
-\usepackage{booktabs}
-\usepackage{savesym}
-\savesymbol{iint}
-\restoresymbol{TXF}{iint}
-%% \usepackage{pdfpages} %% to include a pdf file
+\usepackage{mdframed} % to easily handle boxes
 
 % customization
 \setcounter{Maxaffil}{0} % affiliations
@@ -80,18 +73,20 @@
 % title, authors, affiliations
 \title{Top-down versus bottom-up cohesiveness
 in microbial community coalescence}
-\author[1,2,*]{Juan Diaz-Colunga}
-\author[1,2,*]{Nanxi Lu}
+\author[1,*]{Juan Diaz-Colunga}
+\author[1,*]{Nanxi Lu}
 \author[1,2,*]{Alicia Sanchez-Gorostiaga}
 \author[3]{Joshua E. Goldford}
 \author[4]{Mikhail Tikhonov}
-\author[1,2,$\dagger$]{Álvaro Sánchez}
-\affil[1]{Department of Ecology \& Evolutionary Biology,
+\author[1,$\dagger$]{Álvaro Sánchez}
+\affil[1]{Department of Ecology \& Evolutionary Biology
+and
+Microbial Sciences Institute,
 Yale University, New Haven, CT, USA}
-\affil[2]{Microbial Sciences Institute,
-Yale University, New Haven, CT, USA}
-\affil[3]{Cell Metabolism, Agios Pharmaceuticals, Inc.,
-Cambridge, MA, USA}
+\affil[2]{Department of Microbial Biotechnology,
+Centro Nacional de Biotecnología (CNB-CSIC), Cantoblanco, Madrid, Spain}
+\affil[3]{Physics of Living Systems, Department of Physics,
+Massachusetts Institute of Technology, Cambridge, MA, USA}
 \affil[4]{Department of Physics,
 Center for Science \& Engineering of Living Systems,
 Washington University in St. Louis, St. Louis, MO, USA}
@@ -196,7 +191,7 @@ Our results confirm that positive top-down co-selection is common, but its effec
 In contrast, bottom-up co-selection can be very strong, and positive co-selection is far more common
 than negative co-selection.
 \fi
-We then turn to a microbial consumer-resource model (microCRM)
+We then turn to a Microbial Consumer-Resource Model (MicroCRM)
 \cite{Goldford2018,Marsland2019,Marsland2020}
 that is able to capture the dynamics of microbial communities dominated by metabolic interactions,
 as is the case for the ones assembled in our experimental conditions \cite{Goldford2018,Estrela2020}.
@@ -250,20 +245,154 @@ To test this hypothesis, we performed all pairwise competitions between dominant
 in glutamine and citrate environments by mixing them 1:1 on their native media and propagating
 the cultures for seven serial transfers, roughly 42 generations
 (\methodsref{competitions}).
-We then performed all possible pairwise community coalescence experiments by mixing
+We then carried out all possible pairwise community coalescence experiments by mixing
 equal volumes of the communities and propagating the resulting cultures for seven extra
 transfers
-(\figref[f]{fig1}),
+(\figref[f]{fig1}).
+\iffalse
 and we quantified coalescence outcomes using the similarity between the coalesced and the
 invasive communities
 (\methodsref{metrics}).
+\fi
 The frequencies of all species in both community-community and dominant-dominant competitions
 were determined by 16S Illumina sequencing
 (\methodsref{sequencing}).
 
-\mr Rearrange this section to follow the flow of the new figure 2.
-Also introduce the model here and cook a nice experiment-theory-experiment sandwich later.
+We found that, for communities assembled in the glutamine environment,
+the relative frequency of a dominant against another in head-to-head pairwise competition
+is barely predictive of its relative frequency against that same other dominant when the
+cohorts are present too, i.e. during community coalescence
+(\figref[a]{fig2} red dots, $R^2=0.04$, $p>0.05$).
+This correlation is significantly higher for the citrate communities
+ (\figref[a]{fig2} blue dots, $R^2=0.83$, $p<10^{-8}$).
+This suggests that, in the glutamine environments, head-to-head competition of dominants
+is heavily influenced by higher order effects introduced by the rare taxa of the communities.
+On the other hand, the cohorts seem to play a more passive role in the citrate environments.
+To test the effects of top-down co-selection at the community level,
+we quantified the distances between the invasive and coalesced communities
+using the relative Bray-Curtis similarity (\methodsref{metrics})
+and compared them to the outcomes of the pairwise competitions between dominants alone.
+We again noticed differences between glutamine and citrate communities:
+for the former,
+the pairwise competitive ability of an invasive dominant
+is only weakly predictive of the performance of the invasive community in coalescence
+(\figref[b]{fig2} left panel, $R^2=0.15$, $p<0.05$).
+For the latter,
+the structure of the coalesced communities tends to be more strongly dictated by the
+result of the dominant-dominant competition
+(\figref[b]{fig2} middle panel, $R^2=0.57$, $p<10^{-4}$).
+Alternative quantifications of community distance yield similar results,
+with weaker effects when the metric used
+accounts only for the presence/absence of specific species and not for their relative abundance in
+the communities
+(\figref{figS2}).
+All these metrics include the presence of the dominant species themselves. To better disentangle the effect
+that these dominants have on the other members of their communities, we repeated the analysis this time
+excluding the dominant species from the compositional data, finding that our results still hold
+(\figref{figS3}).
 
+Together, these results suggest that the strength of top-down co-selection depends on
+the environment where communities are assembled and coalescence takes place.
+Communities stabilized with citrate as the primary supplied resource
+display a strong degree of top-down cohesiveness,
+with the fates of the sub-dominant species determined to a large extent by dominant-dominant
+pairwise competition. This competition is, in turn, only weakly affected by the presence of the cohorts.
+For glutamine communities, although some level of top-down co-selection is consistent with our data,
+the cohorts do not appear to just be passively responding to their dominants.
+Instead, evidence suggests that the cohorts might be playing an active role in community coalescence.
+To investigate the determinants of top-down co-selection and the factors modulating its strength,
+we ran a set of simulations of community coalescence. We used a Microbial Consumer-Resource
+Model (MicroCRM) \cite{Goldford2018,Marsland2019} implemented in the Community Simulator package
+for Python \cite{Marsland2020}. We chose this modeling framework because
+communities assembled under our experimental conditions (natural microbiomes re-assembled into
+multispecies communities through serial growth-dilution cycles in synthetic minimal media
+with a single carbon source)
+have been shown to be sustained by dense metabolic cross-feeding networks
+\cite{Goldford2018,Estrela2020},
+for which the MicroCRM provides a good description.
+We carried out our simulations enabling a large variation across species (consumers) in terms of
+their metabolic characterization.
+This choice is discussed in \hyperref[box1]{Box 1}.
+
+\clearpage
+
+\begin{mdframed}
+\internallinenumbers
+\subsubsection*{Box 1: Community cohesiveness in a Microbial Consumer-Resource Model}
+\label{box1}
+
+The Microbial Consumer-Resource Model (MicroCRM) \cite{Goldford2018,Marsland2019,Marsland2020}
+is a modeling framework based on the classic MacArthur's consumer resource model
+\cite{MacArthur1970}.
+It encodes the dynamics of a system with $S$ species and $M$ resources
+in terms of a consumer preference matrix $\mathbf{c}$ and a metabolic matrix $\mathbf{D}$,
+with an additional set of parameters controlling
+the species maintenance costs ($m_i$ for species $i$),
+the resource energy densities ($w_\alpha$ for resource $\alpha$),
+the energy to growth rate conversion factor ($g_i$ for species $i$)
+or the leakage fraction, i.e. the amount of energy lost as byproducts when a resource is consumed
+($l_\alpha$ for resource $\alpha$).
+The element $c_{i\alpha}$ of the consumer preference matrix
+represents the uptake rate of resource $\alpha$ by
+species $i$ (although the relationship between $c_{i\alpha}$ and the uptake rate can be more
+complex in modeling scenarios that are not considered here,
+see \cite{Goldford2018,Marsland2019,Marsland2020}).
+The element $D_{\beta\alpha}$ of the metabolic matrix
+represents the amount of energy secreted in the form of resource $\beta$
+as a result of the metabolism of resource $\alpha$.
+
+This formulation assumes that all species metabolize resources through similar pathways,
+with any two species secreting the same byproducts when consuming a same resource.
+However, experimental evidence suggests that individual species can secrete different sets of metabolites
+to the environment when growing on a same primary resource
+\cite{Harcombe2014,Pinu2018,Estrela2020}. This observation motivated us to introduce a new
+feature in the model:
+in short, we now define $\mathbf{D}$ as a three-dimensional matrix
+where the element $D_{i\beta\alpha}$ represents the energy flux in the form of resource $\beta$
+that is secreted \textit{by species $i$} when it metabolizes resource $\alpha$.
+Note that now $D_{i\beta\alpha}$ need not be equal to $D_{j\beta\alpha}$ if $i \neq j$
+(see illustration below).
+
+\bigskip
+\begin{center}
+\includegraphics[width=8cm,keepaspectratio]{figs/figBox.png}
+\end{center}
+\bigskip
+
+We reason that the choice of species-specific metabolic fluxes is necessary to potentially generate
+cohesiveness at the community level during coalescence.
+If the secretions of all species were identical (or only slightly different),
+higher order cross-feeding effects would be very unspecific:
+the establishment of new invasive species
+--given that they could outcompete resident taxa within their metabolic niches,
+i.e. more effectively feed off the same resource or set of resources as them--
+would not alter (or only do so moderately)
+the metabolic flows through the rest of the cross-feeding network.
+On the other hand, said network could undergo a profound and further-reaching restructuring
+if the invasive species secreted very different sets of metabolites with respect to the resident ones,
+potentially disabling existing niches and/or enabling new ones
+where more invaders could be co-selected.
+For a similar reason, we argue that the sparsity of the metabolic matrix could also modulate
+the emergence of cohesiveness in the face of coalescence.
+A dense metabolic matrix corresponds to a situation where all species secrete a wide
+variety of byproducts.
+New-coming invasive species that secrete similar byproducts as resident ones
+--even if they do so in different amounts--
+might only induce moderate quantitative changes in the metabolic fluxes.
+But if the sets of secretions are qualitatively different, co-selection of species adapted to
+each of those sets becomes possible.
+These ideas are supported by experimental observations
+suggesting that species with a history of coexistence make up
+cohesive communities with highly specific cross-feeding configurations
+\cite{Rosenzweig1994,Goldford2018,Estrela2020}.
+
+
+\bigskip
+\end{mdframed}
+
+\clearpage
+
+\iffalse
 We found that, for communities assembled in the glutamine environment,
 the pairwise competitive ability of an invasive dominant
 is only weakly predictive of the performance of the invasive community in coalescence
@@ -297,9 +426,11 @@ pairwise competition. This competition is, in turn, only weakly affected by the 
 For glutamine communities, although some level of top-down co-selection is consistent with our data,
 the cohorts do not appear to be passively responding to their dominants.
 Instead, evidence suggests that the cohorts might be playing an active role in community coalescence.
+
 This finding led us to investigate the potential role of bottom-up ecological co-selection
 (\figref[e]{fig1}, right panels), i.e. whether in some cases the dominants may be co-selected
 for or against by their cohorts.
+\fi
 
 \subsubsection*{Bottom-up co-selection during community coalescence}
 
@@ -337,11 +468,11 @@ which indicates that positive bottom-up co-selection is common in our experiment
 In contrast, negative co-selection appears to be rare and no instances of it were
 observed in our experiments.
 
-\subsubsection*{Simulations of community coalescence with a consumer-resource model}
+\subsubsection*{Simulations of community coalescence with a Consumer-Resource Model}
 
 To better understand the mechanisms of ecological co-selection in our experiments,
-we ran a set of simulations of community coalescence. We used a microbial consumer-resource
-model (microCRM) \cite{Goldford2018,Marsland2019} implemented in the Community Simulator package
+we ran a set of simulations of community coalescence. We used a Microbial Consumer-Resource
+Model (MicroCRM) \cite{Goldford2018,Marsland2019} implemented in the Community Simulator package
 for Python \cite{Marsland2020}. We chose this modeling framework because
 communities assembled under our experimental conditions (natural microbiomes re-assembled into
 multispecies communities through serial growth-dilution cycles in synthetic minimal media
@@ -349,7 +480,7 @@ with a single carbon source)
 have been shown to be
 sustained by dense metabolic cross-feeding networks
 \cite{Goldford2018,Estrela2020},
-for which the microCRM provides a good description.
+for which the MicroCRM provides a good description.
 We implemented a new feature in the package that makes individual species
 able to secrete different sets of byproducts when consuming a same resource
 (\methodsref{sim}).
@@ -842,7 +973,7 @@ Middle panel (blue): citrate communities, $R^2=0.57$, $p<10^{-4}$.
 A high correlation is consistent with a scenario of
 strong top-down positive co-selection where dominants recruit their cohorts for the final
 coalesced community. Two biological replicates per experiment are plotted individually.
-Right panel (black): simulations with a microbial consumer-resource model are able
+Right panel (black): simulations with a Microbial Consumer-Resource Model are able
 to capture these trends ($R^2=0.22$, $p<10^{-5}$).}
 \label{fig2}
 \end{figure}
@@ -857,7 +988,7 @@ to capture these trends ($R^2=0.22$, $p<10^{-5}$).}
 \textbf{a.} We hypothesize that three scenarios are possible regarding bottom-up co-selection:
 sub-dominant species could co-select for (green) or against (red) their dominant in coalescence,
 or they could have no effect in the invasion success of the dominant taxa (gray).
-\textbf{b.} Simulations with a microbial consumer-resource model suggest that positive bottom-up
+\textbf{b.} Simulations with a Microbial Consumer-Resource Model suggest that positive bottom-up
 co-selection is common and can be very strong, whereas negative bottom-up co-selection is rare.
 We plot the frequency reached by the invasive dominants when invading the resident communities
 in isolation versus the same frequency when invading together with their cohorts,

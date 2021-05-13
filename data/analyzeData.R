@@ -1055,11 +1055,16 @@ for (cs in carbon_sources) {
   }
 }
 
+# check that sample positioning in wells is consistent
+stopifnot(all(plot_this$well_pairwise == plot_this$well_coalescence))
+
 # pseudo-pairwise competition of dominants with cohorts
 plot_this$f_multiinv_rel <- plot_this$f_multiinv/(plot_this$f_multiinv + plot_this$f_residentdom_multiinv)
 
-# check that sample positioning in wells is consistent
-stopifnot(all(plot_this$well_pairwise == plot_this$well_coalescence))
+# strength of bottom-up co-selection
+plot_this$bucs <- plot_this$f_singleinv < 0.15 & plot_this$f_multiinv > 0.05
+plot_this$bucs <- c('neutral','strong')[1 + plot_this$bucs]
+plot_this$bucs <- factor(plot_this$bucs,levels=c('neutral','strong'))
 
 # reshape plotting table (this makes it easier to create multipanel plots)
 plot_this <- gather(plot_this,metric,value,q_bray_curtis:q_endemic_cohort)
@@ -1073,9 +1078,9 @@ plot_this$metric <- factor(plot_this$metric,levels=unique(plot_this$metric))
 # parameters for annotations of plots
 poly <- list(w=0.10,
              aperture=0.15,
-             color=c(rgb(220,245,220,maxColorValue=255),
-                     rgb(230,230,230,maxColorValue=255),
-                     rgb(250,220,220,maxColorValue=255)))
+             color=c('#d6e4d4',
+                     '#e6e6e5',
+                     '#fdd7c8'))
 
 # make plots
 myplots[['q-vs-pairwise_bray-curtis']] <-
@@ -1110,6 +1115,72 @@ myplots[['q-vs-pairwise_bray-curtis']] <-
         panel.border=element_rect(size=0.25)) +
   coord_fixed() # +
   # ggtitle('Bray-Curtis similarity')
+
+myplots[['q-vs-pairwise_bray-curtis_glutamine']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis'
+                        & plot_this$carbon_source=='Glutamine',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5) +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
+myplots[['q-vs-pairwise_bray-curtis_citrate']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis'
+                        & plot_this$carbon_source=='Citrate',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5) +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
 
 myplots[['q-vs-pairwise_other-metrics']] <-
   ggplot(data=plot_this[plot_this$metric!='q_bray_curtis' & !grepl('cohort',plot_this$metric),],
@@ -1233,6 +1304,42 @@ myplots[['pairwise-vs-coalescence']] <-
                                       color='transparent')) +
   coord_fixed()
 
+myplots[['pairwise-vs-coalescence_v2']] <-
+  ggplot(data=unique(plot_this[,c('carbon_source','community_1','community_2','f_pairwise','f_multiinv_rel')]),
+         aes(x=f_pairwise,y=f_multiinv_rel,
+             color=carbon_source)) +
+  geom_point(size=3,
+             shape=1,
+             stroke=0.5) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5) +
+  scale_y_continuous(name='Frequency of\ninvasive dominant species in coalescence',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.background=element_rect(fill='transparent'),
+        legend.position='none',
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        strip.text=element_text(hjust=-0.01,
+                                vjust=-0.01),
+        strip.background=element_rect(fill='transparent',
+                                      color='transparent')) +
+  coord_fixed()
+
 myplots[['alone-vs-together']] <-
   ggplot(data=unique(plot_this[,c('carbon_source',
                                   'community_1',
@@ -1283,17 +1390,139 @@ myplots[['alone-vs-together']] <-
   coord_fixed(xlim=c(0,1),
               ylim=c(0,1))
 
+myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source,
+             group=bucs,
+             fill=bucs)) +
+  geom_point(aes(shape=bucs),
+             size=3,
+             stroke=0.5) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color = 'black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  scale_shape_manual(values=c(22,24)) +
+  scale_fill_manual(values=c('#e6e6e5','#52a25e')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
+myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_strong-bucs']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis'
+                        & plot_this$bucs=='strong',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=3,
+             stroke=0.5,
+             shape=1) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color = 'black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
+myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_neutral-bucs']] <-
+  ggplot(data=plot_this[plot_this$metric=='q_bray_curtis'
+                        & plot_this$bucs=='neutral',],
+         aes(x=f_pairwise,y=value,
+             color=carbon_source)) +
+  geom_point(size=3,
+             stroke=0.5,
+             shape=1) +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color = 'black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
 # display and save plots
 if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis']])
+  print(myplots[['q-vs-pairwise_bray-curtis_glutamine']])
+  print(myplots[['q-vs-pairwise_bray-curtis_citrate']])
   print(myplots[['q-vs-pairwise_other-metrics']])
   print(myplots[['q-vs-pairwise_cohorts']])
   print(myplots[['pairwise-vs-coalescence']])
   print(myplots[['alone-vs-together']])
+  print(myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up']])
+  print(myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_strong-bucs']])
+  print(myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_neutral-bucs']])
 }
 if (save_plots) {
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis.pdf'),
          plot=myplots[['q-vs-pairwise_bray-curtis']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_glutamine.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_glutamine']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_citrate.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_citrate']],
          device='pdf',
          height=90,
          width=90,
@@ -1316,8 +1545,32 @@ if (save_plots) {
          height=120,
          width=120,
          units='mm',dpi=600)
+  ggsave(file.path('.','plots','pairwise-vs-coalescence_v2.pdf'),
+         plot=myplots[['pairwise-vs-coalescence_v2']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
   ggsave(file.path('.','plots','alone-vs-together.pdf'),
          plot=myplots[['alone-vs-together']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_top-down-vs-bottom-up.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_strong-bucs.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_strong-bucs']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_neutral-bucs.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_top-down-vs-bottom-up_neutral-bucs']],
          device='pdf',
          height=90,
          width=90,
@@ -1330,7 +1583,12 @@ if (save_plots) {
 ### ----------------------------------------------------------------------
 
 # load data from simulations
-plot_this <- read.table('simul_data_simple.txt',header=TRUE)
+plot_this <- read.table('simul_data.txt',header=TRUE)
+
+# strength of bottom-up co-selection
+plot_this$bucs <- plot_this$f_singleinv < 0.15 & plot_this$f_coalescence > 0.05
+plot_this$bucs <- c('neutral','strong')[1 + plot_this$bucs]
+plot_this$bucs <- factor(plot_this$bucs,levels=c('neutral','strong'))
 
 # make plots
 myplots[['q-vs-pairwise_bray-curtis_simul']] <-
@@ -1405,6 +1663,74 @@ myplots[['alone-vs-together_simul']] <-
   coord_fixed(xlim=c(0,1),
               ylim=c(0,1))
 
+myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_strong-bucs']] <-
+  ggplot(data=plot_this[!is.na(plot_this$f_pairwise)
+                        & plot_this$bucs=='strong',],
+         aes(x=f_pairwise,y=q_bray_curtis)) +
+  geom_point(size=3,
+             stroke=0.5,
+             shape=1,
+             color='black') +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color = 'black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
+myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']] <-
+  ggplot(data=plot_this[!is.na(plot_this$f_pairwise)
+                        & plot_this$bucs=='neutral',],
+         aes(x=f_pairwise,y=q_bray_curtis)) +
+  geom_point(size=3,
+             stroke=0.5,
+             shape=1,
+             color='black') +
+  geom_smooth(formula = y ~ x,
+              method = 'lm',
+              se = FALSE,
+              size = 0.5,
+              color = 'black') +
+  scale_y_continuous(name='Q\nCoalesced - Invasive',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of\ninvasive dominant species\nin pairwise competition',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_color_manual(values=pl_carbon) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
 # display and save plots
 if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis_simul']])
@@ -1419,6 +1745,18 @@ if (save_plots) {
          units='mm',dpi=600)
   ggsave(file.path('.','plots','alone-vs-together_simul.pdf'),
          plot=myplots[['alone-vs-together_simul']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_strong-bucs.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_strong-bucs']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs.pdf'),
+         plot=myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']],
          device='pdf',
          height=90,
          width=90,

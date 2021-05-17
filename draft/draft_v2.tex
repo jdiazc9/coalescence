@@ -71,8 +71,7 @@
 }
 
 % title, authors, affiliations
-\title{Top-down versus bottom-up cohesiveness
-in microbial community coalescence}
+\title{Cohesiveness in microbial community coalescence}
 \author[1,*]{Juan Diaz-Colunga}
 \author[1,*]{Nanxi Lu}
 \author[1,2,*]{Alicia Sanchez-Gorostiaga}
@@ -291,7 +290,7 @@ that these dominants have on the other members of their communities, we repeated
 excluding the dominant species from the compositional data, finding that our results still hold
 (\figref{figS3}).
 
-Together, these results suggest that the strength of top-down co-selection depends on
+Together, these observations suggest that the strength of top-down co-selection depends on
 the environment where communities are assembled and coalescence takes place.
 Communities stabilized with citrate as the primary supplied resource
 display a strong degree of top-down cohesiveness,
@@ -303,7 +302,7 @@ but rather playing an active role in community coalescence.
 
 To investigate the determinants of top-down co-selection and the factors modulating its strength,
 we ran a set of simulations of community coalescence. We used a Microbial Consumer-Resource
-Model (MicroCRM) \cite{Goldford2018,Marsland2019} implemented in the Community Simulator package
+Model (MicroCRM) \cite{Goldford2018,Marsland2019} as implemented in the Community Simulator package
 for Python \cite{Marsland2020}. We chose this modeling framework because
 communities assembled under our experimental conditions (natural microbiomes re-assembled into
 multispecies communities through serial growth-dilution cycles in synthetic minimal media
@@ -312,20 +311,23 @@ have been shown to be sustained by dense metabolic cross-feeding networks
 \cite{Goldford2018,Estrela2020}
 for which the MicroCRM provides a good description.
 We carried out our simulations enabling a large variation across species in terms of
-their metabolic architectures.
-This choice is discussed in \hyperref[box1]{Box~1}.
+their metabolic architectures;
+this choice is discussed in \hyperref[box1]{Box~1}.
 To reproduce our experimental protocol \textit{in silico},
 we first generated a library of resources and two non-overlapping pools of species.
 Each pool was used to seed a collection of 100 invasive and resident communities respectively,
 that were allowed to stabilize through 20 growth-dilution cycles.
-We then mixed these stable communities in pairs to carry out our coalescence
-and dominant-dominant competition experiments.
-A full description of our modeling framework can be found in the \methodsref{sim} section.
-We found that the MicroCRM was able to capture a correspondence between
+We then mixed these stable communities in pairs to simulate our coalescence
+and dominant-dominant competition experiments
+(\methodsref{sim}).
+We found that the MicroCRM was able to capture a correlation between
 the head-to-head pairwise competition of dominants
 and the outcome of community coalescence
-(\figref[b]{fig2}, right panel).
+(\figref[b]{fig2}, right panel),
+further supporting the idea that top-down ecological co-selection can consistently
+emerge from metabolic interactions across species.
 
+\iffalse
 [Maybe this ``outro'' sentence is not even necessary]
 Our experiments had shown that this correlation varied
 across communities assembled in the glutamine and citrate environments
@@ -333,6 +335,7 @@ across communities assembled in the glutamine and citrate environments
 which led us to investigate the determinants of the strength and direction
 of ecological co-selection in our model.
 
+\fi
 \clearpage
 
 \begin{mdframed}
@@ -374,7 +377,7 @@ Note that now $D_{i\beta\alpha}$ need not be equal to $D_{j\beta\alpha}$ if $i \
 
 \bigskip
 \begin{center}
-\includegraphics[width=8cm,keepaspectratio]{figs/figBox.png}
+\includegraphics[width=8cm,keepaspectratio]{figs/figBox_v2.png}
 \end{center}
 \bigskip
 
@@ -452,24 +455,25 @@ for or against by their cohorts.
 
 \subsubsection*{Bottom-up co-selection during community coalescence}
 
-Experimental evidence suggests that
-the cohorts might have a strong effect in dictating coalescence outcomes.
-At least in some instances,
-head-to-head pairwise competition of dominants can be heavily influenced by the presence of
-sub-dominant species
-(\figref[a]{fig2}).
-These findings led us to investigate the potential role of bottom-up ecological co-selection
-(\figref[e]{fig1}, right panels), i.e. whether the dominants may be co-selected
-for or against by their cohorts.
-We asked whether our model could provide insight regarding the role of sub-dominant taxa in coalescence.
-To test this, we ran a new set of simulations
-this time invading resident communities with the dominants alone,
-as opposed to whole communities invading together (\methodsref{sim}).
-We compared the invasion success of the dominants in this new scenario with respect to our previous
+Our data indicates that the primary resource supplied to the communities can modulate
+the effect of the cohorts in the dominants pairwise competition
+(\figref[a]{fig2})
+and the strength of top-down co-selection
+(\figref[b]{fig2}, left and middle panels).
+Our model suggests that this might be a result of the metabolic interactions
+between community members, including the rarer taxa
+(\hyperref[box1]{Box~1}).
+To investigate the potential role of the cohorts in coalescence,
+ i.e. whether the dominants may be co-selected for or against by them
+(\figref[e]{fig1}, right panels),
+we ran a new set of simulations
+this time invading resident communities with the dominants alone
+(\methodsref{sim}).
+We compared the invasion success of the dominants in isolation with respect to our previous
 simulations where they invaded accompanied by their cohorts.
-The invasion success of the dominant was quantified by its relative abundance
-in the final coalesced community.
-In situations where positive bottom-up ecological co-selection is strong, we expect to see dominants
+The invasion success of the dominants was quantified by their relative abundance
+in the final stabilized communities.
+Whenever positive bottom-up ecological co-selection is strong, we expect to see dominants
 reaching higher invasion success with their cohorts than by themselves
 (\figref[b]{fig3}, green shaded region).
 On the other hand, a high degree of antagonistic bottom-up co-selection would result in dominants
@@ -483,10 +487,44 @@ regardless of the presence or absence of the cohort
 many dominants could not invade on their own
 (or could only do so at very low final relative abundances, below 0.1)
 but were able to reach high frequencies when they were accompanied by their cohorts.
-This is a sign of positive bottom-up co-selection being common and potentially very strong,
-with negative bottom-up co-selection being rarely observed.
-We then asked...
+This indicates that positive bottom-up co-selection is frequent and potentially very strong,
+while negative bottom-up co-selection is far more uncommon.
+We then asked whether the ability of the pairwise competition of dominants
+to predict coalescence outcomes was dependent on the strength of bottom-up co-selection.
+We divided our simulations into two subsets:
+the first one was comprised of the instances where positive bottom-up co-selection was strong
+(i.e. dots in the green shaded region of \figref[b]{fig3}),
+the second set included all other cases
+(dots near the diagonal of \figref[b]{fig3}).
+We went back to our original simulations and plotted the frequency of the invasive dominant
+in pairwise competition with the resident dominant versus the relative similarity between
+the invasive and coalesced communities,
+i.e. the same plot as in \figref[b]{fig2}, for each subset.
+We found that when bottom-up positive co-selection is strong,
+the pairwise competition of dominants is not predictive of coalescence outcomes
+(\figref[c]{fig3}, left panel) and vice-versa (\figref[c]{fig3}, right panel).
 
+We then asked whether this trend was also observed \textit{in vitro}.
+We went back to our synthetic communities
+and carried out a new round of experiments where we invaded the resident communities
+with the invasive dominants alone
+(\methodsref{competitions}).
+After stabilization, we quantified species abundance through 16S Illumina sequencing
+(\methodsref{sequencing}).
+Again, we observed that bottom-up co-selection is far more common in its
+positive than in its negative form
+(\figref[d]{fig3}).
+Interestingly, bottom-up recruitment appears to be more frequent in the glutamine
+environments than in the citrate ones,
+consistent with our hypothesis that metabolic interactions among species
+are key in determining the strength and direction of ecological co-selection.
+We then repeated our analysis in \figref[c]{fig3},
+this time splitting our data according to the observed strength of bottom-up
+co-selection instead of the primary carbon source
+as we had done in \figref[b]{fig2}.
+Our findings were in line with the model prediction:
+pairwise competition between dominants is only predictive of coalescence outcomes
+if bottom-up co-selection is weak.
 
 \iffalse
 To test which of these situations was more common in our conditions,
@@ -570,8 +608,9 @@ These interactions are determined by the metabolic profile of the primary resour
 of our simulations and, in turn, modulate the strength and direction of ecological co-selection.
 \fi
 
-\subsubsection*{Conclusion}
+\subsubsection*{Conclusions}
 
+\iffalse
 Ideas for the conclusions: results and previous theoretical and experimental work on different systems (and on the
 general relationship between metabolic interactions and community structure) suggest that...
 the strength and direction of ecological co-selection is determined by the underlying metabolic networks that
@@ -584,6 +623,7 @@ ALSO: we have only discussed metabolic interactions here. Other forms of facilit
 (and probably more relevant in specific natural settings)... but cohesiveness FOR SURE arises from metabolic interactions
 in our experiments, and we know the effect is ultimately metabolic because the MicroCRM captures it
 (actually both forms of it, top-down and bottom-up).
+\fi
 
 Understanding the mechanisms underlying the responses of microbial communities to invasions is
 an essential but poorly understood question in microbial ecology \cite{Rillig2015}.
@@ -595,27 +635,38 @@ Our results provide direct experimental evidence of ecological co-selection in a
 of community coalescence experiments,
 and highlight the critical role played by the rarer, sub-dominant species in the generation
 of community cohesiveness.
+
 Our data suggests that the strength and direction of ecological co-selection is modulated
-by the underlying metabolic network that shapes the structure of
+by the underlying metabolic networks that shape the structure of
 communities assembled in synthetic minimal conditions
 \cite{Goldford2018,Estrela2020}.
-The architecture of this network is dependent on the supplied primary carbon source.
+This network is in turn regulated by the supplied primary carbon source.
+This idea is supported by the observation that a Microbial Consumer-Resource Model
+captures the trends observed experimentally when we enable a large variation
+in the metabolic fluxes across species.
+The model also predicts a trade-off between the strength of bottom-up co-selection
+and the ability of dominant-dominant pairwise competition to dictate coalescence outcomes,
+which we have confirmed experimentally.
 These observations,
-together with previous experimental results in different systems \cite{Sierocinski2017} as well as
+together with previous results in different systems \cite{Sierocinski2017} as well as
 theoretical predictions
 \cite{Gilpin1994,Toquenaga1997,Tikhonov2016,Tikhonov2017,Vila2019,Lechon2021},
 suggest that collective interactions between microbes
 and the environment should be generically expected to produce ecological co-selection
 during community coalescence.
 
-Further work will be necessary to clarify the relationship between
-metabolic feedbacks, community cohesiveness, and
-the strength and direction of ecological co-selection.
+Additional work will be necessary to further clarify the relationship between
+metabolic feedbacks, community cohesiveness and ecological co-selection.
 The experimental system that we introduced in this work can be easily expanded so that
 large numbers of community coalescence experiments can be carried out in parallel.
 It thus represents a promising tool to explore the properties of microbial community
 coalescence in high throughput
 and test quantitative theories about its role in microbiome assembly.
+On the other hand, coalescence of communities under different settings
+(e.g. in spatially structured environments)
+might be governed by additional factors.
+Understanding them and quantifying their relative contributions in natural communities
+remains an open question in ecology.
 
 \clearpage
 

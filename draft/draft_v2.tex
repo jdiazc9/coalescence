@@ -23,10 +23,11 @@
 \zexternaldocument*{supp}
 \usepackage[square,numbers,sort&compress]{natbib}
 \usepackage[table,xcdraw]{xcolor} % text and table background colors
-\usepackage[margin=3cm]{geometry} % margins
+\usepackage[margin=2.5cm]{geometry} % margins
 \usepackage{lineno} % line numbers
 \usepackage{textcomp} % special characters (some references break if this isn't loaded?)
 \usepackage{mdframed} % to easily handle boxes
+\usepackage[misc]{ifsym} % use \Letter symbol for corresponding author
 
 % customization
 \setcounter{Maxaffil}{0} % affiliations
@@ -75,9 +76,11 @@
 \author[1,*]{Juan Diaz-Colunga}
 \author[1,*]{Nanxi Lu}
 \author[1,2,*]{Alicia Sanchez-Gorostiaga}
+\author[1]{Chang-Yu Chang}
+\author[1]{Helen S. Cai}
 \author[3]{Joshua E. Goldford}
 \author[4]{Mikhail Tikhonov}
-\author[1,$\dagger$]{Álvaro Sánchez}
+\author[1,\Letter]{Álvaro Sánchez}
 \affil[1]{Department of Ecology \& Evolutionary Biology
 and
 Microbial Sciences Institute,
@@ -90,7 +93,7 @@ Massachusetts Institute of Technology, Cambridge, MA, USA}
 Center for Science \& Engineering of Living Systems,
 Washington University in St. Louis, St. Louis, MO, USA}
 
-\affil[$\dagger$]{\normalfont To whom correspondence should be addressed: alvaro.sanchez@yale.edu}
+\affil[$\textrm{\Letter}$]{\normalfont To whom correspondence should be addressed: alvaro.sanchez@yale.edu}
 \affil[*]{\normalfont These authors contributed equally}
 \date{}
 
@@ -195,9 +198,8 @@ We then turn to a Microbial Consumer-Resource Model (MicroCRM)
 that is able to capture the dynamics of microbial communities dominated by metabolic interactions,
 as is the case for the ones assembled in our experimental conditions \cite{Goldford2018,Estrela2020}.
 We show that the empirically observed trends in ecological co-selection are reproduced
-with minimal model assumptions, and that
-tuning the complexity of the metabolic interactions in our \textit{in silico} communities can modulate
-the recurrence of top-down or bottom-up co-selection.
+with minimal model assumptions, and that the recurrence of top-down and bottom-up co-selection
+is determined by the configuration of the cross-feeding networks in the MicroCRM.
 Our findings indicate that collective interactions play an important role at dictating community structure
 during coalescence.
 
@@ -377,7 +379,7 @@ Note that now $D_{i\beta\alpha}$ need not be equal to $D_{j\beta\alpha}$ if $i \
 
 \bigskip
 \begin{center}
-\includegraphics[width=8cm,keepaspectratio]{figs/figBox_v2.png}
+\includegraphics[width=11cm,keepaspectratio]{figs/figBox_v3.png}
 \end{center}
 \bigskip
 

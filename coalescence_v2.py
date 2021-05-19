@@ -256,10 +256,10 @@ assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
 assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
 
-assumptions['w'] = [0.5 + (1-0.5)*random.random() for i in range(assumptions['MA'].sum())]
+assumptions['w'] = [0.5 + (1-0.5)*random.random() for i in range(sum(assumptions['MA']))]
 assumptions['w'].sort(reverse=True)
 
-assumptions['g'] = [0.5 + (1-0.5)*random.random() for i in range(assumptions['SA'].sum() + assumptions['Sgen'])]
+assumptions['g'] = [0.5 + (1-0.5)*random.random() for i in range(sum(assumptions['SA']) + assumptions['Sgen'])]
 
 print(assumptions)
 

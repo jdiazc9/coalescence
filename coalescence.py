@@ -6,7 +6,8 @@ Created on Wed Sep 23 18:28:37 2020
 
 
 
-### INITIALIZIATION
+# %%
+### INITIALIZATION
 
 # reset variables etc.
 from IPython import get_ipython
@@ -44,6 +45,7 @@ start_time = time.time()
 
 
 
+# %%
 ### USER-DEFINED FUNCTIONS
 
 # stabilize communities through serial passaging
@@ -227,14 +229,16 @@ def mysim(p,q,pq):
 
 
 
-### SEED AND STABILIZE COMMUNITIES
+# %%
+### MODEL DEFINITION
 
 # general assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 100 # number of communities
+assumptions['n_wells'] = 50 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
 assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 240 # 30 # number of generalists
+assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
 assumptions['l'] = 0.8 # leakage fraction
 
 assumptions['response'] = 'type I'
@@ -255,14 +259,6 @@ assumptions['fw'] = 0.45 #0.45 # fraction of secretion flux to waste resources
 assumptions['metabolism'] = 'specific' # 'common' uses a common D matrix for all species, 'specific' uses a different matrix D for each species
 assumptions['rs'] = 0.0 # control parameter for resource secretion: 0 means random secretions, 1 means species only secrete resources they can consume (relevant only if 'metabolism' is 'specific')
 
-# assumptions that depend on the nature of the supplied primary resource
-# 'complex' resource
-#assumptions['MA'] = [10, 10, 10] # [30, 30, 30] # number of resources per resource class
-# 'simple' resource
-assumptions['MA'] = 15 # [30, 30, 30] # number of resources per resource class
-
-print(assumptions)
-
 # parameters
 params = community_simulator.usertools.MakeParams(assumptions)
 
@@ -274,25 +270,10 @@ def dRdt(N,R,params):
 
 dynamics = [dNdt,dRdt]
 
-# plot matrices c and D
-'''
-fig,ax=plt.subplots()
-sns.heatmap(params['c'],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
-ax.set_title('consumer matrix c')
-fig
-fig,ax=plt.subplots()
-sns.heatmap(params['c'].iloc[0:20,:],cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
-ax.set_title('consumer matrix c (detail)')
-fig
-if assumptions['metabolism'] == 'specific':
-    Dplot = params['D'][4]
-elif assumptions['metabolism'] == 'common':
-    Dplot = params['D']
-fig,ax=plt.subplots()
-sns.heatmap(Dplot,cmap='Greys',vmin=0,square=True,xticklabels=False,yticklabels=False,cbar=False,ax=ax)
-ax.set_title('metabolic matrix D')
-fig
-'''
+
+
+# %%
+### SEED AND STABILIZE COMMUNITIES
 
 # make species pools
 pool_overlap = 0.0 # 0: no overlap, 1: full overlap (same pool)
@@ -340,25 +321,24 @@ invasive_plate = community_simulator.Community(init_state_invasive,
                                                parallel=par,
                                                scale=1e6)
 
-# plot initial state
-#fig, ax = myStackPlot(resident_plate.N)
+'''
+# plot initial state (10 communities max)
+fig, ax = myStackPlot(resident_plate.N.iloc[:,0:min(10,resident_plate.N.shape[1])])
+'''
 
 # stabilize plates
 N_resident, R_resident = stabilizeCommunities(resident_plate)
 N_invasive, R_invasive = stabilizeCommunities(invasive_plate)
 
-# plot communities after stabilization
-#fig, ax = myStackPlot(N_resident)
+'''
+# plot community composition after stabilization (10 communities max)
+fig, ax = myStackPlot(resident_plate.N.iloc[:,0:min(10,resident_plate.N.shape[1])])
+'''
 
-# plot species abundance histogram
-# fig, ax = plt.subplots()
-# ax.hist(np.log10(N_resident+1e-20),bins=30,histtype='bar',stacked='True')
-# ax.set_xlim(-12,4)
-# ax.set_ylim(0,1000)
-# fig
-
+'''
 # plot ranks
-#rankPlot(N_resident)
+rankPlot(N_resident)
+'''
 
 # make and stabilize coalescence plate
 N0_coalescence = (N_resident + N_invasive)/2*(1/100) # added dilution factor
@@ -373,6 +353,7 @@ N_coalescence, R_coalescence = stabilizeCommunities(coalescence_plate)
 
 
 
+# %%
 ### MONOCULTURES
 
 # find most abundant species in each resident/invasive community
@@ -412,12 +393,13 @@ monoculture_invasive_plate = community_simulator.Community(init_state_monocultur
                                                            parallel=par,
                                                            scale=1e6)
 
-# stabilize monocultures
+# stabilize monocultures (we just allow to grow for a single cycle)
 monoculture_resident_plate.Propagate(1,compress_resources=False,compress_species=True)
 monoculture_invasive_plate.Propagate(1,compress_resources=False,compress_species=True)
 
 
 
+# %%
 ### PAIRWISE COMPETITION
 
 # make plate (rescale so most abundant species at t=0 has abundance 1 (times the scaling factor of the plate))
@@ -477,19 +459,25 @@ N_cohortinv, R_cohortinv = stabilizeCommunities(cohortinv_plate)
 
 
 
-### GET STATISTICS
+# %%
+### STATISTICS
 
-# get Q for each community
-Q = ['NA' for i in range(assumptions['n_wells'])]
-for i in range(assumptions['n_wells']):
-    
-    # community compositions as lists
-    R = N_resident.iloc[:,i].tolist()
-    I = N_invasive.iloc[:,i].tolist()
-    C = N_coalescence.iloc[:,i].tolist()
-    
-    # i-th element of Q
-    Q[i] = mysim(I,R,C)['bray_curtis']
+# community similarity metrics
+s0 = ['NA' for i in range(assumptions['n_wells'])]
+stats = {'bray_curtis':s0.copy(),
+         'jensen_shannon':s0.copy(),
+         'jaccard':s0.copy(),
+         'endemic':s0.copy()}
+
+for s in stats.keys():
+    for i in range(assumptions['n_wells']):
+        
+        # community compositions as lists
+        R = N_resident.iloc[:,i].tolist()
+        I = N_invasive.iloc[:,i].tolist()
+        C = N_coalescence.iloc[:,i].tolist()
+        
+        stats[s][i] = mysim(I,R,C)[s]
     
 # get fraction in pairwise competition
 f_pairwise = ['NA' for i in range(assumptions['n_wells'])]
@@ -523,148 +511,11 @@ F_null = F_null.droplevel(0)
 for i in range(assumptions['n_wells']):
     f_singleinv[i] = F.loc[dominants_invasive[i]][i]
     f_singleinv_null[i] = F_null.loc[dominants_invasive[i]][i]
-    
-# get the ratio of the abundances of the dominant species when growing alone vs when growing with cohort
-kratio_resident = ['NA' for i in range(assumptions['n_wells'])]
-kratio_invasive = ['NA' for i in range(assumptions['n_wells'])]
-N_resident = N_resident.droplevel(0)
-N_invasive = N_invasive.droplevel(0)
-N_resident_monoculture = monoculture_resident_plate.N.droplevel(0)
-N_invasive_monoculture = monoculture_invasive_plate.N.droplevel(0)
-for i in range(assumptions['n_wells']):
-    kratio_resident[i] = N_resident.loc[dominants_resident[i]][i]/N_resident_monoculture.loc[dominants_resident[i]][i]
-    kratio_invasive[i] = N_invasive.loc[dominants_invasive[i]][i]/N_invasive_monoculture.loc[dominants_invasive[i]][i]
-kratio_resident = [math.log10(x) for x in kratio_resident]
-kratio_invasive = [math.log10(x) for x in kratio_invasive]
-kratio_diff = [kratio_invasive[i] - kratio_resident[i] for i in range(assumptions['n_wells'])]
-
-'''
-# get cohort invasiveness (ci)
-ci = ['NA' for i in range(assumptions['n_wells'])]
-N_cohortinv = N_cohortinv.droplevel(0)
-for i in range(assumptions['n_wells']):
-    
-    # identify species in invasive cohort
-    cohort = N_invasive.index[N_invasive.iloc[:,i] > 0]
-    cohort = [x for x in cohort if not(x==dominants_invasive[i])]
-    
-    # how many of those are in the final community? (resident + cohort invading alone)
-    cohort_afterinv = N_cohortinv.iloc[:,i]
-    cohort_afterinv = cohort_afterinv[cohort]
-    
-    # cohort invasivity is the fraction of the species in the cohort that were able to invade
-    ci[i] = sum(cohort_afterinv > 0)/len(cohort)
-    
-# get communities bottom-up cohesiveness (buc)
-buc_resident = ['NA' for i in range(assumptions['n_wells'])]
-buc_invasive = ['NA' for i in range(assumptions['n_wells'])]
-
-sigma = {'type I': lambda R,params: params['c']*R,
-         'type II': lambda R,params: params['c']*R/(1+params['c']*R/params['sigma_max']),
-         'type III': lambda R,params: (params['c']*R)**params['n']/(1+(params['c']*R)**params['n']/params['sigma_max'])
-    }
-
-u = {'independent': lambda x,params: 1.,
-     'energy': lambda x,params: (((params['w']*x)**params['nreg']).T
-                                  /np.sum((params['w']*x)**params['nreg'],axis=1)).T,
-     'mass': lambda x,params: ((x**params['nreg']).T/np.sum(x**params['nreg'],axis=1)).T
-    }
-
-h = {'off': lambda R,params: 0.,
-     'external': lambda R,params: (params['R0']-R)/params['tau'],
-     'self-renewing': lambda R,params: params['r']*R*(params['R0']-R),
-     'predator': lambda R,params: params['r']*R*(params['R0']-R)-params['u']*R
-    }
-
-J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
-                         *params['w']*sigma[assumptions['response']](R,params))
-J_out = {'common': lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T),
-         'specific': lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
-        }
-
-
-# resident plate
-plate = resident_plate.copy()
-dominants = dominants_resident.copy()
-for i in range(assumptions['n_wells']):
-    
-    # remove dominant
-    plate.N.iloc[int(dominants[i].split('S',1)[1]),i] = 0
-    
-    # get secretions of dominant when feeding on the primary resource
-    if assumptions['metabolism'] == 'specific':
-        R0 = plate.params['D'][int(dominants[i].split('S',1)[1])]
-        R0 = R0[:,0]
-    elif assumptions['metabolism'] == 'common':
-        R0 = plate.params['D'][:,0]
-        
-    # get secretions of cohort when feeding on the dominant's secretions
-    resource_flux = (J_out[assumptions['metabolism']](R0,plate.params)/plate.params['w']).T.dot(plate.N.iloc[:,i])
-    resource_flux = resource_flux.tolist()
-    
-    # get uptake rates of dominant species
-    dominant_uptake_rates = plate.params['c'][int(dominants[i].split('S',1)[1]),:]
-    dominant_uptake_rates = dominant_uptake_rates.tolist()
-    
-    # calculate overlap: use Jensen-Shannon
-    ### FIXME: try other ways to quantify this overlap?
-    x = [dominant_uptake_rates[j]/sum(dominant_uptake_rates) for j in range(len(dominant_uptake_rates))]
-    y = [resource_flux[j]/sum(resource_flux) for j in range(len(resource_flux))]
-    buc_resident[i] = 1 - math.sqrt(jensen_shannon(x,y))
-    
-# invasive plate
-plate = invasive_plate.copy()
-dominants = dominants_invasive.copy()
-for i in range(assumptions['n_wells']):
-    
-    # remove dominant
-    plate.N.iloc[int(dominants[i].split('S',1)[1]),i] = 0
-    
-    # get secretions of dominant when feeding on the primary resource
-    if assumptions['metabolism'] == 'specific':
-        R0 = plate.params['D'][int(dominants[i].split('S',1)[1])]
-        R0 = R0[:,0]
-    elif assumptions['metabolism'] == 'common':
-        R0 = plate.params['D'][:,0]
-        
-    # get secretions of cohort when feeding on the dominant's secretions
-    resource_flux = (J_out[assumptions['metabolism']](R0,plate.params)/plate.params['w']).T.dot(plate.N.iloc[:,i])
-    resource_flux = resource_flux.tolist()
-    
-    # get uptake rates of dominant species
-    dominant_uptake_rates = plate.params['c'][int(dominants[i].split('S',1)[1]),:]
-    dominant_uptake_rates = dominant_uptake_rates.tolist()
-    
-    # calculate overlap: use Jensen-Shannon
-    ### FIXME: try other ways to quantify this overlap?
-    x = [dominant_uptake_rates[j]/sum(dominant_uptake_rates) for j in range(len(dominant_uptake_rates))]
-    y = [resource_flux[j]/sum(resource_flux) for j in range(len(resource_flux))]
-    buc_invasive[i] = 1 - math.sqrt(jensen_shannon(x,y))
-   
-# difference in bottom-up cohesiveness
-buc_diff = [buc_invasive[j]-buc_resident[j] for j in range(assumptions['n_wells'])]
-'''
 
 
 
+# %%
 ### SAVE DATA
-
-# all statistics
-s0 = ['NA' for i in range(assumptions['n_wells'])]
-stats = {'bray_curtis':s0.copy(),
-         'jensen_shannon':s0.copy(),
-         'jaccard':s0.copy(),
-         'endemic':s0.copy()}
-
-for s in stats.keys():
-    for i in range(assumptions['n_wells']):
-        
-        # community compositions as lists
-        R = N_resident.iloc[:,i].tolist()
-        I = N_invasive.iloc[:,i].tolist()
-        C = N_coalescence.iloc[:,i].tolist()
-        
-        stats[s][i] = mysim(I,R,C)[s]
 
 # final data frame
 data_out = pd.DataFrame(data={'f_pairwise':f_pairwise,
@@ -678,13 +529,15 @@ data_out.to_csv(os.path.join('.','data','simul_data.txt'),
                 header=True,index=None,sep='\t',na_rep='NA')
 
 
+
+# %%
 ### PLOTS
 
 # Q vs fraction in pairwise competition
 def q_vs_fraction():
     
     x = f_pairwise
-    y = Q
+    y = stats['bray_curtis']
     
     ### remove nan elements (this happens if pairwise competition ends up in extinction of both, need to investigate how this happens)
     ### SOLVED: this happens when none of the two competing species are able to grow over the dilution factor during the propagation time.
@@ -739,145 +592,16 @@ def cohort_vs_alone():
     
     fig
 
-'''
-# k-ratio histogram
-def kratio_hist():
-    
-    color_resident = [55/255,126/255,184/255]
-    color_invasive = [255/255,127/255,0/255]
-    
-    x = np.linspace(min(kratio_resident+kratio_invasive),
-                    max(kratio_resident+kratio_invasive),
-                    num=50).tolist()
-    
-    fig, ax = plt.subplots()
-    
-    ax.hist(kratio_resident,
-            bins=x,
-            histtype='stepfilled',
-            color=color_resident+[0.5],
-            edgecolor=color_resident+[1])
-    
-    ax.hist(kratio_invasive,
-            bins=x,
-            histtype='stepfilled',
-            color=color_invasive+[0.5],
-            edgecolor=color_invasive+[1])
-    
-    ax.set_xlabel("log$_{10}$ K-ratio")
-    ax.set_ylabel("Counts")
-    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
-    plt.legend(['Resident','Invasive'])
-    
-    fig
-    
-# difference in k-ratio vs. cohort invasiveness
-def kratio_vs_ci():
-    
-    x = ci
-    y = kratio_diff
-    
-    # identify dots in green area
-    xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
-    yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
-    
-    # identify dots outside of green area
-    xo = [x[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
-    yo = [y[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
-    
-    fig, ax = plt.subplots()
-    
-    ax.scatter(xo,yo,edgecolors=[0.5, 0.5, 0.5, 1],facecolors=[0.5, 0.5, 0.5, 0.5],zorder=1)
-    ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
-    
-    ax.set_xlabel("Cohort invasiveness")
-    ax.set_ylabel("log$_{10}$ K-ratio\nInvasive - Resident")
-    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
-    
-    fig
-    
-# histogram of invasive communities' bottom-up cohesiveness
-def buc_hist():
-    
-    color_resident = [55/255,126/255,184/255]
-    color_invasive = [255/255,127/255,0/255]
-    
-    x = np.linspace(min(buc_resident+buc_invasive),
-                    max(buc_resident+buc_invasive),
-                    num=50).tolist()
-    
-    fig, ax = plt.subplots()
-    
-    ax.hist(buc_resident,
-            bins=x,
-            histtype='stepfilled',
-            color=color_resident+[0.5],
-            edgecolor=color_resident+[1])
-    
-    ax.hist(buc_invasive,
-            bins=x,
-            histtype='stepfilled',
-            color=color_invasive+[0.5],
-            edgecolor=color_invasive+[1])
-    
-    ax.set_xlabel("Bottom-up cohesiveness")
-    ax.set_ylabel("Counts")
-    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
-    plt.legend(['Resident','Invasive'])
-    
-    fig
-    
-    
-# difference in bottom-up cohesiveness vs. cohort invasiveness
-def buc_vs_ci():
-    
-    x = ci
-    y = buc_diff
-    
-    # identify dots in green area
-    xg = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
-    yg = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.1]
-    
-    # identify dots outside of green area
-    xo = [x[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
-    yo = [y[i] for i in range(len(x)) if not(f_singleinv[i]<0.1) or not(f_coalescence[i]>0.1)]
-    
-    fig, ax = plt.subplots()
-    
-    ax.scatter(xo,yo,edgecolors=[0.5, 0.5, 0.5, 1],facecolors=[0.5, 0.5, 0.5, 0.5],zorder=1)
-    ax.scatter(xg,yg,edgecolors=[0, 0.75, 0, 1],facecolors=[0, 0.75, 0, 0.5],zorder=1)
-    
-    ax.set_xlabel("Cohort invasiveness")
-    ax.set_ylabel("Bottom-up cohesiveness\nInvasive - Resident")
-    ax.set_aspect(1.0/ax.get_data_ratio()) # square axes even if different axes limits
-    
-    fig
-'''
-    
-
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
-'''
-kratio_hist()
-kratio_vs_ci()
-buc_hist()
-buc_vs_ci()
-'''
 
 
 
+# %%
 ### TESTING AREA (keep commented when running from bash)
 
-"""
-# test how much time it takes to propagate a plate for T=1
-import time
-plate = resident_plate.copy()
-start_time = time.time()
-plate.Propagate(1)
-print("%s s" % (time.time() - start_time))
-"""
-
+# execution time
 print("%s s" % (time.time() - start_time))
 
 

@@ -42,12 +42,12 @@ def CompressParams(not_extinct_consumers,not_extinct_resources,params,dimensions
     if 'MxM' in dimensions.keys():
         for item in dimensions['MxM']:
             if item in params_comp.keys():
-                ### FIXME: added this condition: is D a np.ndarray or a list?
-                if isinstance(params_comp[item],np.ndarray): ### FIXME: if D is a np.ndarray, proceed normally (compress it)
+                ### added this condition: is D a np.ndarray or a list?
+                if isinstance(params_comp[item],np.ndarray): ### if D is a np.ndarray, proceed normally (compress it)
                     assert np.shape(params_comp[item])==(M,M), 'Invalid shape for ' + item + '. Please update dimensions dictionary with correct dimensions.'
                     params_comp[item]=params_comp[item][not_extinct_resources,:]
                     params_comp[item]=params_comp[item][:,not_extinct_resources]
-                elif isinstance(params_comp[item],list): ### FIXME: if D is a list, do: 1) compress the list itself (remove elements corresponding to extinct species) and 2) compress every element of the list (remove rows/columns corresponding to extinct resources) - keep the list structure to wrap the remaining compressed matrices
+                elif isinstance(params_comp[item],list): ### if D is a list, do: 1) compress the list itself (remove elements corresponding to extinct species) and 2) compress every element of the list (remove rows/columns corresponding to extinct resources) - keep the list structure to wrap the remaining compressed matrices
                     params_comp[item]=[params_comp[item][i] for i in range(len(params_comp[item])) if not_extinct_consumers[i]]
                     params_comp[item]=pd.Series(params_comp[item]).apply(lambda x: x[not_extinct_resources,:]).tolist()
                     params_comp[item]=pd.Series(params_comp[item]).apply(lambda x: x[:,not_extinct_resources]).tolist()

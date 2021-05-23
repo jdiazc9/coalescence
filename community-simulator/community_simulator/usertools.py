@@ -461,33 +461,13 @@ def MakeResourceDynamics(assumptions):
     """
     ### original in community-simulator package (single D matrix)
     J_out = lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T)
-    ###
-    """
-    
-    """
-    ### my first attempt at multiple matrices - very unefficient and slow bc it requires a lot of .dot() operations between large matrices
-    def J_out(R,params):
-        # get J_in so J_in(R,params) does not have to be re-evaluated for every element of the list
-        Jin = J_in(R,params)
-        # J_out is now a list of J_out_i matrices
-        # J_out_i is the result of the operation (l*J_in)*D_i'
-        # where D_i is the metabolic matrix for species i and ' indicates transposition
-        #J_out = pd.Series(params['D']).apply(lambda x: (params['l']*J_in(R,params)).dot(x.T)).tolist()
-        J_out = pd.Series(params['D']).apply(lambda x: (params['l']*Jin).dot(x.T)).tolist()
-        # the final J_out comes from combining all the J_out_i row by row
-        J_out = [J_out[i][i,:] for i in range(J_out[0].shape[0])]
-        J_out = np.array(J_out)
-        return J_out
-    ###
-    """
-    
-    """
-    ### my second attempt: using list comprehension and trimming J_in before .dot() to speed up
+
+    ### new version --accepts D as a list of matrices (using list comprehension and trimming J_in before .dot() to speed up)
     J_out = lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
     ###
     """
     
-    ### incorporating both scenarios (D is a matrix or D is a list) in the same function
+    ### new version incorporating both scenarios (D can be a matrix or a list, depending on the choice of 'metabolism')
     J_out = {'common': lambda R,params: (params['l']*J_in(R,params)).dot(params['D'].T),
              'specific': lambda R,params: params['l']*np.array([ J_in(R,params)[i,:].dot(params['D'][i].T) for i in range(len(params['D'])) ])
             }
@@ -495,7 +475,6 @@ def MakeResourceDynamics(assumptions):
     return lambda N,R,params: (h[assumptions['supply']](R,params)
                                -(J_in(R,params)/params['w']).T.dot(N)
                                +(J_out[assumptions['metabolism']](R,params)/params['w']).T.dot(N))
-    ###
     
 def MakeConsumerDynamics(assumptions):
     """
@@ -530,6 +509,41 @@ def MakeConsumerDynamics(assumptions):
     J_growth = lambda R,params: (1-params['l'])*J_in(R,params)
     
     return lambda N,R,params: params['g']*N*(np.sum(J_growth(R,params),axis=1)-params['m'])
+
+# same function as MakeConsumerDynamics(), but the returned lambda gives the growth rates (dNdt) *coming only from resource 0 (primary)*
+def MakeConsumerDynamics_R0(assumptions):
+    """
+    Construct resource dynamics. 'assumptions' must be a dictionary containing at least
+    three entries:
+    
+    response = {'type I', 'type II', 'type III'} specifies nonlinearity of growth law
+    
+    regulation = {'independent','energy','mass'} allows microbes to adjust uptake
+        rates to favor the most abundant accessible resources (measured either by
+        energy or mass)
+    
+    supply = {'off','external','self-renewing','predator'} sets choice of
+        intrinsic resource dynamics
+        
+    Returns a function of N, R, and the model parameters, which itself returns the
+        vector of consumer rates of change dN/dt
+    """
+    sigma = {'type I': lambda R,params: params['c']*R,
+             'type II': lambda R,params: params['c']*R/(1+params['c']*R/params['sigma_max']),
+             'type III': lambda R,params: (params['c']*R)**params['n']/(1+(params['c']*R)**params['n']/params['sigma_max'])
+            }
+    
+    u = {'independent': lambda x,params: 1.,
+         'energy': lambda x,params: (((params['w']*x)**params['nreg']).T
+                                      /np.sum((params['w']*x)**params['nreg'],axis=1)).T,
+         'mass': lambda x,params: ((x**params['nreg']).T/np.sum(x**params['nreg'],axis=1)).T
+        }
+    
+    J_in = lambda R,params: (u[assumptions['regulation']](params['c']*R,params)
+                             *params['w']*sigma[assumptions['response']](R,params))
+    J_growth = lambda R,params: (1-params['l'])*J_in(R,params)
+    
+    return lambda N,R,params: params['g']*N*(J_growth(R,params)[:,0]-params['m'])
 
 def MixPairs(plate1, plate2, R0_mix = 'Com1'):
     """

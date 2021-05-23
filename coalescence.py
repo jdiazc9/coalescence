@@ -36,12 +36,16 @@ if os.name == 'nt':
 else:
     par = True
 
-# set random and numpy's seed manually for reproducibility
-#np.random.seed(0)
-#random.seed(0)
+# set random and numpy's seed for reproducibility
+myseed = 999  # 500 works pretty nicely
+np.random.seed(myseed)
+random.seed(myseed)
 
 import time
 start_time = time.time()
+
+# get community hierarchies? (this generates a complete data set but takes time)
+getHierarchies = True
 
 
 
@@ -230,11 +234,11 @@ def mysim(p,q,pq):
 
 
 # %%
-### MODEL DEFINITION
+### MODEL DEFINITION 
 
 # general assumptions
 assumptions = community_simulator.usertools.a_default.copy()
-assumptions['n_wells'] = 50 # number of communities
+assumptions['n_wells'] = 100 # number of communities
 assumptions['S'] = 50 # number of species sampled at initialization
 assumptions['SA'] = [800, 800, 800] # [100, 100, 100] # number of species per specialist family
 assumptions['Sgen'] = 240 # 30 # number of generalists
@@ -418,6 +422,7 @@ N_pairwise, R_pairwise = stabilizeCommunities(pairwise_plate)
 
 
 
+# %%
 ### DOMINANT SPECIES INVADING ALONE
 
 # make plate (added dilution factor)
@@ -435,27 +440,58 @@ N_singleinv, R_singleinv = stabilizeCommunities(singleinv_plate)
 
 
 
-### COHORT INVADING WITHOUT DOMINANT SPECIES
+# %%
+### HIERARCHY INDEX: HOW MUCH OF THE DOMINANTS' GROWTH COMES FROM THE PRIMARY RESOURCE?
 
-# make cohort plate
-invasive_cohorts_plate = invasive_plate.copy()
-invasive_cohorts_plate.N = invasive_cohorts_plate.N.droplevel(0)
-for i in range(assumptions['n_wells']):
-    invasive_cohorts_plate.N.loc[dominants_invasive[i]][i] = 0
-invasive_cohorts_plate.N.index = invasive_plate.N.index
+# define dNdt on resource R0 only
+def dNdt_R0(N,R,params):
+    return community_simulator.usertools.MakeConsumerDynamics_R0(assumptions)(N,R,params)
+
+# define function to calculate hierarchy (requires integration of dynamic equations; passed plate should be stabilized)
+def communityHierarchy(plate,well):
+
+    # dilute consumer and resource abundance of i-th well, replenish primary resource
+    N = plate.N.values[:,well].copy() * (1/100)
+    R = plate.R.values[:,well].copy() * (1/100)
+    R[0] = R[0] + assumptions['R0_food']
     
-# make plate (added dilution factor)
-N0_cohortinv = (resident_plate.N + invasive_cohorts_plate.N)/2*(1/100)
-init_state_cohortinv = (N0_cohortinv,
-                        init_state[1])
-cohortinv_plate = community_simulator.Community(init_state_cohortinv,
-                                                dynamics,
-                                                params,
-                                                parallel=par,
-                                                scale=1e6)
+    # keep track of species growth *on resource R0 only*
+    N_R0 = N.copy()
+    
+    # find dominant
+    dom = np.argmax(N)
+    
+    # integrate until stabilization (max_rel_change less than 1%)
+    max_rel_change = np.inf
+    dt = 1/1000 # time step for integration
+    while max_rel_change > 0.1:
+        
+        # integrate species and resources abundance in the interval (t, t+dt)
+        Nnew = N + dt*dNdt(N,R,plate.params)
+        Nnew_R0 = N_R0 + dt*dNdt_R0(N,R,plate.params)
+        Rnew = R + dt*dRdt(N,R,plate.params)
+        
+        # maximum relative change in abundance (omitting N=0)
+        max_rel_change = np.max(np.divide(np.abs(Nnew - N),N,out=np.zeros_like(N),where=N!=0))
+        
+        # update species and resources abundances
+        N = Nnew.copy()
+        N_R0 = Nnew_R0.copy()
+        R = Rnew.copy()
+    
+    # return hierarchy (fraction of dominant biomass that comes from resource R0)
+    return N_R0[dom]/N[dom]
 
-# stabilize
-N_cohortinv, R_cohortinv = stabilizeCommunities(cohortinv_plate)
+# calculate hierarchies of all communities (if applicable)
+h_inv = ['NA' for i in range(assumptions['n_wells'])]
+h_res = ['NA' for i in range(assumptions['n_wells'])]
+
+if getHierarchies:
+    print('Calculating community hierarchies...')
+    for i in range(assumptions['n_wells']):
+        print('... processing ' + '%s' % (i+1) + ' out of %s' % assumptions['n_wells'])
+        h_inv[i] = communityHierarchy(invasive_plate,well=i)
+        h_res[i] = communityHierarchy(resident_plate,well=i)
 
 
 
@@ -524,7 +560,9 @@ data_out = pd.DataFrame(data={'f_pairwise':f_pairwise,
                               'q_jaccard':stats['jaccard'],
                               'q_endemic':stats['endemic'],
                               'f_singleinv':f_singleinv,
-                              'f_coalescence':f_coalescence})
+                              'f_coalescence':f_coalescence,
+                              'h_inv':h_inv,
+                              'h_res':h_res})
 data_out.to_csv(os.path.join('.','data','simul_data.txt'),
                 header=True,index=None,sep='\t',na_rep='NA')
 

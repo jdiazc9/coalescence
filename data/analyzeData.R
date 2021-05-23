@@ -1586,9 +1586,16 @@ if (save_plots) {
 plot_this <- read.table('simul_data.txt',header=TRUE)
 
 # strength of bottom-up co-selection
-plot_this$bucs <- plot_this$f_singleinv < 0.15 & plot_this$f_coalescence > 0.05
+plot_this$bucs <- plot_this$f_singleinv < 0.1 & plot_this$f_coalescence > 0.05
 plot_this$bucs <- c('neutral','strong')[1 + plot_this$bucs]
-plot_this$bucs <- factor(plot_this$bucs,levels=c('neutral','strong'))
+plot_this$bucs <- factor(plot_this$bucs,levels=c('strong','neutral'))
+
+# difference in hierarchies
+plot_this$h_diff = log10(plot_this$h_res/plot_this$h_inv)
+
+# hierarchy distribution
+h_distrib = data.frame(h=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$mids,
+                       freq=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$counts/(2*nrow(plot_this)))
 
 # make plots
 myplots[['q-vs-pairwise_bray-curtis_simul']] <-
@@ -1731,10 +1738,135 @@ myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']] 
         panel.border=element_rect(size=0.25)) +
   coord_fixed()
 
+myplots[['simul_hierarchy-distribution']] <-
+  ggplot(data=h_distrib,
+         aes(x=h,y=freq)) +
+  geom_bar(stat='identity') +
+  scale_y_continuous(name='Frequency',
+                     limits=c(0,0.5),
+                     breaks=c(0,0.25,0.5),
+                     labels=c('0','0.25','0.5')) +
+  scale_x_continuous(name='Community hierarchy\n \n ',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        legend.position='none') +
+  coord_fixed(2)
+
+myplots[['alone-vs-together_simul_hierarchy']] <-
+  ggplot(data=plot_this,
+         aes(x=f_singleinv,y=f_coalescence,
+             fill=h_diff)) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           y=c(-0.1,poly$w,1.1,1.1,-0.1),
+           fill=poly$color[1]) +
+  annotate('polygon',
+           x=c(-0.1,poly$w,1.1,1.1,-0.1),
+           y=c(-0.1,poly$w,poly$w,-0.1,-0.1),
+           fill=poly$color[3]) +
+  annotate('polygon',
+           x=c(-0.1,1.1,1.1,1.1-1.2*poly$aperture,-0.1),
+           y=c(-0.1,1.1-1.2*poly$aperture,1.1,1.1,-0.1),
+           fill=poly$color[2]) +
+  geom_abline(intercept=0,
+              slope=1,
+              color='black', 
+              linetype='dashed',
+              size=0.25) +
+  geom_point(size=3,
+             shape=21,
+             stroke=0.5,
+             color='black') +
+  scale_fill_gradient(low='black',high='white',
+                      limits=c(-1.75,1.75)) +
+  scale_y_continuous(name='Frequency of dominant\nspecies invading with cohort',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Frequency of dominant\nspecies invading alone\n ',
+                     limits=c(-1,2),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        legend.position='none') +
+  coord_fixed(xlim=c(0,1),
+              ylim=c(0,1))
+
+myplots[['simul_hierarchy-boxplots1']] <-
+  ggplot(data=plot_this,
+         aes(x=bucs,y=h_diff)) +
+  geom_boxplot(aes(fill=bucs),
+               outlier.shape=NA,
+               notch=FALSE) +
+  scale_fill_manual(values=poly$color[1:2]) +
+  scale_y_continuous(name=expression(h[R] / h[I]),
+                     limits=c(-1.75,1.75),
+                     breaks=c(-1,0,1),
+                     labels=c('-1','0','1')) +
+  scale_x_discrete(name=' \n ',
+                   labels=c('Positive bottom-up\nco-selection',
+                            'No bottom-up\nco-selection')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        legend.position='none') +
+  coord_fixed(1)
+
+myplots[['simul_hierarchy-boxplots2']] <-
+  ggplot(data=plot_this,
+         aes(x=bucs,y=h_diff)) +
+  geom_jitter(aes(fill=h_diff),
+              shape=21,
+              size=3,
+              width=0.2,
+              stat='identity') +
+  scale_fill_gradient(low='black',high='white',
+                      limits=c(-1.75,1.75)) +
+  scale_y_continuous(name=expression(h[R] / h[I]),
+                     limits=c(-1.75,1.75),
+                     breaks=c(-1,0,1),
+                     labels=c('-1','0','1')) +
+  scale_x_discrete(name=' \n ',
+                   labels=c('Positive bottom-up\nco-selection',
+                            'No bottom-up\nco-selection')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        legend.position='none') +
+  coord_fixed(1)
+
 # display and save plots
 if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis_simul']])
   print(myplots[['alone-vs-together_simul']])
+  print(myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_strong-bucs']])
+  print(myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']])
+  print(myplots[['simul_hierarchy-distribution']])
+  print(myplots[['alone-vs-together_simul_hierarchy']])
+  print(myplots[['simul_hierarchy-boxplots1']])
+  print(myplots[['simul_hierarchy-boxplots2']])
 }
 if (save_plots) {
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul.pdf'),
@@ -1757,6 +1889,30 @@ if (save_plots) {
          units='mm',dpi=600)
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs.pdf'),
          plot=myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','simul_hierarchy-distribution.pdf'),
+         plot=myplots[['simul_hierarchy-distribution']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','alone-vs-together_simul_hierarchy.pdf'),
+         plot=myplots[['alone-vs-together_simul_hierarchy']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','simul_hierarchy-boxplots1.pdf'),
+         plot=myplots[['simul_hierarchy-boxplots1']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','simul_hierarchy-boxplots2.pdf'),
+         plot=myplots[['simul_hierarchy-boxplots2']],
          device='pdf',
          height=90,
          width=90,

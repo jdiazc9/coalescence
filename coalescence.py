@@ -37,7 +37,7 @@ else:
     par = True
 
 # set random and numpy's seed for reproducibility
-myseed = 999  # 500 works pretty nicely
+myseed = 9999  # 500 works pretty nicely
 np.random.seed(myseed)
 random.seed(myseed)
 
@@ -45,7 +45,7 @@ import time
 start_time = time.time()
 
 # get community hierarchies? (this generates a complete data set but takes time)
-getHierarchies = True
+getHierarchies = False
 
 
 

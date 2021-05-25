@@ -433,12 +433,12 @@ Here, we assembled \textit{in silico} communities by randomly
 sampling a set of species from a pool,
 then integrating equations \ref{eq:crm-n} and \ref{eq:crm-r},
 diluting the final abundances,
-replenishing the primary resource (by default denoted as $R_0$),
+replenishing the primary resource,
 and repeating the process until generational equilibrium was achieved
 (\methodsref{sim}).
 Coalescence simulations were carried out following the same logic,
 this time seeding the coalesced communities by mixing the invasive and resident
-communities instead of sampling from a species pool.
+ones instead of sampling from a species pool.
 
 \bigskip
 \end{mdframed}
@@ -529,7 +529,11 @@ the first one was comprised of the instances where positive bottom-up co-selecti
 the second set included all other cases
 (dots near the diagonal of \figref[b]{fig3}).
 We reexamined our original simulations and plotted the frequency of the invasive dominant
-in pairwise competition with the resident dominant versus the relative similarity between
+in pairwise competition
+\iffalse
+with the resident dominant
+\fi
+versus the relative similarity between
 the invasive and coalesced communities,
 i.e. the same plot as in \figref[b]{fig2}, for each subset.
 We found that when bottom-up positive co-selection is strong,

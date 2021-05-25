@@ -658,18 +658,106 @@ Within each community, the dominant species
 respectively)
 is able to utilize the primary resource that is supplied externally ($\mathrm{R}_1$).
 As a result of $\mathrm{R}_1$ metabolism,
-the dominants secrete a single byproduct off which
-the sub-dominant species ($\mathrm{s}_2$ and $\mathrm{s}_4$ respectively) can feed.
-Finally, these sub-dominants secrete an additional resource that can again
+the dominants secrete a single byproduct
+($\mathrm{R}_2$ and $\mathrm{R}_4$ respectively)
+off which
+the sub-dominants ($\mathrm{s}_2$ and $\mathrm{s}_4$ respectively) can feed.
+Finally, these sub-dominants secrete an additional resource
+($\mathrm{R}_3$ and $\mathrm{R}_5$ respectively)
+that can again
 be metabolized by the respective dominants.
-This is the simplest structure where both top-dwn and bottom-up
+This is the simplest structure where both top-down and bottom-up
 cohesiveness can emerge, with their relative strengths being determined
 by how effectively the species can utilize each other's metabolic byproducts.
-Several parameters can modulate the direction of community cohesiveness,
+Several parameters can modulate the strength and direction of community cohesiveness,
 and even in this simple model there can be complex interactions between them.
-For instance, a sub-dominant that is very efficient at metabolizing the dominant
-secretions will therefore be a strong producer of secondary secretions,
+For instance, a sub-dominant that is very efficient at metabolizing the dominant's
+secretions will therefore be a strong producer of secondary byproducts,
 in turn increasing the metabolic flow towards the dominant itself.
+To keep both communities symmetrical and
+mantain tractability of the model's behavior, we chose to make
+the two sub-dominant species equally able consumers of the
+byproduct of their respective dominants
+(\methodsref{sim-min}).
+We also made it so species secrete only one type of byproduct each,
+i.e. the metabolic matrix is binary in this case
+(see \hyperref[box1]{Box~1}).
+The secretions of the resident and invasive communities are
+non-overlapping:
+\iffalse
+(i.e. $\mathrm{s}_1$ and $\mathrm{s}_2$ secretions
+differ from $\mathrm{s}_3$ and $\mathrm{s}_4$ secretions)
+\fi
+this ensures that coalescence always results in one of the two
+communities taking over and completely excluding the other one,
+which facilitates the interpretation of the model's outcomes.
+
+With these constraints, the model is specified by four rates:
+the resident dominant's uptake rate of the primary resource ($c_{11}$)
+and of the secondary byproduct secreted by $\mathrm{s}_2$ ($c_{13}$),
+as well as
+the invasive dominant's uptake rate of the primary resource ($c_{31}$)
+and of the secondary byproduct secreted by $\mathrm{s}_4$ ($c_{35}$).
+Analogous to what we did for our initial
+experiments and simulations of community coalescence,
+we first stabilized each community separately
+through serial growth-dilution cycles,
+and then mixed them 1:1 and stabilized again until generational
+equilibrium was achieved.
+Equations \ref{eq:crm-n} and \ref{eq:crm-r} in \hyperref[box1]{Box~1}
+describe the dynamics of this system between consecutive dilutions
+with the corresponding choices for the parameter values
+(\methodsref{sim-min}).
+We ran simulations for both community-community competitions and
+invasions from the invasive dominant alone.
+We considered four different scenarios illustrated in \figref[b-e]{fig4}:
+\textit{1)} both communities are cohesive
+from the top-down but not from the bottom-up,
+\textit{2)} the resident community is cohesive
+both from the top-down and from the bottom-up
+while
+the resident community is cohesive
+from the top-down only,
+\textit{3)} the resident community is cohesive
+from the top-down only
+while
+the invasive community is cohesive
+both from the top-down and from the bottom-up,
+and \textit{4)} both communities are cohesive
+from the top-down and from the bottom-up.
+The outcomes in each case are discussed below.
+
+\paragraph*{Top-down resident versus top-down invasive.}
+This is the simplest scenario.
+When both communities are cohesive strictly from the top-down
+($c_{13}=0$ and $c_{35}=0$),
+coalescence outcomes are determined by which dominant is a better consumer
+of the primary resource.
+The most competitive dominant excludes the least competitive one
+($\mathrm{s}_1$ excludes $\mathrm{s}_3$ if $c_{11}>c_{31}$ and vice-versa,
+\figref[b]{fig4})
+and,
+because the cross-feeding networks of the invasive and resident
+communities are non-overlapping,
+it co-selects its sub-dominant exclusively.
+The relative similarity between the invasive and the coalesced communities
+($Q$, see \methodsref{metrics})
+can only be 0 (if the resident dominant ``wins'' competition for
+$\mathrm{R}_1$) or 1 (if the opposite happens).
+The invasion success of the invasive dominant ($\mathrm{s}_3$) is
+unaffected by the presence or absence of its sub-dominant ($\mathrm{s}_4$)
+since it is not being cross-fed by it.
+Thus, again $\mathrm{s}_3$ is only able to invade alone when it
+outcompetes the resident dominant ($\mathrm{s}_1$) for the primary resource ($c_{11}>c_{31}$).
+
+\paragraph*{Bidirectional resident versus top-down invasive.}
+Blablabla...
+
+\paragraph*{Top-down resident versus bidirectional invasive.}
+Blablabla...
+
+\paragraph*{Bidirectional resident versus bidirectional invasive.}
+Blablabla...
 
 \subsubsection*{Community hierarchy regulates the strength of bottom-up co-selction}
 
@@ -1056,6 +1144,8 @@ and the sparsity of the metabolic matrices ($s$) which is set to 0.9
 to generate significant variability in the secretion fluxes across different species
 (see main text).
 
+\subsubsection*{Minimal model}\label{methods:sim-min}
+
 \section*{Data \& code availability}\label{datacode}
 
 Experimental data and code for the analysis, as well as code for the simulations
@@ -1107,12 +1197,12 @@ Research Corporation and the Simons Foundation.
 \textbf{a.}~Environmental samples collected from eight different locations were used
 to inoculate our communities.
 \textbf{b.}~Communities were stabilized in serial batch culture bioreactors
-\cite{Goldford2018} in minimal synthetic media with glutamine or citrate as the
+in minimal synthetic media with glutamine or citrate as the
 only supplied carbon source.
 \textbf{c.}~Communities were plated in minimal media agar plates and the most abundant
 species (the ``dominants") from each community were isolated. We refer to the set of
 sub-dominant species as the ``cohorts".
-\textbf{d.}~Rank-frequency distributions of all eight communities stabilized in either
+\textbf{d.}~Rank-frequency distributions of the eight communities stabilized in either
 glutamine (red) or citrate (blue), sequenced at a depth of $10^{-4}$ reads.
 Three biological replicates per community are shown.
 Community compositions are skewed and long-tailed.
@@ -1166,9 +1256,13 @@ to capture these trends ($R^2=0.22$, $p<10^{-5}$).}
 \textbf{a.} We hypothesize that three scenarios are possible regarding bottom-up co-selection:
 sub-dominant species could co-select for (green) or against (red) their dominant in coalescence,
 or they could have no effect in the invasion success of the dominant taxa (gray).
-\textbf{b.} Simulations with a Microbial Consumer-Resource Model suggest that positive bottom-up
+\textbf{b.}
+\iffalse
+Simulations with a Microbial Consumer-Resource Model suggest that positive bottom-up
 co-selection is common and can be very strong, whereas negative bottom-up co-selection is rare.
-We plot the frequency reached by the invasive dominants when invading the resident communities
+\fi
+Simulations with a Microbial Consumer-Resource Model:
+we plot the frequency reached by the invasive dominants when invading the resident communities
 in isolation versus the same frequency when invading together with their cohorts,
 i.e. in community coalescence.
 Points in the green/red area represent instances where the invasive dominant is able to invade
@@ -1180,22 +1274,28 @@ is only weakly affected by the presence or absence of its cohort.
 positive or no bottom-up co-selection was observed (that is, whether points fell into the green or gray
 areas of panel b). Here we reproduce the plots in \figref[b]{fig2} for each set, representing the
 result of the dominant head-to-head pairwise competition versus the outcome of community coalescence.
+Left panel: strong positive bottom-up co-selection
+($R^2=0.00$, $p>0.05$).
+Right panel: no bottom-up co-selection
+($R^2=0.34$, $p<10^{-6}$).
+\iffalse
 Left panel: when positive bottom-up co-selection is strong, head-to-head pairwise competition of dominants
 is poorly predictive of coalescence outcomes
 ($R^2=0.00$, $p>0.05$).
 Right panel: on the other hand, when bottom-up co-selection is weak coalescence outcomes are more
 strongly dictated by the result of the dominant-dominant competition
 ($R^2=0.34$, $p<10^{-6}$).
+\fi
 \textbf{d.} Experiments show that in our conditions, positive bottom-up co-selection is indeed more
 frequent and strong than negative bottom-up co-selection.
-\textbf{e.} We reproduce the plots in panel c for our experimental data. This is equivalent to recreating
-\figref[b]{fig2}, this time splitting our data by the strength of bottom-up co-selection
-instead of by the carbon source provided to the communities.
-Like simulations predicted, instances of community coalescence displaying strong positive bottom-up co-selection
-yield a poor correspondence between dominant pairwise competition and coalescence outcomes
-(left panel, $R^2=0.07$, $p>0.05$)
-and vice-versa
-(right panel, $R^2=0.37$, $p<10^{-4}$).}
+\textbf{e.} We reproduce the plots in panel c for our experimental data,
+i.e. we recreate
+\figref[b]{fig2} but this time splitting our data by the strength of bottom-up co-selection
+instead of by the carbon source supplied to the communities.
+Left panel: strong positive bottom-up co-selection
+($R^2=0.07$, $p>0.05$).
+Right panel: no bottom-up co-selection
+($R^2=0.37$, $p<10^{-4}$).}
 \label{fig3}
 \end{figure}
 
@@ -1206,8 +1306,14 @@ and vice-versa
 \internallinenumbers
 \includegraphics[scale=0.7,keepaspectratio]{figs/fig4_v2.pdf}
 \caption{\textbf{A minimal model of community coalescence.}
-\textbf{a.} Blablabla...
-\textbf{b.} Blablabla...}
+\textbf{a.} Illustration of the model structure and parameters.
+The primary resource ($\mathrm{R}_1$) is replenished after
+each growth-dilution cycle (red arrows).
+Solid arrows indicate resource consumption, dashed arrows represent
+resource secretion.
+\textbf{b-e.} Coalescence outcomes in the minimal model
+under different relations of cohesiveness between the
+resident and the invasive communities.}
 \label{fig4}
 \end{figure}
 

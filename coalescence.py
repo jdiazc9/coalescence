@@ -36,16 +36,18 @@ if os.name == 'nt':
 else:
     par = True
 
+'''
 # set random and numpy's seed for reproducibility
-myseed = 9999  # 500 works pretty nicely
+myseed = 1000000 # 99
 np.random.seed(myseed)
 random.seed(myseed)
+'''
 
 import time
 start_time = time.time()
 
 # get community hierarchies? (this generates a complete data set but takes time)
-getHierarchies = False
+getHierarchies = True
 
 
 
@@ -629,10 +631,70 @@ def cohort_vs_alone():
     ax.set_yticks([0,0.5,1])
     
     fig
+    
+# Q vs fraction in pairwise competition, split by strength of bottom-up co-selection
+def q_vs_fraction_split():
+    
+    x = f_pairwise
+    y = stats['bray_curtis']  
+    
+    ### remove nan elements (this happens if pairwise competition ends up in extinction of both, need to investigate how this happens)
+    ### SOLVED: this happens when none of the two competing species are able to grow over the dilution factor during the propagation time.
+    ### It is an unusual case but it is possible and it does not imply code malfunction.
+    n = [ni for ni in range(len(x)) if ~np.isnan(x[ni]) and ~np.isnan(y[ni])]
+    x = [x[i] for i in n]
+    y = [y[i] for i in n]
+    
+    # split data
+    x_buc = [x[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.05]
+    y_buc = [y[i] for i in range(len(x)) if f_singleinv[i]<0.1 and f_coalescence[i]>0.05]
+    
+    x_nobuc = [x[i] for i in range(len(x)) if f_singleinv[i]>0.1 or f_coalescence[i]<0.05]
+    y_nobuc = [y[i] for i in range(len(x)) if f_singleinv[i]>0.1 or f_coalescence[i]<0.05]
+    
+    # start plot
+    fig, (ax1,ax2) = plt.subplots(1, 2)
+    
+    # positive bottom-up co-selection
+    ax1.scatter(x_buc,y_buc,edgecolors="black",facecolors="none")
+    z = np.polyfit(x_buc, y_buc, 1)
+    p = np.poly1d(z)
+    dx = (max(x_buc) - min(x_buc))/10
+    ax1.plot([min(x_buc)-dx,max(x_buc)+dx],p([min(x_buc)-dx,max(x_buc)+dx]),c="black")
+    
+    ax1.set_ylabel("Q\nCoalesced - Invasive")
+    #ax1.set_xlabel("Frequency of invasive dominant species\nin pairwise competition")
+    ax1.set_xlim(-0.05,1.05)
+    ax1.set_ylim(-0.05,1.05)
+    ax1.set_aspect("equal")
+    ax1.set_xticks([0,0.5,1])
+    ax1.set_yticks([0,0.5,1])
+    
+    # no bottom-up co-selection
+    ax2.scatter(x_nobuc,y_nobuc,edgecolors="black",facecolors="none")
+    z = np.polyfit(x_nobuc, y_nobuc, 1)
+    p = np.poly1d(z)
+    dx = (max(x_nobuc) - min(x_nobuc))/10
+    ax2.plot([min(x_nobuc)-dx,max(x_nobuc)+dx],p([min(x_nobuc)-dx,max(x_nobuc)+dx]),c="black")
+    
+    ax2.set_ylabel("")
+    #ax2.set_xlabel("Frequency of invasive dominant species\nin pairwise competition")
+    ax2.set_xlim(-0.05,1.05)
+    ax2.set_ylim(-0.05,1.05)
+    ax2.set_aspect("equal")
+    ax2.set_xticks([0,0.5,1])
+    ax2.set_yticks([0,0.5,1])
+    
+    # x axis label
+    fig.text(0.5,0.04,"Frequency of invasive dominant species\nin pairwise competition",ha='center')
+    
+    # display plot
+    fig
 
 # make plots
 q_vs_fraction()
 cohort_vs_alone()
+q_vs_fraction_split()
 
 
 

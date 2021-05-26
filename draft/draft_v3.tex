@@ -71,6 +71,8 @@
   }%
 }
 
+\makeatother
+
 % title, authors, affiliations
 \title{Top-down versus bottom-up cohesiveness in microbial community coalescence}
 \author[1 *]{Juan Diaz-Colunga}
@@ -665,11 +667,11 @@ the sub-dominants ($\mathrm{s}_2$ and $\mathrm{s}_4$ respectively) can feed.
 Finally, these sub-dominants secrete an additional resource
 ($\mathrm{R}_3$ and $\mathrm{R}_5$ respectively)
 that can again
-be metabolized by the respective dominants.
+be metabolized by the corresponding dominants.
 This is the simplest structure where both top-down and bottom-up
 cohesiveness can emerge, with their relative strengths being determined
 by how effectively the species can utilize each other's metabolic byproducts.
-Several parameters can modulate the strength and direction of community cohesiveness,
+Several parameters can modulate the intensity and direction of community cohesiveness,
 and even in this simple model there can be complex interactions between them.
 For instance, a sub-dominant that is very efficient at metabolizing the dominant's
 secretions will therefore be a strong producer of secondary byproducts,
@@ -691,6 +693,11 @@ differ from $\mathrm{s}_3$ and $\mathrm{s}_4$ secretions)
 this ensures that coalescence always results in one of the two
 communities taking over and completely excluding the other one,
 which facilitates the interpretation of the model's outcomes.
+This means that
+the relative similarity between the invasive and the coalesced communities
+($Q$, see \methodsref{metrics})
+can only be 0 (if the resident community dominates in coalescence)
+or 1 (if the opposite happens).
 
 With these constraints, the model is specified by four rates:
 the resident dominant's uptake rate of the primary resource ($c_{11}$)
@@ -700,7 +707,7 @@ the invasive dominant's uptake rate of the primary resource ($c_{31}$)
 and of the secondary byproduct secreted by $\mathrm{s}_4$ ($c_{35}$).
 Analogous to what we did for our initial
 experiments and simulations of community coalescence,
-we first stabilized each community separately
+we first stabilized each minimal community separately
 through serial growth-dilution cycles,
 and then mixed them 1:1 and stabilized again until generational
 equilibrium was achieved.
@@ -709,7 +716,7 @@ describe the dynamics of this system between consecutive dilutions
 with the corresponding choices for the parameter values
 (\methodsref{sim-min}).
 We ran simulations for both community-community competitions and
-invasions from the invasive dominant alone.
+invasions from the dominant alone.
 We considered four different scenarios illustrated in \figref[b-e]{fig4}:
 \textit{1)} both communities are cohesive
 from the top-down but not from the bottom-up,
@@ -727,7 +734,7 @@ and \textit{4)} both communities are cohesive
 from the top-down and from the bottom-up.
 The outcomes in each case are discussed below.
 
-\paragraph*{Top-down resident versus top-down invasive.}
+\textbf{Top-down resident versus top-down invasive.}
 This is the simplest scenario.
 When both communities are cohesive strictly from the top-down
 ($c_{13}=0$ and $c_{35}=0$),
@@ -740,26 +747,64 @@ and,
 because the cross-feeding networks of the invasive and resident
 communities are non-overlapping,
 it co-selects its sub-dominant exclusively.
-The relative similarity between the invasive and the coalesced communities
-($Q$, see \methodsref{metrics})
-can only be 0 (if the resident dominant ``wins'' competition for
-$\mathrm{R}_1$) or 1 (if the opposite happens).
 The invasion success of the invasive dominant ($\mathrm{s}_3$) is
 unaffected by the presence or absence of its sub-dominant ($\mathrm{s}_4$)
 since it is not being cross-fed by it.
 Thus, again $\mathrm{s}_3$ is only able to invade alone when it
-outcompetes the resident dominant ($\mathrm{s}_1$) for the primary resource ($c_{11}>c_{31}$).
+outcompetes $\mathrm{s}_1$ for the primary resource ($c_{11}>c_{31}$).
 
-\paragraph*{Bidirectional resident versus top-down invasive.}
-Blablabla...
+\textbf{Bidirectional resident versus top-down invasive.}
+When
+the resident community is cohesive both top-down and bottom-up ($c_{13}>0$)
+and the invasive community is only cohesive from the top-down ($c_{35}=0$),
+coalescence outcomes
+are determined by the strength of bottom-up cohesiveness in the resident community,
+i.e. the magnitude of $c_{13}$ in the minimal model
+(\figref[c]{fig4}).
+If $c_{13}$ is small (weak bottom-up cohesiveness), the system behaves as in the previous scenario,
+virtually as if both communities were only cohesive from the top-down.
+However, as $c_{13}$ increases (strong bottom-up cohesiveness) the resident community becomes more
+resistant to invasion.
+For large values of $c_{13}$, the invasive dominant being more competitive than the resident
+dominant for the primary resource does not ensure invasion success.
+Since the latter can also be cross-fed by its sub-dominant (through $\mathrm{R}_3$),
+it does not rely on the primary resource only ($\mathrm{R}_1$) to outcompete the invader.
+The same is true when the invasive dominant invades alone.
 
-\paragraph*{Top-down resident versus bidirectional invasive.}
-Blablabla...
+\textbf{Top-down resident versus bidirectional invasive.}
+More outcomes become possible if the resident community is cohesive from the top-down only ($c_{13}=0$)
+and the invasive one is cohesive in both directions ($c_{35}>0$).
+Like in the first scenario we considered, the invasive dominant will only be successful by itself if it is a better
+competitor for $\mathrm{R}_1$ than the resident dominant ($c_{31}>c_{11}$).
+However, if the invasive sub-dominant is also present, the invasion can be successful even if $c_{31}<c_{11}$
+as long as the cross-feeding from $\mathrm{s}_4$ (invasive sub-dominant) to $\mathrm{s}_3$ (invasive dominant)
+is strong enough, i.e. if $c_{35}$ sufficiently large
+(\figref[d]{fig4}).
+In this scenario, we can see cases where the invasive dominant cannot invade in isolation but
+the invasive community still dominates during coalescence,
+similar to what we observed in our experiments and initial simulations.
 
-\paragraph*{Bidirectional resident versus bidirectional invasive.}
-Blablabla...
+\textbf{Bidirectional resident versus bidirectional invasive.}
+If both communities are cohesive from the top-down and from the bottom-up ($c_{13}>0$ and $c_{35}>0$),
+coalescence outcomes are generically determined by the relations of strength between
+all forms of cohesiveness.
+In limit cases we can recover scenarios considered previously, e.g. if $c_{13} >> c_{35}$ the system
+behaves as if the resident community was cohesive from the bottom-up but the invasive community was not.
+Situations where the invasive dominant can invade when accompanied by its sub-dominant despite
+being unable to do so by itself are again possible
+if the invasive community is more strongly cohesive from the bottom-up than the resident community
+(\figref[e]{fig4}).
 
-\subsubsection*{Community hierarchy regulates the strength of bottom-up co-selction}
+This minimal coalescence model shows that
+bottom-up co-selection of a dominant that is unable to invade by itself
+is only possible if said dominant is strongly cross-fed by its cohort.
+The model also demonstrates that this behavior can only happen
+if the byproducts of the cohorts are to some extent non-overlapping
+and preferentially utilized by the respective dominants.
+Otherwise, if both species can utilize all secretions, bottom-up
+co-selection becomes unspecific with respect to the dominant identity.
+
+\subsubsection*{Community hierarchy regulates the strength of bottom-up co-selection}
 
 How do the ideas above scale to more complex and diverse communities?
 
@@ -1146,6 +1191,213 @@ to generate significant variability in the secretion fluxes across different spe
 
 \subsubsection*{Minimal model}\label{methods:sim-min}
 
+Our minimal model is set within the same MicroCRM framework that we used
+for the previous simulations.
+As described in the main text, the model contains two communities
+of two species each
+($\mathrm{s}_1$ to $\mathrm{s}_4$),
+with five resources in total, out of which the first one ($\mathrm{R}_1$)
+is replenished externally at the beginning of each growth cycle
+and the rest correspond to the species' metabolic byproducts.
+Each species secretes a unique byproduct, meaning that the metabolic
+matrix $\mathbf{D}$ is binary in this case.
+The specific structure of $\mathbf{D}$ is displayed below
+--because it is a 3-dimensional matrix in our framework,
+we have ``sliced'' it into the five 2-dimensional matrices corresponding to
+our five species.
+
+\begin{equation*}
+\mathbf{D}_1 = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_5$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[l]
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+0 & * & 0 & * & * \\
+1 & * & 0 & * & * \\
+0 & * & 1 & * & * \\
+0 & * & 0 & * & * \\
+0 & * & 0 & * & *
+\end{pmatrix}
+
+\end{matrix}
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+\mathbf{D}_2 = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_5$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[l]
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+* & 0 & * & * & * \\
+* & 0 & * & * & * \\
+* & 1 & * & * & * \\
+* & 0 & * & * & * \\
+* & 0 & * & * & *
+\end{pmatrix}
+
+\end{matrix}
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+\mathbf{D}_3 = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_5$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[l]
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+0 & * & * & * & 0 \\
+0 & * & * & * & 0 \\
+0 & * & * & * & 0 \\
+1 & * & * & * & 0 \\
+0 & * & * & * & 1
+\end{pmatrix}
+
+\end{matrix}
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+\mathbf{D}_4 = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
+\text{\scriptsize $\mathrm{R}_5$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[l]
+\text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
+\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+* & * & * & 0 & * \\
+* & * & * & 0 & * \\
+* & * & * & 0 & * \\
+* & * & * & 0 & * \\
+* & * & * & 1 & *
+\end{pmatrix}
+
+\end{matrix}
+\end{equation*}
+%
+Asterisks indicate values of $D_{i\beta\alpha}$ that are irrelevant because
+species $i$ cannot utilize resource $\alpha$ (and so the metabolic flux from
+$\alpha$ to $\beta$ corresponding to that species will always be zero
+regardless of the value of $D_{i\alpha\beta}$).
+The consumer preference matrix $\mathbf{c}$ takes the following form:
+
+\begin{equation*}
+\mathbf{c} = \; \; \; \; \; \begin{matrix}
+ & 
+
+\begin{matrix}
+\text{\scriptsize $\mathrm{R}_1$} \;\;\; & 
+\text{\scriptsize $\mathrm{R}_2$} \;\;\; & 
+\text{\scriptsize $\mathrm{R}_3$} \;\;\; & 
+\text{\scriptsize $\mathrm{R}_4$} \;\;\; & 
+\text{\scriptsize $\mathrm{R}_5$}
+\end{matrix}
+
+\\ 
+
+\begin{matrix*}[l]
+\text{\scriptsize $\mathrm{s}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{s}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{s}_3$} \!\!\! \\
+\text{\scriptsize $\mathrm{s}_4$} \!\!\!
+\end{matrix*}
+
+& 
+
+\begin{pmatrix}
+c_{11} & 0 & c_{13} & 0 & 0 \\
+0 & 100 & 0 & 0 & 0 \\
+c_{31} & 0 & 0 & 0 & c_{35} \\
+0 & 0 & 0 & 100 & 0
+\end{pmatrix}
+
+\end{matrix}
+\end{equation*}
+%
+Where we made the sub-dominants equally strong consumers of their dominants' secretions
+($c_{22} = c_{44}$ = 100),
+and we varied all other uptake rates depending on the scenario we were considering (see main text).
+Whenever we were interested in the ratio between two rates (e.g. $c_{35}/c_{13}$ in \figref[e]{fig4})
+we gave the one in the denominator a fixed value of 1 and let one in the numerator range
+within the specified limits.
+
 \section*{Data \& code availability}\label{datacode}
 
 Experimental data and code for the analysis, as well as code for the simulations
@@ -1164,27 +1416,10 @@ sponsored jointly by the Research Corporation for Science Advancement and
 the Gordon and Betty Moore Foundation through grants to Yale University by the
 Research Corporation and the Simons Foundation.
 
-
-
-
-
-
-
-
-\clearpage
-
 % references
 \clearpage
 \bibliographystyle{mystyle}
 \bibliography{refs}
-
-
-
-
-
-
-
-
 \clearpage
 
 \section*{Figures}\label{figs}
@@ -1304,7 +1539,7 @@ Right panel: no bottom-up co-selection
 \begin{figure}[!h]
 \centering
 \internallinenumbers
-\includegraphics[scale=0.7,keepaspectratio]{figs/fig4_v2.pdf}
+\includegraphics[scale=0.7,keepaspectratio]{figs/fig4_v3.pdf}
 \caption{\textbf{A minimal model of community coalescence.}
 \textbf{a.} Illustration of the model structure and parameters.
 The primary resource ($\mathrm{R}_1$) is replenished after

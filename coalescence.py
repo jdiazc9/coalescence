@@ -47,8 +47,7 @@ import time
 start_time = time.time()
 
 # get community hierarchies? (this generates a complete data set but takes time)
-getHierarchies = True
-
+getHierarchies = False
 
 
 # %%

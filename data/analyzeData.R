@@ -25,7 +25,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- TRUE
+save_plots <- FALSE
 
 # general options
 deconvolute_ESVs <- FALSE # should species abundance be estimated from ESV abundance?
@@ -1590,13 +1590,6 @@ plot_this$bucs <- plot_this$f_singleinv < 0.1 & plot_this$f_coalescence > 0.05
 plot_this$bucs <- c('neutral','strong')[1 + plot_this$bucs]
 plot_this$bucs <- factor(plot_this$bucs,levels=c('strong','neutral'))
 
-# difference in hierarchies
-plot_this$h_diff = log10(plot_this$h_res/plot_this$h_inv)
-
-# hierarchy distribution
-h_distrib = data.frame(h=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$mids,
-                       freq=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$counts/(2*nrow(plot_this)))
-
 # make plots
 myplots[['q-vs-pairwise_bray-curtis_simul']] <-
   ggplot(data=plot_this[!is.na(plot_this$f_pairwise),],
@@ -1738,6 +1731,52 @@ myplots[['q-vs-pairwise_bray-curtis_simul_top-down-vs-bottom-up_neutral-bucs']] 
         panel.border=element_rect(size=0.25)) +
   coord_fixed()
 
+
+### ----------------------------------------------------------------------
+### SIMULATIONS DATA: HIERARCHY
+### ----------------------------------------------------------------------
+
+# difference in hierarchies
+plot_this$h_diff = log10(plot_this$h_res/plot_this$h_inv)
+
+# hierarchy distribution
+h_distrib = data.frame(h=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$mids,
+                       freq=hist(c(plot_this$h_res,plot_this$h_inv),breaks=20)$counts/(2*nrow(plot_this)))
+
+# hierarchy groups
+n <- vector(mode='list',length=4)
+names(n) <- c('low_low','low_high','high_low','high_high')
+n[[1]] <- which(plot_this$h_res<0.25 & plot_this$h_inv<0.25 & !is.na(plot_this$f_singleinv) & !is.na(plot_this$f_coalescence))
+n[[2]] <- which(plot_this$h_res<0.25 & plot_this$h_inv>0.25 & !is.na(plot_this$f_singleinv) & !is.na(plot_this$f_coalescence))
+n[[3]] <- which(plot_this$h_res>0.25 & plot_this$h_inv<0.25 & !is.na(plot_this$f_singleinv) & !is.na(plot_this$f_coalescence))
+n[[4]] <- which(plot_this$h_res>0.25 & plot_this$h_inv>0.25 & !is.na(plot_this$f_singleinv) & !is.na(plot_this$f_coalescence))
+
+# recurrence of bottom-up co-selection in each group
+bucs <- data.frame(group=names(n),
+                   f=NA,
+                   err_minus=NA,
+                   err_plus=NA)
+
+for (i in 1:4) {
+  
+  # case i
+  p <- plot_this[n[[i]],]
+  
+  # bootstrapping for error bars
+  f_bootstrap <- rep(NA,1000)
+  for (k in 1:1000) {
+    p_k <- p[sample(nrow(p),replace=TRUE),]
+    f_bootstrap[k] <- nrow(p_k[p_k$f_singleinv<0.1 & p_k$f_coalescence>0.05,])/nrow(p_k)
+  }
+  
+  # add to data frame
+  bucs[i,2:4] <- c(nrow(p[p$f_singleinv<0.1 & p$f_coalescence>0.05,])/nrow(p), #median(f_bootstrap),
+                   quantile(f_bootstrap,0.25),
+                   quantile(f_bootstrap,0.75))
+  
+}
+
+# make plots
 myplots[['simul_hierarchy-distribution']] <-
   ggplot(data=h_distrib,
          aes(x=h,y=freq)) +
@@ -1857,6 +1896,62 @@ myplots[['simul_hierarchy-boxplots2']] <-
         legend.position='none') +
   coord_fixed(1)
 
+myplots[['simul_hierarchy-map']] <-
+  ggplot(data=plot_this[!is.na(plot_this$h_diff),],
+         aes(x=h_res,y=h_inv)) +
+  geom_point(size=3,
+             stroke=0.5,
+             shape=1,
+             color='black') +
+  scale_y_continuous(name='Hierarchy of\ninvasive community, hI',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  scale_x_continuous(name='Hierarchy of\nresident community, hR \n ',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed()
+
+myplots[['simul_hierarchy-bucs-recurrence']] <-
+  ggplot(data=bucs,
+         aes(x=group,y=f)) +
+  geom_bar(stat='identity',
+           fill=poly$color[1],
+           width=0.75) +
+  geom_errorbar(aes(ymin=err_minus,ymax=err_plus),
+                width=0) +
+  scale_y_continuous(name='Recurrence of\nbottom-up co-selection',
+                     limits=c(0,0.3),
+                     breaks=c(0,0.15,0.3),
+                     labels=c('0','0.15','0.3')) +
+  scale_x_discrete(name=' \n \n ',
+                   labels=c('High hR High hI',
+                            'High hR Low hI',
+                            'Low hR High hI',
+                            'Low hR Low hI')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        legend.title=element_blank(),
+        legend.position=c(0.2,0.9),
+        legend.background=element_rect(fill='transparent'),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25)) +
+  coord_fixed(4/0.3)
+
 # display and save plots
 if (display_plots) {
   print(myplots[['q-vs-pairwise_bray-curtis_simul']])
@@ -1867,6 +1962,8 @@ if (display_plots) {
   print(myplots[['alone-vs-together_simul_hierarchy']])
   print(myplots[['simul_hierarchy-boxplots1']])
   print(myplots[['simul_hierarchy-boxplots2']])
+  print(myplots[['simul_hierarchy-map']])
+  print(myplots[['simul_hierarchy-bucs-recurrence']])
 }
 if (save_plots) {
   ggsave(file.path('.','plots','q-vs-pairwise_bray-curtis_simul.pdf'),
@@ -1913,6 +2010,18 @@ if (save_plots) {
          units='mm',dpi=600)
   ggsave(file.path('.','plots','simul_hierarchy-boxplots2.pdf'),
          plot=myplots[['simul_hierarchy-boxplots2']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','simul_hierarchy-map.pdf'),
+         plot=myplots[['simul_hierarchy-map']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+  ggsave(file.path('.','plots','simul_hierarchy-bucs-recurrence.pdf'),
+         plot=myplots[['simul_hierarchy-bucs-recurrence']],
          device='pdf',
          height=90,
          width=90,

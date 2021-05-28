@@ -41,7 +41,7 @@ Simulations were carried out using
 New features were added. First, we now give the option for individual species to
 have unique metabolic matrices instead of a shared one. This behavior can be
 controlled by passing a new entry to the dictionary of modeling assumptions
-of the Community Simulator (see the package [README](./community-simulator/README.md) for details):
+of the Community Simulator (see the package [README](./community-simulator/README.md) reproduced here for details):
 ```
 assumptions['metabolism'] = 'common'
 ```
@@ -59,7 +59,7 @@ with the aditional dimension corresponding to the species index.
 We also added a new control parameter (not used in the publication but
 available in the updated package files) that can be passed when
 the user chooses a species-specific metabolic matrix.
-This parameter, that we denote *r<sub>s</sub>*, controls the correlation
+This parameter (that we denote as *r<sub>s</sub>*) controls the correlation
 between a species' resource preference and its secretion fluxes.
 Setting
 ```

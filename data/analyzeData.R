@@ -25,7 +25,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- FALSE
+save_plots <- TRUE
 
 # general options
 deconvolute_ESVs <- FALSE # should species abundance be estimated from ESV abundance?

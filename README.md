@@ -1,4 +1,4 @@
-# community-simulator
+# coalescence
 
 ## Introduction
 This repository contains the raw data files and code for the paper
@@ -76,7 +76,7 @@ species' preference for the resource (*c<sub>i&alpha;</sub>* for species _i_
 preference for resource _&alpha;_).
 Values between 0 and 1 are also accepted for intermediate behaviors.
 
-The updated package files together with the original instructions to install
+The updated package files, together with the original instructions to install
 and operate it are in the ./community-simulator folder in this repository.
 
 ## Minimal model

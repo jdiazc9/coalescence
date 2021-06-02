@@ -676,4 +676,40 @@
   publisher = {Springer Science and Business Media {LLC}},
 }
 
+@Article{MacArthur1970,
+  author    = {Robert MacArthur},
+  journal   = {Theoretical Population Biology},
+  title     = {Species packing and competitive equilibrium for many species},
+  year      = {1970},
+  month     = {may},
+  number    = {1},
+  pages     = {1--11},
+  volume    = {1},
+  doi       = {10.1016/0040-5809(70)90039-0},
+  publisher = {Elsevier {BV}},
+}
+
+@Article{Estrela2021,
+  author    = {Sylvie Estrela and Alicia Sanchez-Gorostiaga and Jean CC Vila and Alvaro Sanchez},
+  journal   = {{eLife}},
+  title     = {Nutrient dominance governs the assembly of microbial communities in mixed nutrient environments},
+  year      = {2021},
+  month     = {apr},
+  volume    = {10},
+  doi       = {10.7554/elife.65948},
+  publisher = {{eLife} Sciences Publications, Ltd},
+}
+
+@Article{Marsland2020b,
+  author    = {Robert Marsland and Wenping Cui and Pankaj Mehta},
+  journal   = {Scientific Reports},
+  title     = {A minimal model for microbial biodiversity can reproduce experimentally observed ecological patterns},
+  year      = {2020},
+  month     = {may},
+  number    = {10},
+  pages     = {3308},
+  doi       = {10.1101/622829},
+  publisher = {Cold Spring Harbor Laboratory},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}

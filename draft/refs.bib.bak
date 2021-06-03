@@ -701,15 +701,14 @@
 }
 
 @Article{Marsland2020b,
-  author    = {Robert Marsland and Wenping Cui and Pankaj Mehta},
-  journal   = {Scientific Reports},
-  title     = {A minimal model for microbial biodiversity can reproduce experimentally observed ecological patterns},
-  year      = {2020},
-  month     = {may},
-  number    = {10},
-  pages     = {3308},
-  doi       = {10.1101/622829},
-  publisher = {Cold Spring Harbor Laboratory},
+  author  = {Robert Marsland and Wenping Cui and Pankaj Mehta},
+  journal = {Scientific Reports},
+  title   = {A minimal model for microbial biodiversity can reproduce experimentally observed ecological patterns},
+  year    = {2020},
+  month   = {may},
+  number  = {10},
+  pages   = {3308},
+  doi     = {10.1101/622829},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}

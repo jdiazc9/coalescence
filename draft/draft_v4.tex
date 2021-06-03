@@ -102,8 +102,6 @@ Washington University in St. Louis, St. Louis, MO, USA}
   
 The abstract goes here.
 
-\textcolor{red}{To do: figSX, re-write minimal model, check literature, check p-values.}
-  
 \end{abstract}
 
 \section*{Introduction}\label{intro}
@@ -113,8 +111,9 @@ This has been observed, for instance,
 in river courses where terrestrial microbes mix with aquatic microorganisms
 \cite{Mansour2018,Luo2020,Vass2021},
 or in soil communities being invaded as a result of
-tillage and outplanting \cite{Rillig2016} or by
-aerially dispersed bacteria and funghi \cite{Evans2019}.
+tillage and outplanting
+\cite{Rillig2016,Ramoneda2020,Rochefort2020}
+or by aerially dispersed bacteria and funghi \cite{Evans2019}.
 Gut microbiomes can invade external communities
 through the host's secretions \cite{Dutton2021},
 and the skin microbiota is also subject to
@@ -129,7 +128,8 @@ Livingston2013,Prior2015,Rillig2015,OLoughlin2017,Castledine2020}.
 However, and
 in spite of its clear potential importance, the role of coalescence in microbiome assembly is
 only beginning to be addressed and little is known about the mechanisms that govern it and its
-potential implications.
+potential implications or applications
+\cite{Rillig2016b}.
 Early mathematical models of community-community invasions \cite{Gilpin1994,Toquenaga1997}
 as well as more recent work
 \cite{Tikhonov2016,Tikhonov2017,Vila2019,Lechon2021}
@@ -366,7 +366,7 @@ Note that $D_{i\beta\alpha}$ need not be equal to $D_{j\beta\alpha}$ if $i \neq 
 
 \bigskip
 \begin{center}
-\includegraphics[width=11cm,keepaspectratio]{figs/figBox_v3.png}
+\includegraphics[width=11cm,keepaspectratio]{figs/figBox_v4.png}
 \end{center}
 \bigskip
 
@@ -396,7 +396,7 @@ l_\beta D_{j\alpha\beta} \frac{w_\beta}{w_\alpha}
 \end{equation}
 %
 These equations can take slightly different forms in certain cases,
-e.g. if the primary resource is supplied continuously instead of at the beggining
+e.g. if the primary resource is supplied continuously instead of at the beginning
 of each growth cycle \cite{Marsland2019,Marsland2020}.
 They represent a good approximation for the community dynamics between consecutive
 serial dilutions in our setup.
@@ -508,24 +508,40 @@ if bottom-up co-selection is weak
 (\figref[e]{fig3}, $R^2=0.07$, $p>0.05$ when bottom-up co-selection is strong;
 $R^2=0.37$, $p<10^{-4}$ when bottom-up co-selection is weak).
 Once the bottom-up communities are removed,
-the glutamine and citrate communities behave very similarly and both have similar degrees of top-down cohesiveness
-(\figref[e]{fig3} right panel,
-$R^2=0.27$ for the glutamine environments, in red; $R^2=0.54$ for the citrate environments, in blue;
-and $R^2=0.37$ when both environments are considered, black line).
+both the glutamine and citrate communities
+display similar degrees of top-down cohesiveness
+(\figref[e]{fig3}, right panel).
 This suggests that the main difference between citrate and glutamine
 is that the latter is richer in communities exhibiting bottom-up cohesiveness than the former.
 
 \subsubsection*{Understanding the mechanisms of ecological co-selection: a minimal model of community coalescence}
 
-To better understand the underlying mechanisms that govern
-the emergence of ecological co-selection in our experiments,
-we found it useful to study a minimal model of community coalescence
+In view of the success of our model in reproducing the
+experimentally observed trends in ecological co-selection,
+we set out to better understand the mechanisms for its emergence.
+In our experimental conditions and in the MicroCRM,
+comunities are sustained by dense cross-feeding facilitation networks.
+These networks can have a very vertical direction if
+a single species (the dominant) cross-feeds
+the rarer members of the community
+but these do not cross feed the dominant in return.
+Alternatively, if the dominant is strongly cross-fed by its cohort
+the network structure would be more horizontal.
+In the latter scenario, positive bottom-up co-selection of a dominant
+can take place if
+cross-feeding from its cohort allow it
+to persist in the final community after coalescence
+--even if it cannot invade succesfully in isolation.
+
+We found it useful to study a minimal model of community coalescence
+to test these ideas
 (\methodsref{sim-min}).
-This model is comprised of two communities with two species each
+This model is comprised of two communities
+(resident and invasive)
+with only two species each
 as illustrated in \figref[a]{fig4}.
 Within each community, the dominant species
-($\mathrm{S}_1$ and $\mathrm{s}_1$ in the resident and invasive communities
-respectively)
+($\mathrm{S}_1$ and $\mathrm{s}_1$ respectively)
 are able to utilize the single externally supplied resource ($\mathrm{R}_1$).
 They secrete a single byproduct
 ($\mathrm{R}_2$ and $\mathrm{r}_2$ respectively)
@@ -535,13 +551,17 @@ Finally, these sub-dominants secrete an additional resource
 ($\mathrm{R}_3$ and $\mathrm{r}_3$ respectively)
 that can in turn
 be metabolized by the corresponding dominants.
-With this structure, community members interact via simple cross-feeding networks that can be
-very vertical if the dominant cross-feeds the sub-dominant but the sub-dominant does not cross-feed
-the dominant (i.e. if the dominant cannot utilize the sub-dominant's secretions),
-or more horizontal (bidirectional) if the cohort also cross-feeds the dominant.
-We hypothesize that when two such communities coalesce,
-bottom-up ecological co-selection can emerge if the invasive community is
-sustained by a bidirectional cross-feeding network.
+The dominants' ability to utilize their sub-dominants' metabolic
+byproducts determines whether the structure of the cross-feeding
+networks of these minimal communities is vertical
+(if the dominants cannot utilize the cohort secretions
+and thus are not cross-fed by them)
+or horizontal
+(in the opposite scenario).
+The model parameters controlling how effectively the dominants
+can metabolize said byproducts modulate the direction of the
+cross-feeding networks
+(\figref[a]{fig4}).
 
 In the limit case when the cross-feeding networks of both the invasive and resident communities
 are strictly vertical (that is, the sub-dominants are passively sustained by the dominants
@@ -555,7 +575,7 @@ If the resident community is maintained by a more horizontal cross-feeding netwo
 it can display further resistance to invasion.
 In this scenario, even if the resident dominant is less competitive for the externally supplied resource
 than the invasive dominant,
-cross-feeding from the resident cohort can favor its success in coalescence.
+cross-feeding from the resident cohort can allow it to persist in coalescence.
 The stronger the metabolic flux from the resident cohort towards the dominant,
 the more prominent this effect can be
 (\figref[c]{fig4}).
@@ -576,12 +596,12 @@ may have in isolation.
 
 In summary, coalescence outcomes are contingent on the direction of the
 cross-feeding networks sustaining the communities in this simple setting.
-We ran simulations of all scenarios described above with the minimal model of community coalescence
+We ran simulations of all scenarios described above with our minimal model of community coalescence
 implemented in the MicroCRM framework
 (\methodsref{sim-min}).
-In line with our hypothesis, simulations indicate that
+In line with our initial proposition, simulations indicate that
 bottom-up co-selection of a dominant that is unable to invade by itself
-is only possible if said dominant is strongly cross-fed by its cohort
+is possible if said dominant is strongly cross-fed by its cohort
 (\figref{fig4}).
 
 \subsubsection*{Community hierarchy regulates the strength of bottom-up co-selection}
@@ -650,9 +670,9 @@ and $\Delta N_{\mathrm{dom}}^{\mathrm{R1}}$
 represents the increase in said biomass resulting from the metabolism of the primary resource
 ($\mathrm{R}_1$) only.
 If the dominant was just utilizing the primary resource, the cross-feeding network would be very
-hierarchical ($h \sim 1$),
+vertical ($h \sim 1$),
 whereas if it was growing mostly on the secretions of other taxa,
-it would be more distributed ($h << 1$).
+it would be more horizontal ($h << 1$).
 We quantified the hierarchies of the resident and invasive communities in our MicroCRM,
 finding that $h$ follows a bimodal distribution (\figref[a]{fig5}).
 We therefore divided our simulations into four groups according to
@@ -1434,6 +1454,40 @@ $D_{i\beta\alpha}=D_{j\beta\alpha}$ for all $i$, $j$, $\alpha$ and $\beta$,
 see \hyperref[box1]{Box~1}).
 Virtually no bottom-up co-selection is observed in either case.}
 \label{figS4}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+\centering
+\internallinenumbers
+\includegraphics[scale=0.9,keepaspectratio]{figs/figS4.pdf}
+\caption{\textbf{Top-down co-selection is robust in the MicroCRM.}
+We ran simulations of community coalescence following the same
+procedure described in the main text, but randomly sampling the
+following prameters of the MicroCRM
+uniformly within the indicated ranges:
+number of species per community sampled at initialization ($S$) between 10 and 90;
+total number of species families between 1 and 5;
+total number of species per family ($S_A$) between 400 and 1200;
+total number of generalist species ($S_{gen}$) between 100 and 380;
+specialist species preference strength ($q$) between 0.5 and 1;
+number of resource classes between 1 and 5;
+number of resources per class ($M_A$) between 3 and 17;
+leakage fraction ($l_{\alpha}$) between 0.45 and 0.95;
+maintenance cost ($m_i$) between 0 and 0.2;
+standard deviation of the sum of consumption rates ($\sigma_c$) between 2 and 4;
+sparsity of the metabolic matrix between 0.05 and 0.95;
+fraction of secretion flux to resources of the same type ($f_s$) or to waste resources ($f_w$) between 0.05 and 0.45.
+The metabolic matrix was randomly chosen to be such that $D_{i\beta\alpha}=D_{j\beta\alpha}$ or such that
+$D_{i\beta\alpha} \neq D_{j\beta\alpha}$ for all species ($i$, $j$) and resources ($\alpha$, $\beta$).
+Both options were given equal probabilities.
+For each randomly sampled set of parameters, we ran 100 simulations
+and quantified the ability of the pairwise competition
+of dominants to predict coalescence outcomes (see \figref[a]{fig2}), i.e. the strength of top-down co-selection
+in each regime.
+The histogram shows that top-down co-selection is robust throughout the parameter space in the MicroCRM.}
+\label{figSX}
 \end{figure}
 
 \clearpage

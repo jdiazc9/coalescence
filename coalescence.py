@@ -36,13 +36,6 @@ if os.name == 'nt':
 else:
     par = True
 
-'''
-# set random and numpy's seed for reproducibility
-myseed = 1000000 # 99
-np.random.seed(myseed)
-random.seed(myseed)
-'''
-
 import time
 start_time = time.time()
 

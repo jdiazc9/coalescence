@@ -40,6 +40,9 @@ else:
 import time
 start_time = time.time()
 
+np.random.seed(1)
+random.seed(1)
+
 
 
 # %%
@@ -127,7 +130,7 @@ for n_sim in range(100):
     assumptions['SA'] = [n_species_per_family] * n_families
     assumptions['Sgen'] = random.randint(100,380) # number of generalists -- uniformly distributed between 100 and 380
     
-    n_resource_classes = random.randint(2,5) # number of resource classes -- uniformly distributed between 1 and 5
+    n_resource_classes = random.randint(3,8) # number of resource classes -- uniformly distributed between 1 and 5
     n_resources_per_class = random.randint(3,17) # number of resources per class -- uniformly distributed between 3 and 17
     assumptions['MA'] = [n_resources_per_class] * n_resource_classes
     

@@ -101,6 +101,8 @@ Washington University in St. Louis, St. Louis, MO, USA}
 \begin{abstract}
   
 The abstract goes here.
+
+\textcolor{red}{To do: figSX, re-write minimal model, check literature, check p-values.}
   
 \end{abstract}
 
@@ -108,8 +110,8 @@ The abstract goes here.
 
 Microbial communities often invade one another.
 This has been observed, for instance, 
-in river courses where terrestrial microbes mix with aquatic microorganisms,
-\cite{Mansour2018,Luo2020,Vass2021}
+in river courses where terrestrial microbes mix with aquatic microorganisms
+\cite{Mansour2018,Luo2020,Vass2021},
 or in soil communities being invaded as a result of
 tillage and outplanting \cite{Rillig2016} or by
 aerially dispersed bacteria and funghi \cite{Evans2019}.
@@ -150,7 +152,7 @@ off the metabolic secretions of the dominant species \cite{Rosenzweig1994,Goldfo
 The fate of these sub-dominant taxa may be dependent on the invasion success of their dominant
 species, or, alternatively, the dominant itself may owe its dominance (at least in part) to cross-feeding
 or other forms of facilitation from the rarer members of the population.
-We refer to these two opposite scenarios as
+We refer to these two opposite scenarios as the
 ``top-down'' or ``bottom-up'' forms of community cohesiveness, respectively.
 Top-down cohesiveness emerges when the dominant invader co-selects other sub-dominant taxa
 into the final community during coalescence.
@@ -522,15 +524,15 @@ we found it useful to study a minimal model of community coalescence
 This model is comprised of two communities with two species each
 as illustrated in \figref[a]{fig4}.
 Within each community, the dominant species
-($\mathrm{s}_1$ and $\mathrm{s}_3$ in the resident and invasive communities
+($\mathrm{S}_1$ and $\mathrm{s}_1$ in the resident and invasive communities
 respectively)
 are able to utilize the single externally supplied resource ($\mathrm{R}_1$).
 They secrete a single byproduct
-($\mathrm{R}_2$ and $\mathrm{R}_4$ respectively)
+($\mathrm{R}_2$ and $\mathrm{r}_2$ respectively)
 off which
-the sub-dominants ($\mathrm{s}_2$ and $\mathrm{s}_4$ respectively) can feed.
+the sub-dominants ($\mathrm{S}_2$ and $\mathrm{s}_2$ respectively) can feed.
 Finally, these sub-dominants secrete an additional resource
-($\mathrm{R}_3$ and $\mathrm{R}_5$ respectively)
+($\mathrm{R}_3$ and $\mathrm{r}_3$ respectively)
 that can in turn
 be metabolized by the corresponding dominants.
 With this structure, community members interact via simple cross-feeding networks that can be
@@ -691,19 +693,20 @@ The model predicts a trade-off between the strength of bottom-up co-selection
 and the ability of dominant-dominant pairwise competition to dictate coalescence outcomes,
 which we have confirmed experimentally.
 It also suggests that rarer taxa may play a more prominent role in co-selecting
-dominant species when the metabolic fluxes across the community are
-distributed rather than hierarchical.
-These observations,
+dominant species when the cross-feeding interactions across community members are
+horizontal rather than hierarchical.
+Testing this theoretical prediction would require to map the cross-feeding networks of all of our communities.
+Keeping track of every molecule secreted by every species in co-culture and by which species they are uptaken
+is still a low throughput process that is both labor intensive and expensive.
+Recent progress in metabolomic tools promise to help us test this hypothesis in future work.
+Our findings,
 together with previous results in different systems \cite{Sierocinski2017} as well as
 theoretical predictions
 \cite{Gilpin1994,Toquenaga1997,Tikhonov2016,Tikhonov2017,Vila2019,Lechon2021},
 suggest that collective interactions of microbes with one another
 and with the environment should be generically expected to produce ecological co-selection
 during community coalescence.
-Testing this theoretical prediction would require to map the cross-feeding networks of all of our communities.
-Keeping track of every molecule secreted by every species in co-culture and by which species they are uptaken
-is still a low throughput process that is both labor intensive and expensive.
-Recent progress in metabolomic tools promise to help us test this hypothesis in future work.
+
 
 \iffalse
 Additional work will be necessary to further clarify the relationship between
@@ -966,7 +969,8 @@ Our minimal model is set within the same MicroCRM framework that we used
 for the previous simulations.
 As described in the main text, the model contains two communities
 of two species each
-($\mathrm{s}_1$ to $\mathrm{s}_4$),
+($\mathrm{S}_1$ and $\mathrm{S}_2$ in the resident community,
+$\mathrm{s}_1$ and $\mathrm{s}_2$ in the invasive community),
 with five resources in total, out of which the first one ($\mathrm{R}_1$)
 is replenished externally at the beginning of each growth cycle
 and the rest correspond to the species' metabolic byproducts.
@@ -985,8 +989,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_5$}
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{r}_3$}
 \end{matrix}
 
 \\ 
@@ -995,8 +999,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{r}_3$} \!\!\!
 \end{matrix*}
 
 & 
@@ -1022,8 +1026,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_5$}
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{r}_3$}
 \end{matrix}
 
 \\ 
@@ -1032,8 +1036,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{r}_3$} \!\!\!
 \end{matrix*}
 
 & 
@@ -1059,8 +1063,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_5$}
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{r}_3$}
 \end{matrix}
 
 \\ 
@@ -1069,8 +1073,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{r}_3$} \!\!\!
 \end{matrix*}
 
 & 
@@ -1096,8 +1100,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! & 
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! & 
-\text{\scriptsize $\mathrm{R}_5$}
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! & 
+\text{\scriptsize $\mathrm{r}_3$}
 \end{matrix}
 
 \\ 
@@ -1106,8 +1110,8 @@ our four species.
 \text{\scriptsize $\mathrm{R}_1$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_2$} \!\!\! \\
 \text{\scriptsize $\mathrm{R}_3$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_4$} \!\!\! \\
-\text{\scriptsize $\mathrm{R}_5$} \!\!\!
+\text{\scriptsize $\mathrm{r}_2$} \!\!\! \\
+\text{\scriptsize $\mathrm{r}_3$} \!\!\!
 \end{matrix*}
 
 & 
@@ -1137,25 +1141,25 @@ The consumer preference matrix $\mathbf{c}$ takes the following form:
 \text{\scriptsize $\mathrm{R}_1$} \;\;\; & 
 \text{\scriptsize $\mathrm{R}_2$} \;\;\; & 
 \text{\scriptsize $\mathrm{R}_3$} \;\;\; & 
-\text{\scriptsize $\mathrm{R}_4$} \;\;\; & 
-\text{\scriptsize $\mathrm{R}_5$}
+\text{\scriptsize $\mathrm{r}_2$} \;\;\; & 
+\text{\scriptsize $\mathrm{r}_3$}
 \end{matrix}
 
 \\ 
 
 \begin{matrix*}[l]
+\text{\scriptsize $\mathrm{S}_1$} \!\!\! \\
+\text{\scriptsize $\mathrm{S}_2$} \!\!\! \\
 \text{\scriptsize $\mathrm{s}_1$} \!\!\! \\
-\text{\scriptsize $\mathrm{s}_2$} \!\!\! \\
-\text{\scriptsize $\mathrm{s}_3$} \!\!\! \\
-\text{\scriptsize $\mathrm{s}_4$} \!\!\!
+\text{\scriptsize $\mathrm{s}_2$} \!\!\!
 \end{matrix*}
 
 & 
 
 \begin{pmatrix}
-c_{11} & 0 & c_{13} & 0 & 0 \\
+C_{11} & 0 & C_{13} & 0 & 0 \\
 0 & 100 & 0 & 0 & 0 \\
-c_{31} & 0 & 0 & 0 & c_{35} \\
+c_{11} & 0 & 0 & 0 & c_{13} \\
 0 & 0 & 0 & 100 & 0
 \end{pmatrix}
 
@@ -1163,9 +1167,9 @@ c_{31} & 0 & 0 & 0 & c_{35} \\
 \end{equation*}
 %
 Where we made the sub-dominants equally strong consumers of their dominants' secretions
-($c_{22} = c_{44}$ = 100),
+($C_{22} = c_{22}$ = 100),
 and we varied all other uptake rates depending on the scenario we were considering (see main text).
-Whenever we were interested in the ratio between two rates (e.g. $c_{35}/c_{13}$ in \figref[e]{fig4})
+Whenever we were interested in the ratio between two rates (e.g. $c_{13}/C_{13}$ in \figref[e]{fig4})
 we gave the one in the denominator a fixed value of 1 and let one in the numerator range
 within the specified limits.
 
@@ -1299,7 +1303,7 @@ Right panel: no bottom-up co-selection
 \begin{figure}[!h]
 \centering
 \internallinenumbers
-\includegraphics[scale=0.7,keepaspectratio]{figs/fig4_v3.pdf}
+\includegraphics[scale=0.7,keepaspectratio]{figs/fig4_v4.pdf}
 \caption{\textbf{A minimal model of community coalescence.}
 \textbf{a.} Illustration of the model structure and parameters.
 The primary resource ($\mathrm{R}_1$) is replenished after

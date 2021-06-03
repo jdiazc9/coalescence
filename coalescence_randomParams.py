@@ -98,7 +98,7 @@ def mysim(p,q,pq):
 r_squared = ['NA' for i in range(100)]
 
 # repeat simulation 100 times
-for n_sim in range(1):
+for n_sim in range(100):
     
     # print progress
     print('Running simulation %s out of 100' % (n_sim+1))
@@ -106,7 +106,7 @@ for n_sim in range(1):
     
     # general assumptions (common to all simulations)
     assumptions = community_simulator.usertools.a_default.copy()
-    assumptions['n_wells'] = 100 # number of communities
+    assumptions['n_wells'] = 50 # number of communities
     
     assumptions['response'] = 'type I'
     assumptions['regulation'] = 'independent' # 'independent' is standard, 'energy' or 'mass' enable preferential consumption of resources
@@ -142,7 +142,8 @@ for n_sim in range(1):
     assumptions['sparsity'] = random.uniform(0.05,0.95) # variability in secretion fluxes among resources (must be less than 1) -- uniformly distributed between 0.05 and 0.95
     assumptions['fs'] = random.uniform(0.05,0.45) # fraction of secretion flux to resources of the same type as the consumed one -- uniformly distributed between 0.05 and 0.45
     assumptions['fw'] = random.uniform(0.05,0.45) # fraction of secretion flux to waste resources -- uniformly distributed between 0.05 and 0.45
-    assumptions['metabolism'] = ['common','specific'][random.randint(0,1)] # common or species-specific D matrix -- chosen arbitrarily with equal probabilities
+    #assumptions['metabolism'] = ['common','specific'][random.randint(0,1)] # common or species-specific D matrix -- chosen arbitrarily with equal probabilities
+    assumptions['metabolism'] = 'common'
     
     # parameters (make new matrices, etc)
     params = community_simulator.usertools.MakeParams(assumptions)

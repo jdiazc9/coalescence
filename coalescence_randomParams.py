@@ -127,7 +127,7 @@ for n_sim in range(100):
     assumptions['SA'] = [n_species_per_family] * n_families
     assumptions['Sgen'] = random.randint(100,380) # number of generalists -- uniformly distributed between 100 and 380
     
-    n_resource_classes = random.randint(1,5) # number of resource classes -- uniformly distributed between 1 and 5
+    n_resource_classes = random.randint(2,5) # number of resource classes -- uniformly distributed between 1 and 5
     n_resources_per_class = random.randint(3,17) # number of resources per class -- uniformly distributed between 3 and 17
     assumptions['MA'] = [n_resources_per_class] * n_resource_classes
     
@@ -142,8 +142,7 @@ for n_sim in range(100):
     assumptions['sparsity'] = random.uniform(0.05,0.95) # variability in secretion fluxes among resources (must be less than 1) -- uniformly distributed between 0.05 and 0.95
     assumptions['fs'] = random.uniform(0.05,0.45) # fraction of secretion flux to resources of the same type as the consumed one -- uniformly distributed between 0.05 and 0.45
     assumptions['fw'] = random.uniform(0.05,0.45) # fraction of secretion flux to waste resources -- uniformly distributed between 0.05 and 0.45
-    #assumptions['metabolism'] = ['common','specific'][random.randint(0,1)] # common or species-specific D matrix -- chosen arbitrarily with equal probabilities
-    assumptions['metabolism'] = 'common'
+    assumptions['metabolism'] = ['common','specific'][random.randint(0,1)] # common or species-specific D matrix -- chosen arbitrarily with equal probabilities
     
     # parameters (make new matrices, etc)
     params = community_simulator.usertools.MakeParams(assumptions)

@@ -25,7 +25,7 @@ library(RColorBrewer)
 myplots <- vector(mode='list')
 if(!dir.exists('plots')) dir.create('plots')
 display_plots <- TRUE
-save_plots <- TRUE
+save_plots <- FALSE
 
 # general options
 deconvolute_ESVs <- FALSE # should species abundance be estimated from ESV abundance?
@@ -2033,8 +2033,8 @@ if (save_plots) {
 ### SIMULATIONS DATA: ROBUSTNESS OF TOP-DOWN CO-SELECTION
 ### ----------------------------------------------------------------------
 
-r_squared <- rnorm(100,mean=0.6,sd=0.15)
-r_squared <- r_squared[!is.nan(r_squared) & r_squared<1 & r_squared>0]
+r_squared <- read.table('r_squared.txt')[,1]
+r_squared <- r_squared[!is.nan(r_squared)]
 
 r_distrib = data.frame(r=hist(r_squared,breaks=20)$mids,
                        freq=hist(r_squared,breaks=20)$counts/length(r_squared))

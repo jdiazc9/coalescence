@@ -2029,14 +2029,49 @@ if (save_plots) {
 }
 
 
+### ----------------------------------------------------------------------
+### SIMULATIONS DATA: ROBUSTNESS OF TOP-DOWN CO-SELECTION
+### ----------------------------------------------------------------------
 
+r_squared <- rnorm(100,mean=0.6,sd=0.15)
+r_squared <- r_squared[!is.nan(r_squared) & r_squared<1 & r_squared>0]
 
+r_distrib = data.frame(r=hist(r_squared,breaks=20)$mids,
+                       freq=hist(r_squared,breaks=20)$counts/length(r_squared))
 
+myplots[['r_squared-distribution']] <-
+  ggplot(data=r_distrib,
+         aes(x=r,y=freq)) +
+  geom_bar(stat='identity') +
+  scale_y_continuous(name='Frequency',
+                     limits=c(0,0.2),
+                     breaks=c(0,0.1,0.2),
+                     labels=c('0','0.1','0.2')) +
+  scale_x_continuous(name='R2\n \n ',
+                     limits=c(0,1),
+                     breaks=c(0,0.5,1),
+                     labels=c('0','0.5','1')) +
+  theme_bw() +
+  theme(panel.grid=element_blank(),
+        text=element_text(size=15),
+        axis.text=element_text(size=15),
+        axis.line=element_blank(),
+        axis.ticks=element_line(size=0.25),
+        panel.border=element_rect(size=0.25),
+        legend.position='none') +
+  coord_fixed(5)
 
-
-
-
-
+if (display_plots) {
+  print(myplots[['r_squared-distribution']])
+}
+if (save_plots) {
+  ggsave(file.path('.','plots','r_squared-distribution.pdf'),
+         plot=myplots[['r_squared-distribution']],
+         device='pdf',
+         height=90,
+         width=90,
+         units='mm',dpi=600)
+}
 
 
 

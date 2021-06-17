@@ -83,14 +83,20 @@ def bray_curtis(p,q):
 # pq: coalesced
 def mysim(p,q,pq):
     
-    # normalization
-    p = [p_i/sum(p) for p_i in p]
-    q = [q_i/sum(q) for q_i in q]
-    pq = [pq_i/sum(pq) for pq_i in pq]
+    # if any of the vectors is empty, return nan (this could happen e.g. if maintenance costs are too high)
+    if sum(p)==0 or sum(q)==0 or sum(pq)==0:
+        return np.nan
     
-    sim = bray_curtis(p,pq)/(bray_curtis(p,pq) + bray_curtis(q, pq))
-                                                  
-    return sim
+    # otherwise...
+    else:
+    
+        # normalization
+        p = [p_i/sum(p) for p_i in p]
+        q = [q_i/sum(q) for q_i in q]
+        pq = [pq_i/sum(pq) for pq_i in pq]
+        
+        # relative similarity
+        return bray_curtis(p,pq)/(bray_curtis(p,pq) + bray_curtis(q, pq))
 
 
 

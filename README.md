@@ -4,7 +4,7 @@
 This repository contains the raw data files and code for the paper
 
 Juan Diaz-Colunga, Nanxi Lu, Alicia Sanchez-Gorostiaga, Chang-Yu Chang, Helen S. Cai, Joshua E. Goldford,
-Mikhail Tikhonov and Alvaro Sanchez (2021). Top-down and bottom-up cohesiveness in microbial community coalescence. *bioRxiv*:XXXXXX. 
+Mikhail Tikhonov and Alvaro Sanchez (2021). Top-down and bottom-up cohesiveness in microbial community coalescence. *PNAS* **119(6)**:e2111261119. [doi.org/10.1073/pnas.2111261119](https://doi.org/10.1073/pnas.2111261119)
 
 The code includes R files to analyze the data and generate plots, as well as python scripts to run the simulations.
 This repository also includes an updated version of [the Community Simulator package](https://github.com/Emergent-Behaviors-in-Biology/community-simulator)
